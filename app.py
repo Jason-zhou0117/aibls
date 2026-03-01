@@ -68,6 +68,7 @@ def register_log(app: Flask):
     app.logger.addHandler(file_handler)
 
 
+
 #初始化APP
 app= create_app()
 socketio.init_app(app, cors_allowed_origins="*",async_mode='eventlet'  )
