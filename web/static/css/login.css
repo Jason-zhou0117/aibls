@@ -1,0 +1,141 @@
+/* 清除内、外间距 */
+* {
+    margin: 0;
+    padding: 0;
+}
+
+/* 去除a标签的下划线 */
+a {
+    text-decoration: none;
+}
+
+/* 去除li标签的序列符号（小黑点） */
+li {
+    list-style: none;
+}
+.limsg{
+    color:red;
+    height:1.2rem;
+}
+
+body {
+    background-color:#F2F2F2;;
+}
+
+.box {
+    /* 分布式布局 */
+    display: flex;
+    justify-content: center;
+}
+
+/* 登录、注册外div共同样式 */
+.login,
+.register {
+    width: 20rem;
+    height: 30.5rem;
+    background-color: white;
+    border-radius: 0.5rem;
+    margin: 1.25rem;
+}
+
+/* 登录、注册顶部div共同样式 */
+.login_top,
+.register_top {
+    width: 20rem;
+    height: 12rem;
+    color: white;
+    border-radius: 0.5rem 0.5rem 0 0;
+    text-align: center;
+}
+
+.login_top {
+    background: #2dbce8;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login_top img {
+    width: 5.5rem;
+    height: 5.5rem;
+    margin-top: 2rem;
+}
+
+.login_bottom,
+.register_bottom {
+    text-align: center;
+}
+
+/* 登录、注册表单共同样式 */
+.login_bottom .input,
+.register_bottom .input {
+    width: 17.5rem;
+    height: 2.5rem;
+    margin-top: 1rem;
+    padding-left: 0.6rem;
+    border-radius: 0.6rem;
+    border: 0.1rem solid silver;
+    /* 去除表单点击后出现的边框 */
+    outline: none;
+    color: reb(107, 107, 107);
+}
+
+.login_bottom p {
+    font-size: 0.8rem;
+    margin-top: 1rem;
+}
+
+/* 使复选框与后面文字水平对齐 */
+.login_bottom p input {
+    vertical-align: middle;
+    /* vertical 垂直的  middle 中间 */
+}
+
+.login_bottom p span {
+    margin-right: 0.5rem;
+    color: #757575;
+}
+
+.login_bottom p a {
+    color: #214c52;
+}
+
+.register_bottom p {
+    font-size: 0.8rem;
+    margin-top: 1rem;
+}
+
+.register_bottom p span {
+    margin-right: 0.5rem;
+    color: #757575;
+}
+
+.register_bottom p a {
+    color: #214c52;
+}
+
+/* 登录、注册按钮共同样式 */
+.login_bottom button,
+.register_bottom button {
+    width: 18rem;
+    height: 2.8rem;
+    color: white;
+    margin-top: 2rem;
+    border-radius: 0.6rem;
+    border: none;
+}
+
+.login_bottom button {
+    background: #ff679a;
+    margin-top: 3.6rem;
+}
+
+.register_bottom button {
+    background: #ff679a;
+}
+
+/* 鼠标滑过按钮出现阴影效果 */
+.login_bottom button:hover,
+.register_bottom button:hover {
+    box-shadow: 0.2rem 0.2rem 0 rgba(0, 0, 0, 0.3);
+}

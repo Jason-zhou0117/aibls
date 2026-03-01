@@ -1,0 +1,122 @@
+html,body{
+    height: 100%;
+}
+
+body{
+    display: flex;
+    flex-direction: column;
+    background-color:#F2F2F2;
+}
+
+header{
+
+}
+.header{
+    height: 5rem;
+    width:100%;
+    position: fixed;
+    top: 0;
+    z-index: 1000;
+}
+.spaceheader{
+    height: 5rem;
+    width:100%;
+}
+.header_top{
+    height: 2.5rem;
+    background-color: #2dbce8;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-bottom: 1px solid #bfbfbf;
+}
+
+.head_user_pic img{
+    width:1.6rem;
+    height:1.6rem;
+    border-radius:50%;
+    overflow: hidden;
+}
+.head_user_txt{
+    padding-left:0.2rem;
+    color: #ffffff;
+    text-decoration:underline;
+}
+
+.nav_title{
+    height:2rem;
+    font-size:0.8rem;
+    background-color: white;
+    border-bottom:1px solid #bfbfbf;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-left:0.5rem;
+    padding-right:0.5rem;
+}
+.nav_title img{
+    height:1.2rem;
+    width:1.2rem;
+}
+.spacefooter{
+    height: 3rem;
+    width:100%;
+}
+.footer {
+    width: 100%;
+    height: 3rem;
+    position: fixed;
+    bottom:0;
+    left:0;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    right:0;
+    z-index: 1000;
+}
+
+.mask_hidden {
+  display: none; /* 初始时隐藏遮罩 */
+  position: fixed; /* 固定定位 */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* 半透明黑色 */
+  z-index: 2000; /* 确保遮罩在内容之上 */
+}
+
+.mask_show {
+  display: flex; /* 初始时隐藏遮罩 */
+  align-items: center;
+  justify-content: center;
+  position: fixed; /* 固定定位 */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* 半透明黑色 */
+  z-index: 2000; /* 确保遮罩在内容之上 */
+}
+
+.maskcontent{
+    width:100%;
+    height:8rem;
+    background-color:#242424;
+    display: flex;
+    align-items: center;
+    justify-content: flex-center;
+}
+.maskcontent img{
+    width:8rem;
+    height:4.5rem;
+}
+.masktext{
+    height:4.5rem;
+    display: flex; /* 初始时隐藏遮罩 */
+    align-items: center;
+}
+.masktext span{
+    color:white;
+    font-size:1rem;
+}

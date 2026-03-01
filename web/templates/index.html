@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="referrer" content="no-referrer" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bili批量处理系统</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/reset.css') }}" type="text/css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/head.css') }}" type="text/css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/roomlist.css') }}" type="text/css">
+    <script src="{{ url_for('static', filename='js/head.js') }}" ></script>
+    <script src="{{ url_for('static', filename='js/roomhelper.js') }}" ></script>
+</head>
+<body>
+    <header>
+        <div class="header">
+            <div class="header_top">
+                <span class="head_user_pic">
+                    <img src="{{user_face}}" alt="头像"/>
+                </span>
+                <span class="head_user_txt" onclick="javascript:gotosetting();">
+                    {{nick_name}}
+                </span>
+            </div>
+            <div class="nav_title">
+                <span>
+                    <img src="{{ url_for('static', filename='images/btn_home.png') }}" alt="返回主页" onclick="javascript:headJs.goHome()"/>
+                </span>
+                <span>房间列表</span>
+            </div>
+        </div>
+    </header>
+    <section>
+        <div class="spaceheader"></div>
+        <div class="roomform">
+                <input type="text" class="inputfilter" id="room_id" name="room_id" placeholder="请输入房间号" onkeyup="javascript:roomJs.onFilterKeyPress(event);" />
+                 <img src="{{ url_for('static', filename='images/btn_goto.png') }}" alt="同步"  onclick="javascript:roomJs.doNewRoom();"/>
+                <span id="msg_txt" class="msgtxt"></span>
+        </div>
+        <div class="roomcontainer" id="divrooms">
+        {% for room in rooms %}
+        <div class="roominfo" data-roomid="{{room.room_id}}" data-index="{{loop.index}}">
+           <img class="cover" src="{{room.room_cover}}"  alt="封面"/>
+           <div class="roomcontents">
+               <p class="room_title">{{room.room_name}}</p>
+               <p class="roomidp">房号:{{room.room_id}}</p>
+               <p class="upuserp">UP:{{room.room_user_name}}</p>
+           </div>
+           <div class="buttons">
+               {% if room.is_favorites == 'Y' %}
+               <img class="fav_button" data-roomid="{{room.room_id}}" data-hasfav="{{room.is_favorites}}" src="{{ url_for('static', filename='images/btn_fav.png') }}" alt="收藏" onclick="javascript:roomJs.onFav(event)"/>
+               {% else %}
+               <img class="fav_button"  data-roomid="{{room.room_id}}" data-hasfav="{{room.is_favorites}}"  src="{{ url_for('static', filename='images/btn_unfav.png') }}" alt="收藏" onclick="javascript:roomJs.onFav(event)"/>
+               {% endif %}
+               <img class="send_button" src="{{ url_for('static', filename='images/btn_send.png') }}" alt="投递" data-roomid="{{room.room_id}}"  onclick="javascript:roomJs.goSend(event)"/>
+           </div>
+        </div>
+        {% endfor %}
+        </div>
+        <div class="spacefooter"></div>
+    </section>
+</body>
+</html>

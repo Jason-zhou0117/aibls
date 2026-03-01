@@ -1,0 +1,210 @@
+section>.newroomtop{
+    margin-bottom:0.5rem;
+}
+.roominfo{
+    height:6rem;
+    width:100%;
+    display:flex;
+    align-items: center;
+    margin-top:0.1rem;
+    justify-content: space-between;
+    background-color: white;
+    border-bottom:1px solid #bfbfbf;
+}
+.roominfo .cover{
+    width:9rem;
+    margin-left:0.5rem;
+    border-radius:0.5rem;
+}
+.roominfo .roomcontents{
+    width:12rem;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    justify-content: space-between;
+    background-color: white;
+    margin-left:0.5rem;
+}
+.roominfo .roomcontents .room_title{
+    font-size:0.8rem;
+    margin-top:0.5rem;
+    font-weight:bold;
+}
+.roominfo .roomcontents .roomidp{
+    font-size:0.7rem;
+    color: #bfbfbf;
+}
+.roominfo .roomcontents .upuserp{
+    font-size:0.7rem;
+    margin-bottom:0.8rem;
+    color: #bfbfbf;
+}
+.roominfo .buttons{
+    height:100%;
+    width:3rem;
+    display:block;
+}
+
+.send-config{
+    width:100%;
+    display:flex;
+    flex-direction:column;
+    background-color: white;
+}
+.sendtime{
+    height:2rem;
+    width:100%;
+    display:flex;
+    justify-content:space-evenly;
+    font-size:0.8rem;
+    align-items: center;
+    border-bottom:1px solid #bfbfbf;
+}
+.giftrow{
+    height:3rem;
+    width:100%;
+    display:flex;
+    justify-content:flex-start;
+    font-size:0.8rem;
+    align-items: center;
+    border-bottom:1px solid #bfbfbf;
+}
+.giftrow .selecttype{
+    margin-left:2rem;
+    height:2rem;
+}
+.firstc{
+    display:flex;
+    margin-left:1rem;
+    align-items: center;
+}
+.firstitem{
+    height:2rem;
+    width:3rem;
+    border-radius:0.3rem;
+    box-sizing:border-box;
+    background-color:#ebf4ff;
+    display:flex;
+    align-items: center;
+    margin-left:0.2rem;
+    padding: 0 12px;
+    font-size:0.7rem;
+}
+.firstitem-checked{
+    background-color:#ff679a;
+}
+.firstitem-disabled{
+    background-color:#dfdfdf;
+}
+.gift_num{
+    height:2rem;
+    border:1px solid #bfbfbf;
+    border-radius:0.3rem;
+    width:3rem;
+    text-align:right;
+    padding-right:0.5rem;
+}
+
+.partners{
+    padding-top:1rem;
+    padding-bottom:1rem;
+    width:100%;
+    display:flex;
+    flex-wrap:wrap;
+    border-bottom:1px dashed #bfbfbf;
+}
+.partneritem{
+    height:2rem;
+    width:48%;
+    border-radius:0.3rem;
+    box-sizing:border-box;
+    background-color:#ebf4ff;
+    display:flex;
+    align-items: center;
+    margin-left:0.2rem;
+    margin-right: 0.2rem;
+    margin-bottom: 0.2rem;
+    padding: 0 12px;
+    font-size:0.7rem;
+}
+.partneritem-checked{
+    background-color:#ff679a;
+}
+.userfilter{
+    height:3rem;
+    align-items: center;
+    font-size:0.9rem;
+    display:flex;
+    justify-content:space-between;
+}
+.allselect{
+    display:flex;
+    width:5rem;
+    font-size:0.9rem;
+    justify-content:space-start;
+}
+.allselect img{
+    margin-left:1rem;
+    width:1.5rem;
+    height:1.5rem;
+}
+.allselect span{
+    padding-top:0.1rem;
+}
+.inputrange{
+    width:16rem;
+    font-size:0.9rem;
+    display:flex;
+    justify-content:space-start;
+}
+.inputrange input{
+    width:3rem;
+}
+.inputrange a{
+    margin-left:0.5rem;
+    color:#2dbce8;
+}
+.refresh{
+    width:3rem;
+}
+.refresh img{
+    width:1.2rem;
+    height:1.2rem;
+}
+.avalunum{
+    color:#ff679a;
+    font-weight:bold;
+}
+.send-user{
+    margin-top:1rem;
+}
+.sendbutton{
+    width: 18rem;
+    height: 1.8rem;
+    color: white;
+    display:flex;
+    justify-content:center;
+    border-radius: 0.6rem;
+    align-items: center;
+    border:1px solid #ff679a;
+    background-color: #ff679a;
+}
+.grouptitle{
+    height: 1.8rem;
+    display:flex;
+    background-color:white;
+    justify-content:space-between;
+    align-items: center;
+    border:1px dashed #bfbfbf;
+}
+.grouptitle .partnerid{
+    margin-left:1rem;
+    font-size:0.8rem;
+    color:#2dbce8;
+}
+.grouptitle .pusernum{
+    margin-left:1rem;
+    font-size:0.8rem;
+    margin-right:1rem;
+    color:#2dbce8;
+}

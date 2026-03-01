@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="referrer" content="no-referrer" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bili批量处理系统</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/reset.css') }}" type="text/css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/head.css') }}" type="text/css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/chgpwd.css') }}" type="text/css">
+    <script src="{{ url_for('static', filename='js/head.js') }}" ></script>
+    <script src="{{ url_for('static', filename='js/logins.js') }}" ></script>
+</head>
+<body>
+    <section>
+        <div class="spaceheader"></div>
+        <div class="binduser">
+            <div class="bindusertitle">
+                <img src="{{ url_for('static', filename='images/btn_refresh.png') }}" data-qrkey="" onclick="javascript:loginJs.refreshQrcode();"/>
+            </div>
+            <div class="divqrcode" id="divqrcode">
+
+            </div>
+        </div>
+
+        <div class="spacefooter"></div>
+        <div class="mask_hidden" id="fullmask">
+            <div class="maskcontent">
+                <img src="{{ url_for('static', filename='images/g_loading.gif') }}" />
+                <div class="masktext"><span id="maskmsg">正在执行，请耐心等待……</span></div></div>
+        </div>
+    </section>
+</body>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        loginJs.refreshQrcode();
+    });
+</script>
+</html>

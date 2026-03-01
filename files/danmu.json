@@ -1,0 +1,111 @@
+{
+  'room_display_id': 1708051140,
+  'room_real_id': 1708051140,
+  'type': 'DANMU_MSG',
+  'data': {
+    'cmd': 'DANMU_MSG',
+    'dm_v2': '',
+    'info': [
+      [
+        0,
+        1,
+        25,
+        16777215,
+        1772240697556,
+        -886385182,
+        0,
+        '0f2e2b36',
+        0,
+        0,
+        0,
+        '',
+        0,
+        '{}',
+        '{}',
+        {
+          'extra': '{"send_from_me":false,"master_player_hidden":false,"mode":0,"color":16777215,"dm_type":0,"font_size":25,"player_mode":1,"show_player_type":0,"content":"动图","user_hash":"254683958","emoticon_unique":"","bulge_display":0,"recommend_score":5,"dm_score":0,"chronos_force_display":0,"main_state_dm_color":"","objective_state_dm_color":"","direction":0,"pk_direction":0,"quartet_direction":0,"anniversary_crowd":0,"yeah_space_type":"","yeah_space_url":"","jump_to_url":"","space_type":"","space_url":"","animation":{},"emots":null,"is_audited":false,"id_str":"7d2bd703a94fbd467e4b06138669a23f1715","icon":{"prefix":{"type":1,"resource":"ChronosWealth_4.png"}},"show_reply":true,"reply_mid":0,"reply_uname":"","reply_uname_color":"","reply_is_mystery":false,"reply_type_enum":0,"hit_combo":0,"esports_jump_url":"","is_mirror":false,"is_collaboration_member":false,"card":{"card_type":0,"oid_str":"","oid_str_1":"","origin_oid_str":"","share_id":"","share_origin":"","from":"","card_content":null},"voice":null,"background_type":0}',
+          'mode': 0,
+          'show_player_type': 0,
+          'user': {
+            'base': {
+              'face': 'https://i2.hdslb.com/bfs/face/99644edfed9b8cca3bb23af795121212162daa13.webp',
+              'is_mystery': False,
+              'name': '依呀妮',
+              'name_color': 0,
+              'name_color_str': '',
+              'official_info': {
+                'desc': '',
+                'role': 0,
+                'title': '',
+                'type': -1
+              },
+              'origin_info': {
+                'face': 'https://i2.hdslb.com/bfs/face/99644edfed9b8cca3bb23af795121212162daa13.webp',
+                'name': '依呀妮'
+              },
+              'risk_ctrl_info': None
+            },
+            'guard': None,
+            'guard_leader': {
+              'is_guard_leader': False
+            },
+            'medal': None,
+            'title': {
+              'old_title_css_id': '',
+              'title_css_id': ''
+            },
+            'uhead_frame': None,
+            'uid': 3546817130138147,
+            'wealth': None
+          }
+        },
+        {
+          'activity_identity': '',
+          'activity_source': 0,
+          'not_show': 0
+        },
+        0
+      ],
+      '动图',
+      [
+        3546817130138147,
+        '依呀妮',
+        0,
+        0,
+        0,
+        10000,
+        1,
+        ''
+      ],
+      [],
+      [
+        24,
+        0,
+        5805790,
+        '>50000',
+        0
+      ],
+      [
+        '',
+        ''
+      ],
+      0,
+      0,
+      None,
+      {
+        'ct': 'DE2CDE88',
+        'ts': 1772240697
+      },
+      0,
+      0,
+      None,
+      None,
+      0,
+      572,
+      [
+        40
+      ],
+      None
+    ]
+  }
+}

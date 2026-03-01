@@ -1,0 +1,88 @@
+section>.newroomtop{
+    margin-top:0.5rem;
+    margin-bottom:0.5rem;
+}
+
+.authoricform{
+    height:3rem;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+}
+
+.authoricform .inputfilter {
+    width: 15rem;
+    height: 1.5rem;
+    padding-left: 0.6rem;
+    border-radius: 0.6rem;
+    border: 0.1rem solid silver;
+    /* 去除表单点击后出现的边框 */
+    outline: none;
+    font-size:0.8rem;
+    color: reb(107, 107, 107);
+}
+.authoricform img {
+    width: 1rem;
+    height: 1rem;
+    margin-left:0.5rem;
+}
+.authoricform .msgtxt {
+    width: 3rem;
+    height: 1rem;
+    margin-left:0.5rem;
+    color:red;
+    font-size:0.5rem;
+}
+
+.authinfo{
+    height:3rem;
+    width:100%;
+    display:flex;
+    align-items: center;
+    margin-top:0.1rem;
+    justify-content: space-between;
+    background-color: white;
+    border-bottom:1px solid #bfbfbf;
+}
+.authinfo .btnupdown{
+    width:2rem;
+    margin-left:0.5rem;
+}
+
+.authinfo .authcontents{
+    width:15rem;
+    height:100%;
+    display:flex;
+    align-items: center;
+    justify-content: flex-start;
+    background-color: white;
+    margin-left:0.5rem;
+}
+.authinfo .authcontents .auth_title{
+    font-size:0.8rem;
+    font-weight:bold;
+}
+.authinfo .authcontents .targe_id{
+    font-size:0.8rem;
+    margin-left:0.3rem;
+    color: #bfbfbf;
+}
+
+.authinfo .buttons{
+    height:100%;
+    width:3rem;
+    display:flex;
+    flex-direction:column;
+    justify-content: space-around;
+    border-left: 1px solid #bfbfbf;
+}
+
+.authinfo .buttons .del_button{
+    width:0.8rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+

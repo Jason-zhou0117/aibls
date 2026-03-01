@@ -1,0 +1,96 @@
+section>.newroomtop{
+    margin-top:0.5rem;
+    margin-bottom:0.5rem;
+}
+
+.roomform{
+    height:3rem;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+}
+
+.roomform .input {
+    width: 8rem;
+    height: 1.5rem;
+    padding-left: 0.6rem;
+    border-radius: 0.6rem;
+    border: 0.1rem solid silver;
+    /* 去除表单点击后出现的边框 */
+    outline: none;
+    font-size:0.8rem;
+    color: reb(107, 107, 107);
+}
+.roomform img {
+    width: 1rem;
+    height: 1rem;
+    margin-left:0.5rem;
+}
+.roomform .msgtxt {
+    width: 3rem;
+    height: 1rem;
+    margin-left:0.5rem;
+    color:red;
+    font-size:0.5rem;
+}
+
+.roominfo{
+    height:6rem;
+    width:100%;
+    display:flex;
+    align-items: center;
+    margin-top:0.1rem;
+    justify-content: space-between;
+    background-color: white;
+    border-bottom:1px solid #bfbfbf;
+}
+.roominfo .cover{
+    width:9rem;
+    margin-left:0.5rem;
+    border-radius:0.5rem;
+}
+.roominfo .roomcontents{
+    width:12rem;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    justify-content: space-between;
+    background-color: white;
+    margin-left:0.5rem;
+}
+.roominfo .roomcontents .room_title{
+    font-size:0.8rem;
+    margin-top:0.5rem;
+    font-weight:bold;
+}
+.roominfo .roomcontents .roomidp{
+    font-size:0.7rem;
+    color: #bfbfbf;
+}
+.roominfo .roomcontents .upuserp{
+    font-size:0.7rem;
+    margin-bottom:0.8rem;
+    color: #bfbfbf;
+}
+.roominfo .buttons{
+    height:100%;
+    width:3rem;
+    display:block;
+    border-left: 1px solid #bfbfbf;
+}
+
+.roominfo .buttons .fav_button{
+    width:1.2rem;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top:0.5rem;
+}
+.roominfo .buttons .send_button{
+    width:1.2rem;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top:1.2rem;
+}
+
+

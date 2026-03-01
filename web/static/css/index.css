@@ -1,0 +1,45 @@
+.hometitle{
+    justify-content: center;
+}
+
+section>.user_nav{
+    height: 10rem;
+    margin-bottom:1rem;
+    background-color:white;
+    border-bottom:1px solid #bfbfbf;
+}
+
+.nav_main{
+    display:flex;
+    justify-content: space-around;
+    align-items: center;
+    padding-top: 0.5rem;
+}
+.nav_item{
+    width:33%;
+    margin:10px 0px;
+    border:1px solid #ffffff;
+}
+.nav_item:hover{
+    width:33%;
+    margin:10px 0px;
+    border:1px solid #f2f2f2;
+}
+.nav_item img{
+    width:20%;
+    margin-left:auto;
+    margin-right:auto;
+}
+.nav_item p{
+    width:100%;
+    margin-top: 0.5rem;
+    font-size:0.6rem;
+    text-align:center;
+}
+
+section>.task_nav{
+    height: 10rem;
+    margin-top:0.3rem;
+    margin-bottom:0.3rem;
+    background-color:white;
+}
