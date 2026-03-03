@@ -96,7 +96,7 @@ danmuJs.startStop = function (event){
         .then(data => {
              if (data.code == 0){
                  //danmuJs.socket.emit('join_room', { room_id: parseInt(room_id) });
-                 danmuJs.setStatus(data.message)
+                 danmuJs.setRoomStatus(data)
              }
              else{
                 alert(data.text);
@@ -109,7 +109,8 @@ danmuJs.startStop = function (event){
     }
 }
 
-danmuJs.setStatus = function(msg){
+danmuJs.setRoomStatus = function(data) {
     span_status = document.getElementById('txt_status');
-    span_status.innerText = msg
+    span_status.innerText = data.message;
+    span_status.setAttribute("data-running", data.type);
 }

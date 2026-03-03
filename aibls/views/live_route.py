@@ -121,14 +121,14 @@ def start_generator(room_id:int):
             return {
                 'code': 0,
                 'message': f'正在监听[{room_id}]',
-                'type': 'start',
+                'type': 1,
                 'generator_id': generator.generator_id,
                 'timestamp': datetime.now().isoformat()
             }
         else:
             return {
                 'code': 0,
-                'type': 'start',
+                'type': 1,
                 'message': f'正在监听[{room_id}]',
                 'generator_id': generator.generator_id,
                 'timestamp': datetime.now().isoformat()
@@ -148,7 +148,7 @@ def stop_generator(room_id:int):
         generator.stop()
         return {
             'code': 0,
-            'type': 'stop',
+            'type': 0,
             'message': f'关闭监听[{room_id}]',
             'timestamp': datetime.now().isoformat()
         }
