@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>B站弹幕实时推送</title>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .control-panel {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .input-group input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a67d8;
+        }
+
+        .btn-primary:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-success {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #38a169;
+        }
+
+        .status-panel {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .status-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .status-label {
+            font-size: 12px;
+            color: #718096;
+            margin-bottom: 5px;
+        }
+
+        .status-value {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .connected { color: #48bb78; }
+        .connecting { color: #ecc94b; }
+        .disconnected { color: #f56565; }
+
+        .stats-panel {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            padding: 20px;
+            background: white;
+        }
+
+        .stat-box {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 28px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #718096;
+            margin-top: 5px;
+        }
+
+        .filter-bar {
+            padding: 10px 20px;
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .filter-btn {
+            padding: 6px 16px;
+            margin-right: 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            background: white;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover {
+            background: #edf2f7;
+        }
+
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .messages-container {
+            height: 400px;
+            overflow-y: auto;
+            padding: 20px;
+            background: white;
+        }
+
+        .message {
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            background: #f7fafc;
+            border-left: 4px solid;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.danmaku { border-left-color: #667eea; }
+        .message.gift { border-left-color: #fbbf24; }
+        .message.welcome { border-left-color: #48bb78; }
+        .message.guard { border-left-color: #9f7aea; }
+        .message.view { border-left-color: #f56565; }
+        .message.system { border-left-color: #718096; }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .message-user {
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .message-content {
+            font-size: 14px;
+            color: #1a202c;
+        }
+
+        .debug-panel {
+            background: #1a202c;
+            color: #a0aec0;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            height: 100px;
+            overflow-y: auto;
+            border-top: 1px solid #2d3748;
+        }
+
+        .footer {
+            background: #f7fafc;
+            padding: 15px;
+            text-align: center;
+            color: #718096;
+            font-size: 13px;
+            border-top: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📺 B站直播弹幕实时推送</h1>
+            <p>使用 bilibili-api-python 异步回调，通过 Flask-SocketIO 实时推送</p>
+        </div>
+
+        <div class="control-panel">
+            <div class="input-group">
+                <input type="number" id="roomId" value="23058" placeholder="输入B站直播间号">
+                <button class="btn btn-primary" onclick="connect()" id="connectBtn">连接</button>
+                <button class="btn btn-secondary" onclick="disconnect()" id="disconnectBtn" disabled>断开</button>
+                <button class="btn btn-success" onclick="testMessage()">测试</button>
+            </div>
+
+            <div class="status-panel">
+                <div class="status-item">
+                    <div class="status-label">服务器</div>
+                    <div class="status-value" id="serverStatus">未连接</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-label">直播间</div>
+                    <div class="status-value" id="roomDisplay">-</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-label">连接状态</div>
+                    <div class="status-value" id="connectionStatus">-</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-label">消息数</div>
+                    <div class="status-value" id="msgCount">0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-panel">
+            <div class="stat-box">
+                <div class="stat-number" id="statDanmaku">0</div>
+                <div class="stat-label">弹幕</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number" id="statGift">0</div>
+                <div class="stat-label">礼物</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number" id="statWelcome">0</div>
+                <div class="stat-label">欢迎</div>
+            </div>
+        </div>
+
+        <div class="filter-bar">
+            <button class="filter-btn active" onclick="filterMessages('all')">全部</button>
+            <button class="filter-btn" onclick="filterMessages('danmaku')">弹幕</button>
+            <button class="filter-btn" onclick="filterMessages('gift')">礼物</button>
+            <button class="filter-btn" onclick="filterMessages('welcome')">欢迎</button>
+            <button class="filter-btn" onclick="filterMessages('guard')">大航海</button>
+            <button class="filter-btn" onclick="clearMessages()" style="float: right;">清空</button>
+        </div>
+
+        <div class="messages-container" id="messages">
+            <div class="message system">
+                <div class="message-header">
+                    <span>系统</span>
+                    <span>-</span>
+                </div>
+                <div class="message-content">输入直播间号，点击"连接"开始接收弹幕</div>
+            </div>
+        </div>
+
+        <div class="debug-panel" id="debug">[系统] 等待连接...</div>
+
+        <div class="footer">
+            ⚡ 实时推送 | 使用 bilibili-api-python 17.4.1
+        </div>
+    </div>
+
+    <script>
+        // 连接Socket.IO
+        const socket = io({
+            transports: ['websocket', 'polling'],
+            reconnection: true,
+            reconnectionAttempts: 10,
+            reconnectionDelay: 1000,
+            timeout: 20000
+        });
+
+        // 状态变量
+        let currentRoom = null;
+        let messageCounts = {
+            total: 0,
+            danmaku: 0,
+            gift: 0,
+            welcome: 0,
+            guard: 0
+        };
+        let currentFilter = 'all';
+
+        // 调试输出
+        function debug(message) {
+            const debugDiv = document.getElementById('debug');
+            const time = new Date().toLocaleTimeString();
+            debugDiv.innerHTML = `[${time}] ${message}<br>` + debugDiv.innerHTML;
+            if (debugDiv.children.length > 10) {
+                debugDiv.removeChild(debugDiv.lastChild);
+            }
+            console.log(`[DEBUG] ${message}`);
+        }
+
+        // 更新统计
+        function updateStats() {
+            document.getElementById('statDanmaku').textContent = messageCounts.danmaku;
+            document.getElementById('statGift').textContent = messageCounts.gift;
+            document.getElementById('statWelcome').textContent = messageCounts.welcome;
+            document.getElementById('msgCount').textContent = messageCounts.total;
+        }
+
+        // 添加消息
+        function addMessage(type, data) {
+            if (currentFilter !== 'all' && type !== currentFilter) {
+                return;
+            }
+
+            messageCounts.total++;
+            messageCounts[type] = (messageCounts[type] || 0) + 1;
+            updateStats();
+
+            const messagesDiv = document.getElementById('messages');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${type}`;
+
+            let contentHtml = '';
+            let typeText = '';
+
+            switch(type) {
+                case 'danmaku':
+                    typeText = '💬 弹幕';
+                    contentHtml = `<span class="message-user">${data.uname}:</span> ${data.msg}`;
+                    break;
+                case 'gift':
+                    typeText = '🎁 礼物';
+                    contentHtml = `<span class="message-user">${data.uname}</span> ${data.msg}了 ${data.gift_num} 个 ${data.gift_name}`;
+                    break;
+                case 'welcome':
+                    typeText = '👋 欢迎';
+                    contentHtml = `<span class="message-user">${data.uname}</span> 进入直播间`;
+                    break;
+                case 'guard':
+                    typeText = '⚓ 大航海';
+                    contentHtml = `<span class="message-user">${data.uname}</span> 购买了 ${data.guard_level} 级舰长`;
+                    break;
+                case 'view':
+                    typeText = '👥 人气';
+                    contentHtml = `当前人气值: ${data.view_count}`;
+                    break;
+                default:
+                    typeText = '📢 系统';
+                    contentHtml = JSON.stringify(data);
+            }
+
+            msgDiv.innerHTML = `
+                <div class="message-header">
+                    <span>${typeText}</span>
+                    <span>${data.time || new Date().toLocaleTimeString()}</span>
+                </div>
+                <div class="message-content">${contentHtml}</div>
+            `;
+
+            messagesDiv.appendChild(msgDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+            // 限制消息数量
+            while (messagesDiv.children.length > 500) {
+                messagesDiv.removeChild(messagesDiv.firstChild);
+            }
+        }
+
+        // Socket.IO事件处理
+        socket.on('connect', () => {
+            document.getElementById('serverStatus').innerHTML = '<span class="connected">已连接</span>';
+            debug('已连接到服务器');
+        });
+
+        socket.on('disconnect', () => {
+            document.getElementById('serverStatus').innerHTML = '<span class="disconnected">已断开</span>';
+            debug('与服务器断开连接');
+        });
+
+        socket.on('status_update', () => {
+            document.getElementById('serverStatus').innerHTML = '<span class="disconnected">已断开</span>';
+            debug('与服务器断开连接');
+        });
+
+        socket.on('connection_ack', (data) => {
+            debug(`连接确认: ${JSON.stringify(data)}`);
+        });
+
+        // 监听所有事件（调试用）
+        socket.onAny((event, data) => {
+            debug(`收到事件: ${event}`);
+        });
+
+        // 弹幕事件
+        socket.on('danmaku', (data) => {
+            debug(`弹幕: ${data.user}: ${data.content}`);
+            addMessage('danmaku', data);
+        });
+
+        // 礼物事件
+        socket.on('gift', (data) => {
+            debug(`礼物: ${data.user} 赠送 ${data.gift_name}`);
+            addMessage('gift', data);
+        });
+
+        // 欢迎事件
+        socket.on('welcome', (data) => {
+            debug(`欢迎: ${data.user} 进入直播间`);
+            addMessage('welcome', data);
+        });
+
+        // 大航海事件
+        socket.on('guard', (data) => {
+            debug(`大航海: ${data.user} 购买舰长`);
+            addMessage('guard', data);
+        });
+
+        // 人气事件
+        socket.on('view', (data) => {
+            // 不显示在消息列表，只更新统计
+            document.getElementById('statWelcome').textContent = data.view_count;
+        });
+
+        // 连接状态
+        socket.on('status_update', (data) => {
+            const statusEl = document.getElementById('connectionStatus');
+
+            document.getElementById('roomDisplay').textContent = data.room_id;
+
+            if (data.generator_running !== undefined && data.generator_running) {
+                currentRoom = data.room_id;
+                document.getElementById('connectBtn').disabled = true;
+                document.getElementById('disconnectBtn').disabled = false;
+                statusEl.innerHTML = `<span class="connected">运行中</span>`;
+            } else {
+                currentRoom = null;
+                document.getElementById('connectBtn').disabled = false;
+                document.getElementById('disconnectBtn').disabled = true;
+                statusEl.innerHTML = `<span class="disconnected">运行中</span>`;
+            }
+        });
+
+        // 房间加入确认
+        socket.on('room_joined', (data) => {
+            debug(`房间加入确认: ${data.room_id}`);
+        });
+
+        // 房间离开确认
+        socket.on('room_left', (data) => {
+            if (data.room_id === currentRoom) {
+                currentRoom = null;
+                document.getElementById('roomDisplay').textContent = '-';
+                document.getElementById('connectBtn').disabled = false;
+                document.getElementById('disconnectBtn').disabled = true;
+                debug(`房间离开: ${data.room_id}`);
+            }
+        });
+
+        // 心跳响应
+        socket.on('pong', (data) => {
+            // 静默处理
+        });
+
+        // 连接直播间
+        function connect() {
+            const roomId = document.getElementById('roomId').value;
+            if (!roomId) {
+                alert('请输入房间号');
+                return;
+            }
+
+            debug(`尝试连接房间 ${roomId}`);
+
+            fetch(`/connect/${roomId}`)
+                .then(res => res.json())
+                .then(data => {
+                    debug(`API响应: ${JSON.stringify(data)}`);
+                    if (data.status === 'success') {
+                        socket.emit('join_room', { room_id: parseInt(roomId) });
+                    }
+                })
+                .catch(err => {
+                    debug(`连接错误: ${err.message}`);
+                });
+        }
+
+        // 断开连接
+        function disconnect() {
+            if (currentRoom) {
+                debug(`断开房间 ${currentRoom}`);
+                fetch(`/disconnect/${currentRoom}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        debug(`断开响应: ${JSON.stringify(data)}`);
+                    });
+            }
+        }
+
+        // 测试消息
+        function testMessage() {
+            const roomId = document.getElementById('roomId').value || '23058';
+            debug(`发送测试消息`);
+
+            fetch(`/test/${roomId}`)
+                .then(res => res.json())
+                .then(data => {
+                    debug(`测试响应: ${JSON.stringify(data)}`);
+                });
+        }
+
+        // 过滤消息
+        function filterMessages(type) {
+            currentFilter = type;
+
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        // 清空消息
+        function clearMessages() {
+            document.getElementById('messages').innerHTML = '';
+            messageCounts = { total: 0, danmaku: 0, gift: 0, welcome: 0, guard: 0 };
+            updateStats();
+            debug('消息已清空');
+        }
+
+        // 定期发送心跳
+        setInterval(() => {
+            if (socket.connected) {
+                socket.emit('ping');
+            }
+        }, 25000);
+    </script>
+</body>
+</html>

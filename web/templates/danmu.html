@@ -19,15 +19,15 @@
                 <span class="head_user_pic">
                     <img src="{{user_face}}" alt="头像"/>
                 </span>
-                <span class="head_user_txt" onclick="javascript:gotosetting();">
+                <span class="head_user_txt">
                     {{nick_name}}
                 </span>
             </div>
             <div class="nav_title">
                 <span>
-                    <img src="{{ url_for('static', filename='images/btn_home.png') }}" alt="返回主页" data-roomid="{{room_id}}" data-running="0" onclick="javascript:danmuJs.startStop(event)"/>
+                    <img src="{{ url_for('static', filename='images/btn_home.png') }}" alt="返回主页" />
                 </span>
-                <span id="txt_status">未监听{{room_id}}</span>
+                <span id="txt_status" style="cursor:hand" data-roomid="{{room_id}}" data-running="1" onclick="danmuJs.startStop(event)">正在监听[{{room_id}}]</span>
             </div>
         </div>
     </header>

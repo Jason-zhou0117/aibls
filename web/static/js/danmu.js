@@ -1,8 +1,29 @@
 var danmuJs = {}
 
+danmuJs.socket=null;
+
 danmuJs.init = function(){
-    danmuJs.socket = io.connect('http://' + document.domain + ':' + location.port);
+    danmuJs.connect_socket()
     danmuJs.danmuCount = 0;
+
+}
+
+danmuJs.connect_socket = function (){
+
+
+    if (danmuJs.socket && danmuJs.socket.connected) {
+        console.log('已经连接，无需重复连接');
+        return;
+    }
+
+    danmuJs.socket = io({
+            transports: ['websocket', 'polling'],
+            reconnection: true,
+            reconnectionAttempts: 10,
+            reconnectionDelay: 1000,
+            timeout: 20000
+        });
+
     // 监听连接事件
     danmuJs.socket.on('connect', function() {
         console.log('Socket.IO连接成功');
@@ -11,11 +32,51 @@ danmuJs.init = function(){
     danmuJs.socket.on('disconnect', function() {
         console.log('Socket.IO连接断开');
     });
-    danmuJs.socket.on('new_danmu', function(data) {
-        console.log('收到新弹幕:', data);
-        ++danmuJs.danmuCount;
+    // 重连尝试事件
+    danmuJs.socket.on('reconnect_attempt', function(attempt) {
+        console.log('重连尝试 #' + attempt);
+    });
+
+    // 重连成功事件
+    danmuJs.socket.on('reconnect', function() {
+        console.log('重连成功');
+    });
+
+    // 重连失败事件
+    danmuJs.socket.on('reconnect_failed', function() {
+        console.log('重连失败');
+    });
+
+    // 欢迎消息
+    danmuJs.socket.on('welcome', function(data) {
+        console.log('收到欢迎信息弹幕:', data);
+        danmuJs.setStatus(data.msg);
+    });
+
+    danmuJs.socket.on('danmaku', function(data) {
+        console.log('收到新弹幕:', data.msg);
+        //++danmuJs.danmuCount;
         //处理页面效果
     });
+
+    // 监听所有事件（调试用）
+    danmuJs.socket.onAny((eventName, ...args) => {
+            console.log(`事件 ${eventName}:`, args);
+        });
+
+    // 礼物事件
+    danmuJs.socket.on('gift', (data) => {
+            console.log('收到礼物:', data);
+        });
+
+    // 欢迎事件
+    danmuJs.socket.on('welcome', (data) => {
+            console.log('收到欢迎:', data);
+        });
+    // 房间加入确认
+    danmuJs.socket.on('room_joined', (data) => {
+            console.log('房间加入确认:', data);
+        });
 }
 
 
@@ -29,11 +90,13 @@ danmuJs.startStop = function (event){
         if (is_running == "1"){
             url = '/danmu/stop/'+room_id;
         }
+        console.log("启停，url=" + url);
         fetch(url)
         .then(response => response.json())
         .then(data => {
              if (data.code == 0){
-                danmuJs.setStatus(data.message)
+                 //danmuJs.socket.emit('join_room', { room_id: parseInt(room_id) });
+                 danmuJs.setStatus(data.message)
              }
              else{
                 alert(data.text);

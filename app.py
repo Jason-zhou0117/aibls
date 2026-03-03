@@ -1,3 +1,10 @@
+# 首先执行 eventlet.monkey_patch()
+import asyncio
+import datetime
+import queue
+
+import eventlet
+
 import logging
 import time
 from logging.handlers import RotatingFileHandler
@@ -14,9 +21,10 @@ from aibls.decorators.decorator import check_session_go_login_decorator
 from aibls.views import user_api, room_api, live_api
 
 from aibls.views.room_route import room_service
-from aibls.views.live_route import danmu_service
+from aibls.views.live_route import danmu_service, generator
 from aibls.views.login_route import user_service
-from stock_io import socketio
+
+from stock_io import socketio, message_queue
 
 
 def create_app():
@@ -70,7 +78,11 @@ def register_log(app: Flask):
 
 #初始化APP
 app= create_app()
-socketio.init_app(app, cors_allowed_origins="*",async_mode='eventlet'  )
+socketio.init_app(app,
+                    cors_allowed_origins="*",
+                    async_mode='gevent',
+                    logger=True,
+                    engineio_logger=True)
 
 
 @app.route("/")
@@ -134,6 +146,28 @@ def debug_routes():
         'routes': routes,
         'blueprints': list(app.blueprints.keys())
     })
-#执行APP
+
+
+
+
 if __name__ == "__main__":
-    socketio.run(app, debug=True,port=5000, allow_unsafe_werkzeug=True if app.debug else False)
+    try:
+        print("=" * 60)
+        print("启动服务器...")
+        print(f"生成器ID: {generator.generator_id}")
+        print(f"队列大小: {message_queue.qsize()}")
+        print("=" * 60)
+        print("访问地址: http://localhost:5000")
+        print("=" * 60)
+
+        # 使用 socketio.run 而不是 app.run
+        socketio.run(app,
+                     debug=True,
+                     port=5000,
+                     allow_unsafe_werkzeug=True,
+                     use_reloader=False)  # 禁用重载器以避免线程问题
+
+    except KeyboardInterrupt:
+        print("\n👋 正在关闭服务器...")
+        generator.stop()
+        print("服务器已关闭")
