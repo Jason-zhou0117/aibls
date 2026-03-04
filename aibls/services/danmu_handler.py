@@ -145,33 +145,35 @@ class AsyncMessageGenerator:
             logger.info(f"礼物弹幕，原始数据: {event}")
 
             data = event["data"]["data"]
-
+            print(data)
             gift_info =  data["gift_info"]
+            gift_img = gift_info["gif"] if "gif" in gift_info else gift_info["img_basic"]
+            print(gift_img)
             #粉丝灯牌
             medal_info = data["medal_info"]
             medal_name = medal_info["medal_name"] if medal_info is not None and "medal_name" in medal_info else ""
             medal_level = medal_info["medal_level"] if medal_info is not None and "medal_level" in medal_info else 0
+            print(f"投喂-粉丝灯牌{gift_img}")
 
-            send_user  = data["sender_uinfo"]["origin_info"]
+            send_user  = data["sender_uinfo"]["base"]
             user_face = send_user["face"] if send_user is not None and "face" in send_user else ""
-
+            print(f"投喂-用户头像{user_face}")
             # 礼物数据结构: https://github.com/Nemo2011/bilibili-api/blob/main/bilibili_api/live.py
             info = {
                 "type": "gift",
-                "msg": f"{data['uname']} {data['action']} 礼物 {data['giftName']} x {data['num']}，总价值{data["total_coin"]/1000} 元",  # 弹幕内容 (info[1])
+                "msg": f"弹幕-礼物: {data['uname']} {data['action']} {data['giftName']} x{data['num']}",  # 弹幕内容 (info[1])
                 "uname": data["uname"],
                 "uid": data["uid"],
                 "user_face" : user_face,
                 "medal_name": medal_name,  # 粉丝牌名称
                 "medal_level":medal_level,  # 粉丝牌等级 粉丝牌等级
-                "honor_level": medal_info[""],
                 "gift_name": data["giftName"],
-                "gift_img": gift_info["gif"],
-                "num": data["num"],
+                "gift_img": gift_img,
+                "gift_num": data["num"],
                 "action": data["action"],  # 赠送动作，如 "赠送"
                 "price": data["price"],  # 单价 (金瓜子)
                 "total_coin": data["total_coin"] ,
-                "raw_info": event# 总价值
+                "raw_info": event
             }
             logger.info(f"弹幕-礼物: {data['uname']} {data['action']} {data['giftName']} x{data['num']}")
 
@@ -184,7 +186,7 @@ class AsyncMessageGenerator:
     async def on_buy_guard(self, event):
         """上舰事件回调"""
         try:
-            data = event["data"]
+            data = event["data"]["data"]
             # 舰长等级对应: 3=舰长, 2=提督, 1=总督
             guard_level_names = {1: "总督", 2: "提督", 3: "舰长"}
             guard_name = guard_level_names.get(data["guard_level"], "未知")
@@ -210,7 +212,7 @@ class AsyncMessageGenerator:
     async def on_super_chat(self, event):
         """超级聊天（醒目留言）事件回调"""
         try:
-            data = event["data"]
+            data = event["data"]["data"]
             info = {
                 "type": "super_chat",
                 "msg": data["message"],
@@ -230,9 +232,9 @@ class AsyncMessageGenerator:
     async def on_interaction(self, event):
         """进入直播间事件回调"""
         try:
-            data = event["data"]
+            data = event["data"]["data"]
             info = {
-                "type": "interaction",
+                "type": "welcome",
                 "uname": data["uname"],
                 "uid": data["uid"],
                 "msg": f"欢迎 {data['uname']} 进入直播间"
