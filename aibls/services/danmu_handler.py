@@ -64,7 +64,7 @@ class AsyncMessageGenerator:
         self._room.add_event_listener("SEND_GIFT", self.on_gift)  # 赠送礼物
         self._room.add_event_listener("GUARD_BUY", self.on_buy_guard)  # 购买舰长
         self._room.add_event_listener("SUPER_CHAT_MESSAGE", self.on_super_chat)  # 醒目留言
-        self._room.add_event_listener("INTERACT_WORD", self.on_interaction)  # 用户进入直播间
+        self._room.add_event_listener("ENTRY_EFFECT", self.on_user_enter)  # 用户进入直播间
         try:
             # 连接并开始监听
             sync(self._room.connect())
@@ -142,7 +142,7 @@ class AsyncMessageGenerator:
         """礼物事件回调"""
         try:
 
-            logger.info(f"礼物弹幕，原始数据: {event}")
+            logger.info(f"---------礼物弹幕，原始数据: {event}")
 
             data = event["data"]["data"]
             print(data)
@@ -186,6 +186,7 @@ class AsyncMessageGenerator:
     async def on_buy_guard(self, event):
         """上舰事件回调"""
         try:
+            logger.info(f"***********上舰: {event}")
             data = event["data"]["data"]
             # 舰长等级对应: 3=舰长, 2=提督, 1=总督
             guard_level_names = {1: "总督", 2: "提督", 3: "舰长"}
@@ -212,6 +213,7 @@ class AsyncMessageGenerator:
     async def on_super_chat(self, event):
         """超级聊天（醒目留言）事件回调"""
         try:
+            logger.info(f"+++++++++醒目留言: {event}")
             data = event["data"]["data"]
             info = {
                 "type": "super_chat",
@@ -229,9 +231,69 @@ class AsyncMessageGenerator:
             logger.error(f"解析醒目留言数据出错: {e}")
             logger.info(f"文字弹幕，原始数据: {event}")
 
+    async def on_user_enter(self, event):
+        """(新版)进入直播间事件回调"""
+        try:
+            logger.info(f"==========进入直播间: {event}")
+            # 新协议的数据结构通常如下，你可以打印出来看看具体字段
+            data = event["data"].get('data', {})
+
+            # 注意：新版协议中用 'uid' 和 'open_id' 区分别，建议用 open_id
+            # 安全获取用户信息
+            user_id = data.get('open_id', data.get('uid', '0'))
+            user_info = data.get('uinfo', None)
+            user_name = ""
+            if user_info is not None and user_id != 0:
+                user_info_base = user_info.get('base', None)
+                user_name = user_info_base.get('name', '未知用户')
+
+            fans_medal_name = ""
+            fans_level = 0
+            guard_level = 0
+            guard_name = ""
+
+            #粉丝信息
+            fans_info = data.get('medal', None)
+            logger.info(f"粉丝信息： {fans_info} ")
+            if fans_info is not None:
+                #灯牌信息
+                fans_medal_name = fans_info.get('name', '')
+                fans_level = fans_info.get('level', '')
+
+                #舰长类型
+                guard_level = fans_info.get('guard_level', 0)  # 0:无, 1:总督, 2:提督, 3:舰长
+                guard_levels = {1: "总督", 2: "提督", 3: "舰长"}
+                guard_name = guard_levels.get(guard_level, "")
+
+
+            info = {
+                "type": "welcome",
+                "uname": user_name,
+                "uid": user_id,
+                "guard_name":guard_name,
+                "fans_level":fans_level,
+                "guard_level":guard_level,
+                "fans_medal_name":fans_medal_name,
+                "msg": f" 欢迎 {guard_name} {user_name} 进入直播间！"
+            }
+            logger.info(f"欢迎 {guard_name} {user_name} 进入直播间！")
+
+            # 将弹幕放入消息队列
+            self.message_queue.put(info)
+        except Exception as e:
+            logger.error(f"解析进入事件数据出错: {e}")
+            logger.info(f"文字弹幕，原始数据: {event}")
+
+    async def load_user_info(self,user_id):
+        user_obj = user.User(user_id,self.credential)
+        user_info = await user_obj.get_user_info()
+        print(user_info)
+        return user_info
+
     async def on_interaction(self, event):
         """进入直播间事件回调"""
         try:
+            logger.info(f"==========进入直播间: {event}")
             data = event["data"]["data"]
             info = {
                 "type": "welcome",

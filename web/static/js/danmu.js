@@ -1,8 +1,14 @@
-var danmuJs = {}
-
-danmuJs.socket = null;
+const danmuJs = {
+        socket: null,
+        roomId: null,
+        isRunning: false,
+        roomTitle: '',
+        counts: { gift: 0, danmaku: 0, welcome: 0 },
+        collapsedColumns: { gift: false, welcome: false }
+}
 
 danmuJs.init = function () {
+
     danmuJs.connect_socket()
     danmuJs.danmuCount = 0;
     danmuJs.currentFilter = 'all';
@@ -10,9 +16,8 @@ danmuJs.init = function () {
 
 }
 
+/**链接WebSocket**/
 danmuJs.connect_socket = function () {
-
-
     if (danmuJs.socket && danmuJs.socket.connected) {
         console.log('已经连接，无需重复连接');
         return;
@@ -55,36 +60,181 @@ danmuJs.connect_socket = function () {
     });
 
     // 欢迎事件
-    danmuJs.socket.on('welcome', (data) => {
-        console.log('收到欢迎:', data);
-        danmuJs.addMessage('welcome', data);
-    });
+    danmuJs.socket.on('welcome', (data) => danmuJs.addWelcome(data));
 
     //弹幕
-    danmuJs.socket.on('danmaku', function (data) {
-        console.log('收到新弹幕:', data.msg);
-        //++danmuJs.danmuCount;
-        //处理页面效果
-        danmuJs.addMessage('danmaku', data);
-    });
+    danmuJs.socket.on('danmaku', (data) => danmuJs.addDanmaku(data));
 
     // 礼物事件
-    danmuJs.socket.on('gift', (data) => {
-        console.log('收到礼物:', data);
-        danmuJs.addMessage('gift', data);
-    });
+    danmuJs.socket.on('gift', (data) => danmuJs.addGift(data));
 
     // 上舰事件
-    danmuJs.socket.on('guard', (data) => {
-        console.log('收到礼物:', data);
-        danmuJs.addMessage('guard', data);
-    });
+    danmuJs.socket.on('guard', (data) => danmuJs.addGuard(data));
 
     // 上舰事件
-    danmuJs.socket.on('super_chat', (data) => {
-        console.log('收到醒目留言:', data);
-        danmuJs.addMessage('super_chat', data);
-    });
+    danmuJs.socket.on('super_chat', (data) => danmuJs.addSuperChat(data));
+}
+
+/**添加聊天弹幕**/
+danmuJs.addDanmaku = function(data) {
+    const container = document.getElementById('danmaku_messages');
+    const div_time = '<div class="message-time">' + (data.time || new Date().toLocaleTimeString()) + '</div>';
+    const div_username = '<div><span class="message-user">' + danmuJs.escapeHtml(data.uname) +':</span></div>';
+    const div_msg = '<div class="message-content">' + danmuJs.escapeHtml(data.msg)+'</div>';
+    const msgDiv = danmuJs.createMessageDiv('danmaku', div_time + div_username + div_msg);
+    container.appendChild(msgDiv);
+    danmuJs.scrollToBottom(container);
+    danmuJs.counts.danmaku++;
+    document.getElementById('danmaku_count').innerText = danmuJs.counts.danmaku;
+    danmuJs.limitMessages(container);
+}
+
+/**添加礼物弹幕**/
+danmuJs.addGift = function(data) {
+    const container = document.getElementById('gift_messages');
+    const div_time = '<div class="message-time">' + (data.time || new Date().toLocaleTimeString()) + '</div>';
+    const div_username = '<div><span class="message-user">' + danmuJs.escapeHtml(data.uname) +':</span></div>';
+    const div_msg = '<div class="message-content">送了' + data.gift_num+ '个 <span class="gift-name">' + danmuJs.escapeHtml(data.gift_name)+'</span></div>';
+    const msgDiv = danmuJs.createMessageDiv('gift', div_time + div_username + div_msg);
+    container.appendChild(msgDiv);
+    danmuJs.scrollToBottom(container);
+    danmuJs.counts.gift++;
+    document.getElementById('gift_count').innerText = danmuJs.counts.gift;
+    danmuJs.limitMessages(container);
+}
+
+/**添加上舰消息**/
+danmuJs.addGuard = function(data) {
+    const container = document.getElementById('gift_messages');
+    const div_time = '<div class="message-time">' + (data.time || new Date().toLocaleTimeString()) + '</div>';
+    const div_username = '<div><span class="message-user">' + danmuJs.escapeHtml(data.uname) +':</span></div>';
+    const div_msg = '<div class="message-content">🏆 购买了 ' + danmuJs.escapeHtml(data.guard_level) + '舰长</div>';
+    const msgDiv = danmuJs.createMessageDiv('guard', div_time + div_username + div_msg);
+    container.appendChild(msgDiv);
+    danmuJs.scrollToBottom(container);
+    danmuJs.counts.gift++;
+    document.getElementById('gift_count').innerText = danmuJs.counts.gift;
+    danmuJs.limitMessages(container);
+}
+
+/**添加醒目消息消息**/
+danmuJs.addSuperChat = function(data) {
+
+    const container = document.getElementById('gift_messages');
+
+    const div_time = '<div class="message-time">' + (data.time || new Date().toLocaleTimeString()) + '</div>';
+    const div_username = '<div><span class="message-user">✨ ' + danmuJs.escapeHtml(data.uname) +':</span></div>';
+    const div_msg = '<div class="message-content">💰' + danmuJs.escapeHtml(data.message) + '</div>';
+    const msgDiv = danmuJs.createMessageDiv('super-chat', div_time + div_username + div_msg);
+
+    container.appendChild(msgDiv);
+    danmuJs.scrollToBottom(container);
+    danmuJs.counts.danmaku++;
+    document.getElementById('danmaku_count').innerText = danmuJs.counts.danmaku;
+    danmuJs.limitMessages(container);
+}
+
+/**添加入场消息**/
+danmuJs.addWelcome = function(data) {
+    const container = document.getElementById('welcome_messages');
+
+    const div_time = '<div class="message-time">' + (data.time || new Date().toLocaleTimeString()) + '</div>';
+    const div_guard = '<div class="message-content">⭐ ' + danmuJs.escapeHtml(data.guard_name) + danmuJs.escapeHtml(data.uname) + '进入直播间</div>';
+    const div_normal = '<div class="message-content">👋 ' + danmuJs.escapeHtml(data.uname) +'进入直播间</div>';
+
+    const msgDiv = danmuJs.createMessageDiv('welcome', div_time + (data.guard_name ? div_guard : div_normal));
+
+    container.appendChild(msgDiv);
+    danmuJs.scrollToBottom(container);
+    danmuJs.counts.welcome++;
+    document.getElementById('welcome_count').innerText = danmuJs.counts.welcome;
+    danmuJs.limitMessages(container);
+}
+
+/**生成消息体**/
+danmuJs.createMessageDiv = function(type, innerHtml) {
+    const div = document.createElement('div');
+    div.className = `message-item ${type}-item`;
+    div.innerHTML = innerHtml;
+    return div;
+}
+
+/**自动滚动到底部**/
+danmuJs.scrollToBottom = function(container) {
+    setTimeout(() => { container.scrollTop = container.scrollHeight; }, 10);
+}
+
+/**消息超限后清除前面的消息**/
+danmuJs.limitMessages = function(container, maxCount = 200) {
+    while (container.children.length > maxCount) {
+        container.removeChild(container.firstChild);
+    }
+}
+
+/**清除所有的消息**/
+danmuJs.clearAllMessages = function() {
+    document.getElementById('gift_messages').innerHTML = '';
+    document.getElementById('danmaku_messages').innerHTML = '';
+    document.getElementById('welcome_messages').innerHTML = '';
+    danmuJs.counts = { gift: 0, danmaku: 0, welcome: 0 };
+    document.getElementById('gift_count').innerText = '0';
+    document.getElementById('danmaku_count').innerText = '0';
+    document.getElementById('welcome_count').innerText = '0';
+}
+
+/**优化文本**/
+danmuJs.escapeHtml = function(text) {
+    if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+    return div.innerHTML;
+}
+
+/*切换列*/
+danmuJs.toggleColumn = function(column) {
+    const columnMap = { 'gift': 'column_gift', 'welcome': 'column_welcome' };
+    const colElement = document.getElementById(columnMap[column]);
+    if (!colElement) return;
+
+    danmuJs.collapsedColumns[column] = !danmuJs.collapsedColumns[column];
+
+    if (danmuJs.collapsedColumns[column]) {
+        colElement.classList.add('collapsed');
+    } else {
+        colElement.classList.remove('collapsed');
+    }
+
+//    danmuJs.updateCollapseButtons();
+}
+
+/**收起所有的列**/
+danmuJs.toggleAllColumns = function() {
+    danmuJs.toggleColumn('gift');
+    danmuJs.toggleColumn('welcome');
+}
+
+/**更新收放按钮的状态**/
+danmuJs.updateCollapseButtons=function() {
+    const giftCol = document.getElementById('column_gift');
+    const welcomeCol = document.getElementById('column_welcome');
+    const giftBtn = giftCol?.querySelector('.collapse-btn');
+    const welcomeBtn = welcomeCol?.querySelector('.collapse-btn');
+    console.log(giftBtn);
+    console.log("礼物栏状态" +danmuJs.collapsedColumns.gift)
+    if (giftBtn) {
+        giftBtn.textContent  = danmuJs.collapsedColumns.gift ? '▶' : '◀';
+        // 强制设置样式
+        giftBtn.style.color = '#ffffff';
+        giftBtn.style.fontSize = '16px';
+        giftBtn.style.fontWeight = 'bold';
+        giftBtn.style.opacity = '1';
+        giftBtn.style.visibility = 'visible';
+
+    };
+    if (welcomeBtn) {
+        welcomeBtn.innerHTML = (danmuJs.collapsedColumns.welcome ? '◀' : '▶');
+
+    };
 }
 
 
@@ -118,8 +268,18 @@ danmuJs.startStop = function (event) {
 
 //更新房间链接状态
 danmuJs.setRoomStatus = function (data) {
-    span_status = document.getElementById('txt_status');
-    span_status.innerText = data.message;
+    const roomId = document.getElementById('room_id_display');
+    const roomTitle = document.getElementById('room_title_display');
+    const span_status = document.getElementById('status_text_display');
+    const status_dot = document.getElementById('status_dot');
+    if (data.type == '1'){
+        status_dot.classList.add("connected");
+        span_status.innerText="正在监听……";
+    }
+    else{
+        status_dot.classList.remove("connected");
+        span_status.innerText="未监听";
+    }
     span_status.setAttribute("data-running", data.type);
 }
 
@@ -152,6 +312,14 @@ danmuJs.applyFilter = function () {
         }
     });
 }
+
+
+
+
+
+
+
+
 
 // 清空消息
 danmuJs.clearMessages = function () {
@@ -186,7 +354,7 @@ danmuJs.addMessage = function (type, data) {
             break;
         case 'welcome':
             typeText = '👋 欢迎';
-            contentHtml = `<span class="message-user">${data.uname}</span> 进入直播间`;
+            contentHtml = `<span class="message-user">${data.guard_name}${data.uname}</span> 进入直播间`;
             break;
         case 'guard':
             typeText = '⚓ 大航海';

@@ -90,7 +90,7 @@
    height:1.2rem;
 }
 .divqrcode{
-    width:100%;
+    width:10rem;
     display:flex;
     flex-direction:column;
     justify-content: space-center;
@@ -98,6 +98,7 @@
 }
 .divqrcode .imgqrcode{
     width:100%;
+    margin: 0 auto;
 }
 .divqrcode span{
     width:100%;

@@ -1,0 +1,100 @@
+{
+  'room_display_id': 26172108,
+  'room_real_id': 26172108,
+  'type': 'ENTRY_EFFECT',
+  'data': {
+    'cmd': 'ENTRY_EFFECT',
+    'data': {
+      'id': 381,
+      'uid': 3546855109560562,
+      'target_id': 381159823,
+      'mock_effect': 0,
+      'face': 'https://i1.hdslb.com/bfs/face/c8538815b0ae9aca5f9bb8996b21d99763ca9aea.jpg',
+      'privilege_type': 0,
+      'copy_writing': '<%不会打狙的魔王...%> 来了',
+      'copy_color': '#F7F7F7',
+      'highlight_color': '#FFFFFF',
+      'priority': 1,
+      'basemap_url': '',
+      'show_avatar': 0,
+      'effective_time': 0,
+      'web_basemap_url': 'https://i0.hdslb.com/bfs/live/mlive/b436ffaac9ef05903023cc6acbcb59376d10ccd1.png',
+      'web_effective_time': 4,
+      'web_effect_close': 1,
+      'web_close_time': 900,
+      'business': 6,
+      'copy_writing_v2': '<%不会打狙的魔…%> 来了',
+      'icon_list': [],
+      'max_delay_time': 7,
+      'trigger_time': 1777262200718587453,
+      'identities': 1,
+      'effect_silent_time': 0,
+      'effective_time_new': 0,
+      'web_dynamic_url_webp': '',
+      'web_dynamic_url_apng': '',
+      'mobile_dynamic_url_webp': '',
+      'wealthy_info': {
+        'uid': 0,
+        'level': 25,
+        'level_total_score': 0,
+        'cur_score': 0,
+        'upgrade_need_score': 0,
+        'status': 0,
+        'dm_icon_key': ''
+      },
+      'new_style': 1,
+      'is_mystery': False,
+      'uinfo': {
+        'uid': 3546855109560562,
+        'base': {
+          'name': '不会打狙的魔王爱丶',
+          'face': 'https://i1.hdslb.com/bfs/face/c8538815b0ae9aca5f9bb8996b21d99763ca9aea.jpg',
+          'name_color': 0,
+          'is_mystery': False,
+          'risk_ctrl_info': None,
+          'origin_info': None,
+          'official_info': None,
+          'name_color_str': ''
+        },
+        'medal': {
+          'name': 'en有鱼',
+          'level': 15,
+          'color_start': 12632256,
+          'color_end': 12632256,
+          'color_border': 12632256,
+          'color': 12478086,
+          'id': 1232304,
+          'typ': 0,
+          'is_light': 0,
+          'ruid': 381159823,
+          'guard_level': 0,
+          'score': 545,
+          'guard_icon': '',
+          'honor_icon': '',
+          'v2_medal_color_start': '#919298CC',
+          'v2_medal_color_end': '#919298CC',
+          'v2_medal_color_border': '#919298CC',
+          'v2_medal_color_text': '#FFFFFF',
+          'v2_medal_color_level': '#919298E6',
+          'user_receive_count': 0
+        },
+        'wealth': {
+          'level': 25,
+          'dm_icon_key': ''
+        },
+        'title': None,
+        'guard': {
+          'level': 0,
+          'expired_str': ''
+        },
+        'uhead_frame': None,
+        'guard_leader': None
+      },
+      'full_cartoon_id': 1801,
+      'priority_level': 0,
+      'wealth_style_info': {
+        'url': 'https://i0.hdslb.com/bfs/live/7e3c647c9b6abea76703f43fe89f0dd729a63954.png'
+      }
+    }
+  }
+}

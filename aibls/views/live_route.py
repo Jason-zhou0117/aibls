@@ -13,11 +13,12 @@ from bilibili_api import Credential, live, sync
 from flask import session, render_template, request
 from flask_socketio import emit
 
-from aibls.decorators.decorator import check_session_2api_decorator
+from aibls.decorators.decorator import check_session_2api_decorator, check_session_go_login_decorator
 from aibls.models.users import LoginCookie
 from aibls.services.danmu_handler import AsyncMessageGenerator
 from aibls.services.danmu_service import DanmuService
 from aibls.views import live_api
+from aibls.views.room_route import room_service
 
 from stock_io import socketio, app, message_queue
 
@@ -96,17 +97,28 @@ consumer_thread.start()
 print(f"[{datetime.now().strftime('%H:%M:%S')}] 消费者线程已启动")
 
 
-@live_api.route('/danmu/<int:room_id>')
-def danmu_page(room_id):
+@live_api.route('/')
+@check_session_go_login_decorator
+def danmu_page():
     """主页"""
     if generator.running:
         generator.stop()
+
     login_user: dict[str, Any] = session.get("login_user")
     user_credential: Credential = LoginCookie.dic_to_credential(login_user)
-    generator.connect(user_credential,room_id)
-    generator.start()
+
+    room_data = room_service.get_default_live_room()
+    room_id="000000"
+    room_owner="未设置房间"
+
+    if room_data is not None:
+        room_id = room_data["room_id"]
+        room_owner=room_data["room_user_name"]
+        generator.connect(user_credential,room_id)
+        generator.start()
+
     return render_template('danmu.html',nick_name=login_user["nick_name"],
-                           user_face=login_user["user_face"],room_id=room_id)
+                           user_face=login_user["user_face"],room_id=room_id,room_owner=room_owner)
 
 
 @live_api.route('/danmu/start/<int:room_id>')

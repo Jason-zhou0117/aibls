@@ -1,0 +1,79 @@
+{
+  'room_display_id': 26172108,
+  'room_real_id': 26172108,
+  'type': 'ENTRY_EFFECT',
+  'data': {
+    'cmd': 'ENTRY_EFFECT',
+    'data': {
+      'id': 380,
+      'uid': 3706937470356245,
+      'target_id': 381159823,
+      'mock_effect': 0,
+      'face': 'https://i2.hdslb.com/bfs/face/afe36d3cc257a1dab8718d6ffa97614354b5f66f.jpg',
+      'privilege_type': 0,
+      'copy_writing': '<%啦XI教练%> 来了',
+      'copy_color': '#F7F7F7',
+      'highlight_color': '#FFFFFF',
+      'priority': 1,
+      'basemap_url': '',
+      'show_avatar': 0,
+      'effective_time': 0,
+      'web_basemap_url': 'https://i0.hdslb.com/bfs/live/mlive/19e7564ed9d466b02f341abfa979c6e38c2ffffb.png',
+      'web_effective_time': 4,
+      'web_effect_close': 1,
+      'web_close_time': 900,
+      'business': 6,
+      'copy_writing_v2': '<%啦XI教练%> 来了',
+      'icon_list': [],
+      'max_delay_time': 7,
+      'trigger_time': 1777266425612525111,
+      'identities': 1,
+      'effect_silent_time': 0,
+      'effective_time_new': 0,
+      'web_dynamic_url_webp': '',
+      'web_dynamic_url_apng': '',
+      'mobile_dynamic_url_webp': '',
+      'wealthy_info': {
+        'uid': 0,
+        'level': 16,
+        'level_total_score': 0,
+        'cur_score': 0,
+        'upgrade_need_score': 0,
+        'status': 0,
+        'dm_icon_key': ''
+      },
+      'new_style': 1,
+      'is_mystery': False,
+      'uinfo': {
+        'uid': 3706937470356245,
+        'base': {
+          'name': '啦XI教练',
+          'face': 'https://i2.hdslb.com/bfs/face/afe36d3cc257a1dab8718d6ffa97614354b5f66f.jpg',
+          'name_color': 0,
+          'is_mystery': False,
+          'risk_ctrl_info': None,
+          'origin_info': None,
+          'official_info': None,
+          'name_color_str': ''
+        },
+        'medal': None,
+        'wealth': {
+          'level': 16,
+          'dm_icon_key': ''
+        },
+        'title': None,
+        'guard': {
+          'level': 0,
+          'expired_str': ''
+        },
+        'uhead_frame': None,
+        'guard_leader': None
+      },
+      'full_cartoon_id': 1802,
+      'priority_level': 0,
+      'wealth_style_info': {
+        'url': 'https://i0.hdslb.com/bfs/live/ea32c9db0a5402580541ec974f336ad55b473869.png'
+      }
+    }
+  }
+}
