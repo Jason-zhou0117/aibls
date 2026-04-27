@@ -2,14 +2,14 @@ import uuid
 
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-from sqlalchemy import Index, text, CHAR, Column, String, Integer, Text, DateTime
+from sqlalchemy import Index, text, CHAR, Column, String, Integer, Text, DateTime, PrimaryKeyConstraint
 
 from aibls.models.base import BaseModel
 
 db = SQLAlchemy()
 
 
-class Danmaku(BaseModel):
+class DanmakuInfo(BaseModel):
     """弹幕模型 - 使用MySQL分区表"""
     __tablename__ = 'danmaku_info'
 
@@ -26,6 +26,10 @@ class Danmaku(BaseModel):
 
     # 创建索引
     __table_args__ = (
+
+        # 复合主键：id + sendtime
+        PrimaryKeyConstraint('id', 'send_time', name='danmaku_info'),
+
         Index('idx_room_id_send_time', 'room_id', 'send_time'),
         Index('idx_user_id_send_time', 'user_id', 'send_time'),
         Index('idx_send_time', 'send_time'),
