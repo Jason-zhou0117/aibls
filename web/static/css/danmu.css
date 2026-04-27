@@ -1,0 +1,102 @@
+.filter-bar {
+    padding: 10px 20px;
+    background: white;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.filter-btn {
+    padding: 6px 10px;
+    margin-right: 8px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: white;
+    cursor: pointer;
+    font-size: 0.6rem;
+    transition: all 0.2s;
+}
+
+.filter-btn:hover {
+    background: #edf2f7;
+}
+
+.filter-btn.active {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+}
+
+.messages-container {
+
+    overflow-y: auto;
+    padding: 0.2em;
+
+}
+
+.message {
+    padding: 12px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    background: #f7fafc;
+    border-left: 4px solid;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.message.danmaku {
+    border-left-color: #667eea;
+}
+
+.message.gift {
+    border-left-color: #fbbf24;
+}
+
+.message.welcome {
+    border-left-color: #48bb78;
+}
+
+.message.guard {
+    border-left-color: #9f7aea;
+}
+
+.message.view {
+    border-left-color: #f56565;
+}
+.message.super_chat {
+    border-left-color: #f56565;
+}
+
+.message.system {
+    border-left-color: #718096;
+}
+.message.hidden {
+    display: none;
+}
+
+.message-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    font-size: 12px;
+    color: #718096;
+}
+
+.message-user {
+    font-weight: bold;
+    color: #2d3748;
+}
+
+.message-content {
+    font-size: 14px;
+    color: #1a202c;
+
+}

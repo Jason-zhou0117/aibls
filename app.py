@@ -1,3 +1,10 @@
+# 首先执行 eventlet.monkey_patch()
+import asyncio
+import datetime
+import queue
+
+import eventlet
+
 import logging
 import time
 from logging.handlers import RotatingFileHandler
@@ -11,12 +18,12 @@ from flask import session, render_template
 
 from aibls import db, config
 from aibls.decorators.decorator import check_session_go_login_decorator
-from aibls.views import user_api, room_api, live_api
+
 
 from aibls.views.room_route import room_service
-from aibls.views.live_route import danmu_service
-from aibls.views.login_route import user_service
-from stock_io import socketio
+from aibls.views.live_route import danmu_service, generator
+
+from stock_io import socketio, message_queue
 
 
 def create_app():
@@ -40,6 +47,7 @@ def create_app():
     return app
 
 def register_blueprint(app: Flask):
+    from aibls.views import user_api, room_api, live_api
     """
     这是注册
     :param app: 传入Flask APP
@@ -51,6 +59,18 @@ def register_blueprint(app: Flask):
     app.register_blueprint(room_api)
     #注册弹幕API的蓝图
     app.register_blueprint(live_api)
+
+    print_registered_routes(app)
+
+def print_registered_routes(app):
+    """调试函数：启动时打印所有路由"""
+    print("\n" + "=" * 60)
+    print("当前已成功注册的路由列表：")
+    print("=" * 60)
+    for rule in app.url_map.iter_rules():
+        methods = ','.join(sorted(rule.methods - {'HEAD', 'OPTIONS'}))
+        print(f"{rule.endpoint:30s} | {methods:15s} | {rule.rule}")
+    print("=" * 60 + "\n")
 
 def register_log(app: Flask):
     """
@@ -71,15 +91,18 @@ def register_log(app: Flask):
 
 #初始化APP
 app= create_app()
-socketio.init_app(app, cors_allowed_origins="*",async_mode='eventlet'  )
+socketio.init_app(app,
+                    cors_allowed_origins="*",
+                    async_mode='gevent',
+                    logger=True,
+                    engineio_logger=True)
 
 
-@app.route("/")
+@app.route("/index")
 @check_session_go_login_decorator
 def index():
     login_user : dict[str,Any] = session.get("login_user")
-    filters = {"login_id": login_user["login_id"]}
-    result_data = room_service.load_rooms_by_filter(filters)
+    result_data = room_service.load_rooms_by_filter(None)
     return render_template('index.html',nick_name=login_user["nick_name"],
                            user_face=login_user["user_face"],
                            rooms=result_data["items"])
@@ -135,6 +158,28 @@ def debug_routes():
         'routes': routes,
         'blueprints': list(app.blueprints.keys())
     })
-#执行APP
+
+
+
+
 if __name__ == "__main__":
-    socketio.run(app, debug=True,port=5000, allow_unsafe_werkzeug=True if app.debug else False)
+    try:
+        print("=" * 60)
+        print("启动服务器...")
+        print(f"生成器ID: {generator.generator_id}")
+        print(f"队列大小: {message_queue.qsize()}")
+        print("=" * 60)
+        print("访问地址: http://localhost:5000")
+        print("=" * 60)
+
+        # 使用 socketio.run 而不是 app.run
+        socketio.run(app,
+                     debug=True,
+                     port=5000,
+                     allow_unsafe_werkzeug=True,
+                     use_reloader=False)  # 禁用重载器以避免线程问题
+
+    except KeyboardInterrupt:
+        print("\n👋 正在关闭服务器...")
+        generator.stop()
+        print("服务器已关闭")

@@ -22,6 +22,10 @@ header{
     height: 5rem;
     width:100%;
 }
+.spaceheader{
+    height: 8rem;
+    width:100%;
+}
 .header_top{
     height: 2.5rem;
     background-color: #2dbce8;

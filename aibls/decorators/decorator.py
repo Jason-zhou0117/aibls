@@ -1,8 +1,14 @@
 import asyncio
 import functools
 
+from bilibili_api import Credential
 from flask import session, render_template, jsonify
 
+from aibls.exceptions.BLSException import BLSException
+from aibls.models.users import LoginCookie
+from aibls.services.user_service_file import UserServiceFile
+
+user_service = UserServiceFile()
 
 def check_session_go_login_decorator(func):
     """校验是否登录，如没有跳转到登录页面"""
@@ -12,7 +18,17 @@ def check_session_go_login_decorator(func):
         if login_user is None:
             return render_template('login.html')
         else:
-            return func(*args, **kwargs)
+            try:
+                #重新获取一次登录用户信息，以免登录态过期
+                user_credential:Credential = LoginCookie.dic_to_credential(login_user)
+                login_user_info = user_service.test_login_status(user_credential)
+                if login_user_info:
+                    session["login_user"] = login_user
+                    return func(*args,**kwargs)
+                else:
+                    return render_template('login.html')
+            except BLSException as e:
+                return render_template('login.html')
     return inner
 
 def check_session_2api_decorator(func):

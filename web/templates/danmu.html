@@ -1,44 +1,95 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta name="referrer" content="no-referrer" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bili批量处理系统</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/reset.css') }}" type="text/css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/head.css') }}" type="text/css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/roomlist.css') }}" type="text/css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>B站弹幕监控</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/danmu2.css') }}" type="text/css">
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
     <script src="{{ url_for('static', filename='js/head.js') }}" ></script>
     <script src="{{ url_for('static', filename='js/danmu.js') }}" ></script>
 </head>
 <body>
-    <header>
-        <div class="header">
-
-            <div class="header_top">
-                <span class="head_user_pic">
-                    <img src="{{user_face}}" alt="头像"/>
-                </span>
-                <span class="head_user_txt" onclick="javascript:gotosetting();">
-                    {{nick_name}}
-                </span>
+    <!-- 新版Header -->
+    <div class="header">
+        <div class="header-content">
+            <!-- 左侧 Logo -->
+            <div class="header-left">
+                <div class="logo">
+                    <span class="logo-icon">🎬</span>
+                    <span class="logo-text">BiliMon</span>
+                </div>
             </div>
-            <div class="nav_title">
-                <span>
-                    <img src="{{ url_for('static', filename='images/btn_home.png') }}" alt="返回主页" data-roomid="{{room_id}}" data-running="0" onclick="javascript:danmuJs.startStop(event)"/>
-                </span>
-                <span id="txt_status">未监听{{room_id}}</span>
+
+            <!-- 中间：直播间信息 -->
+            <div class="header-center">
+                <div class="room-info-card">
+                    <div class="room-id">
+                        <span class="room-id-label">房间号</span>
+                        <span class="room-id-value" id="room_id_display">[{{room_id}}]</span>
+                    </div>
+                    <div class="room-title">
+                        <span class="room-title-label">📺</span>
+                        <span class="room-title-value" id="room_title_display">{{room_owner}}</span>
+                    </div>
+                    <div class="connection-status">
+                        <span class="status-dot connected" id="status_dot"></span>
+                        <span class="status-text" id="status_text_display" data-roomid="{{room_id}}" data-running="1" onclick="danmuJs.startStop(event)">正在监听</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧：按钮区域 -->
+            <div class="header-right">
+                <!-- 配置按钮 -->
+                <button class="header-btn" id="config_btn" onclick="headJs.openConfig()">
+                    <span class="btn-icon">⚙️</span>
+                    <span>配置</span>
+                </button>
+
+                <!-- 登录用户按钮/用户信息 -->
+                <div id="user_area">
+                    <!-- 已登录状态显示用户信息 -->
+                    <div class="user-info" id="user_info" onclick="headJs.openLogin()">
+                        <div class="user-avatar" id="user_avatar"> <img src="{{user_face}}" alt="头像"/></div>
+                        <span class="user-name" id="user_name"> {{nick_name}}</span>
+                    </div>
+                </div>
             </div>
         </div>
-    </header>
-    <section>
-        <div class="spaceheader"></div>
+    </div>
 
-        <div class="spacefooter"></div>
-    </section>
+    <!-- 三列消息容器 -->
+    <div class="columns-container">
+        <div class="column column-gift" id="column_gift">
+            <div class="column-header" onclick="danmuJs.toggleColumn('gift')">
+                <span>🎁 礼物 / 上舰</span>
+                <span class="count" id="gift_count">0</span>
+                <button class="collapse-btn" onclick="event.stopPropagation(); danmuJs.toggleColumn('gift')">◀</button>
+            </div>
+            <div id="gift_messages" class="messages-container"></div>
+        </div>
+
+        <div class="column column-danmaku">
+            <div class="column-header">
+                <span>💬 弹幕 / 醒目留言</span>
+                <span class="count" id="danmaku_count">0</span>
+            </div>
+            <div id="danmaku_messages" class="messages-container"></div>
+        </div>
+
+        <div class="column column-welcome" id="column_welcome">
+            <div class="column-header" onclick="danmuJs.toggleColumn('welcome')">
+                <span>👋 进场 / 欢迎</span>
+                <span class="count" id="welcome_count">0</span>
+                <button class="collapse-btn" onclick="event.stopPropagation(); danmuJs.toggleColumn('welcome')">▶</button>
+            </div>
+            <div id="welcome_messages" class="messages-container"></div>
+        </div>
+    </div>
+</body>
     <script>
         //初始化
-        danmuJs.init();
+        document.addEventListener('DOMContentLoaded', () => { danmuJs.init(); });
     </script>
-</body>
 </html>

@@ -6,15 +6,15 @@ from typing import Any
 
 from bilibili_api import Credential
 from bilibili_api.login_v2 import QrCodeLogin, QrCodeLoginEvents
-from flask import jsonify, session
+from flask import jsonify, session, render_template
 
-from aibls.services.user_service import UserService
+from aibls.services.user_service_file import UserServiceFile
 from aibls.utils.snowflake import Snowflake
 from aibls.views import user_api
 
 logger = logging.getLogger(__name__)
 
-user_service = UserService()
+user_service = UserServiceFile()
 
 qrcode_login = QrCodeLogin()
 
@@ -24,6 +24,12 @@ def to_sync(awaitable):
     asyncio.set_event_loop(loop)
     return loop.run_until_complete(awaitable)
 
+
+@user_api.route('/login/page')
+def login_page():
+    """主页"""
+    return render_template('login.html')
+
 @user_api.route("/login/qrcode")
 def refresh_qrcode():
     """
@@ -31,14 +37,18 @@ def refresh_qrcode():
     :return:
     """
     #清除存量数据
+    logger.info("生成二维码的保存目录")
     _clear_qrcode_file()
 
     qrcode_key = Snowflake().next_id()
     #获取二维码的元数据（从login中获取方法）
+    logger.info("生成二维码的KEY={}".format(qrcode_key))
     to_sync(qrcode_login.generate_qrcode())
     source_url = qrcode_login.get_qrcode_picture().url
     #创建二维码，并获取文件名（不包括路径）
     img_url = _copy_qrcode_local(source_url,qrcode_key)
+
+    logger.info("生成二维码的IMAGEURL={}".format(img_url))
 
     session["qrcode_key"] = qrcode_key
     session.modified = True
@@ -61,7 +71,7 @@ def _copy_qrcode_local(qrcode_url,qrcode_key):
     #将临时目录的文件Copy到对应目录
     shutil.copyfile(qrcode_url.replace("file://",""), file_path)
     #返回目标二维码图片的WebUrl
-    img_url = f'static/images/qrcodes/{filename}'
+    img_url = f'/static/images/qrcodes/{filename}'
     return img_url
 
 @user_api.route("/login/poll")

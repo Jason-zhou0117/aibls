@@ -12,4 +12,6 @@ room_api = Blueprint("room_api",__name__)
 live_api = Blueprint("live_api",__name__)
 
 
-
+from aibls.views import login_route   # 导入登录路由
+from aibls.views import room_route    # 导入房间路由
+from aibls.views import live_route

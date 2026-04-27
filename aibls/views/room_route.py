@@ -8,13 +8,13 @@ from flask import Blueprint, session, request, jsonify, render_template
 from aibls.decorators.decorator import check_session_2api_decorator, check_session_go_login_decorator
 from aibls.models.users import LoginCookie
 from aibls.services.response import ResponseResult
-from aibls.services.room_service import RoomService
+from aibls.services.room_service_file import RoomServiceFile
 from aibls.views import room_api
 
 """日志对象的记录"""
 logger = logging.getLogger(__name__)
 
-room_service = RoomService()
+room_service = RoomServiceFile()
 
 @room_api.route('/api/updateroom', methods=['GET','POST'])
 @check_session_2api_decorator

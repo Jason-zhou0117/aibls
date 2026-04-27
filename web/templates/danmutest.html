@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="referrer" content="no-referrer" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bili批量处理系统</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/reset.css') }}" type="text/css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/head.css') }}" type="text/css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/danmu.css') }}" type="text/css">
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="{{ url_for('static', filename='js/head.js') }}" ></script>
+    <script src="{{ url_for('static', filename='js/danmu.js') }}" ></script>
+</head>
+<body>
+    <header>
+        <div class="header">
+
+            <div class="header_top">
+                <span class="head_user_pic">
+                    <img src="{{user_face}}" alt="头像"/>
+                </span>
+                <span class="head_user_txt">
+                    {{nick_name}}
+                </span>
+            </div>
+            <div class="nav_title">
+                <span>
+                    <img src="{{ url_for('static', filename='images/btn_home.png') }}" alt="返回主页" />
+                </span>
+                <span id="txt_status" style="cursor:pointer" data-roomid="{{room_id}}" data-running="1" onclick="danmuJs.startStop(event)">正在监听[{{room_id}}]</span>
+            </div>
+            <div class="filter-bar">
+                <button class="filter-btn active" onclick="danmuJs.filterMessages('all')">全部</button>
+                <button class="filter-btn" onclick="danmuJs.filterMessages('danmaku')">弹幕</button>
+                <button class="filter-btn" onclick="danmuJs.filterMessages('gift')">礼物</button>
+                <button class="filter-btn" onclick="danmuJs.filterMessages('welcome')">欢迎</button>
+                <button class="filter-btn" onclick="danmuJs.filterMessages('guard')">大航海</button>
+                <button class="filter-btn" onclick="danmuJs.clearMessages()" style="float: right;">清空</button>
+            </div>
+        </div>
+    </header>
+    <section id="sectionMain">
+        <div class="spaceheader"></div>
+        <div class="messages-container" id="messages">
+            <div class="message system">
+                <div class="message-header">
+                    <span>系统</span>
+                    <span>-</span>
+                </div>
+                <div class="message-content">输入直播间号，点击"连接"开始接收弹幕</div>
+            </div>
+        </div>
+        <div class="spacefooter"></div>
+    </section>
+    <script>
+        //初始化
+        danmuJs.init();
+    </script>
+</body>
+</html>
