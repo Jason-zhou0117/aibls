@@ -274,7 +274,7 @@ danmuJs.setRoomStatus = function (data) {
     const status_dot = document.getElementById('status_dot');
     if (data.type == '1'){
         status_dot.classList.add("connected");
-        span_status.innerText="正在监听……";
+        span_status.innerText="正在监听";
     }
     else{
         status_dot.classList.remove("connected");
@@ -314,6 +314,32 @@ danmuJs.applyFilter = function () {
 }
 
 
+danmuJs.changeRoom = function (){
+    let room_id = prompt('请输入房间号：');
+    if (room_id == ""){
+        alert("请输入房间号");
+        return
+    }
+    formData = new FormData();
+    formData.append('room_id', room_id);
+    fetch('/api/updateroom',{
+        method:"post",
+        body:formData,
+        headers:{}
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.code == 0){
+           location.reload();
+        }
+        else{
+            alert(data.message);
+        }
+    })
+    .catch(error => console.error('Error:', error))
+    .finally(() => {
+    });
+}
 
 
 

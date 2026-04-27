@@ -18,10 +18,10 @@ from flask import session, render_template
 
 from aibls import db, config
 from aibls.decorators.decorator import check_session_go_login_decorator
-
+from aibls.views.live_route import generator
 
 from aibls.views.room_route import room_service
-from aibls.views.live_route import danmu_service, generator
+# from aibls.views.live_route import danmu_service, generator
 
 from stock_io import socketio, message_queue
 

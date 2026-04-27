@@ -27,7 +27,8 @@ logger = logging.getLogger(__name__)
 
 danmu_service = DanmuService()
 
-
+# 创建生成器实例
+generator = AsyncMessageGenerator(message_queue)
 
 def message_consumer():
     """消息消费者函数 - 独立线程运行"""
@@ -55,8 +56,16 @@ def message_consumer():
                     # 添加处理时间戳
                     message['pushed_at'] = datetime.now().isoformat()
                     logger.info(f"从消息队列中获取消息：{message},并准备推送……")
-                    # 通过SocketIO推送到所有连接的客户端
-                    socketio.emit(message["type"], message)
+                    # 根据消息类型推送到前端
+                    msg_type = message.get("type")
+
+                    if msg_type == "video_command":
+                        # 视频指令使用独立事件名
+                        socketio.emit('video_command', message)
+                        logger.info(f"已推送视频指令: {message.get('uname')}")
+                    else:
+                        # 其他消息类型（danmaku,gift,welcome,guard,super_chat）
+                        socketio.emit(msg_type, message)
 
                     logger.info(
                         f"[{datetime.now().strftime('%H:%M:%S')}] 消息队列剩余: {message_queue.qsize()}")
@@ -86,8 +95,7 @@ def message_consumer():
             time.sleep(0.5)
 
 
-# 创建生成器实例
-generator = AsyncMessageGenerator(message_queue)
+
 
 
 
@@ -101,11 +109,20 @@ print(f"[{datetime.now().strftime('%H:%M:%S')}] 消费者线程已启动")
 @check_session_go_login_decorator
 def danmu_page():
     """主页"""
-    if generator.running:
-        generator.stop()
+    global generator  # 添加这一行
 
-    login_user: dict[str, Any] = session.get("login_user")
-    user_credential: Credential = LoginCookie.dic_to_credential(login_user)
+    # 完全销毁旧的
+    if generator:
+        generator.stop()
+        # 等待线程完全结束
+        time.sleep(0.5)
+        generator = None
+
+    # 创建全新的
+    generator = AsyncMessageGenerator(message_queue)
+
+    login_user = session.get("login_user")
+    user_credential = LoginCookie.dic_to_credential(login_user)
 
     room_data = room_service.get_default_live_room()
     room_id="000000"
@@ -113,9 +130,26 @@ def danmu_page():
 
     if room_data is not None:
         room_id = room_data["room_id"]
-        room_owner=room_data["room_user_name"]
-        generator.connect(user_credential,room_id)
+        room_owner = room_data["room_user_name"]
+        generator.connect(user_credential, room_id)
         generator.start()
+        print(f"🎉 全新 generator 创建完成，房间: {room_id}")
+
+    # if generator.running:
+    #     generator.stop()
+    #
+    # login_user: dict[str, Any] = session.get("login_user")
+    # user_credential: Credential = LoginCookie.dic_to_credential(login_user)
+    #
+    # room_data = room_service.get_default_live_room()
+    # room_id="000000"
+    # room_owner="未设置房间"
+    #
+    # if room_data is not None:
+    #     room_id = room_data["room_id"]
+    #     room_owner=room_data["room_user_name"]
+    #     generator.connect(user_credential,room_id)
+    #     generator.start()
 
     return render_template('danmu.html',nick_name=login_user["nick_name"],
                            user_face=login_user["user_face"],room_id=room_id,room_owner=room_owner)

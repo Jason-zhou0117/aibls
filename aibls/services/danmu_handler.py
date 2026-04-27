@@ -7,6 +7,8 @@ from datetime import datetime
 
 from bilibili_api import Credential, live, sync, user
 
+from aibls.utils.vipconfig import VIPConfig
+
 logger = logging.getLogger(__name__)
 
 
@@ -19,6 +21,7 @@ class AsyncMessageGenerator:
         self.thread = None
         self.running = False
         self.generator_id = random.randint(1000, 9999)
+        self._room = None
 
     def connect(self, user_credential: Credential, room_id: int):
         self.credential = user_credential
@@ -27,6 +30,18 @@ class AsyncMessageGenerator:
 
     def start(self):
         """启动消息生成器线程"""
+        # 关键修复：检查线程是否活着，而不是检查 None
+        if self.thread is None or not self.thread.is_alive():
+            self.running = True
+            self.thread = threading.Thread(target=self._run_async_loop)
+            self.thread.daemon = True
+            self.thread.start()
+            logger.info(f"✅ 新线程已启动")
+            return True
+        else:
+            logger.warning(f"线程还在运行中，无法重新启动")
+            return False
+
         if self.thread is None or not self.thread.is_alive():
             self.running = True
             self.thread = threading.Thread(target=self._run_async_loop)
@@ -40,6 +55,20 @@ class AsyncMessageGenerator:
     def stop(self):
         """停止消息生成器"""
         self.running = False
+
+        # 关键：主动断开B站WebSocket连接
+        if self._room:
+            try:
+                # 尝试获取当前连接并断开
+                if hasattr(self._room, '_websocket') and self._room._websocket:
+                    sync(self._room._websocket.close())
+                # 或者调用断开方法（取决于库版本）
+                if hasattr(self._room, 'disconnect'):
+                    sync(self._room.disconnect())
+                logger.info(f"已断开B站房间 {self.room_id} 的连接")
+            except Exception as e:
+                logger.warning(f"断开连接时出错: {e}")
+
         if self.loop and self.loop.is_running():
             self.loop.call_soon_threadsafe(self.loop.stop)
         logger.info(f"[{datetime.now().strftime('%H:%M:%S')}] 消息生成器 {self.generator_id} 已停止")
@@ -240,7 +269,7 @@ class AsyncMessageGenerator:
 
             # 注意：新版协议中用 'uid' 和 'open_id' 区分别，建议用 open_id
             # 安全获取用户信息
-            user_id = data.get('open_id', data.get('uid', '0'))
+            user_id = str(data.get('open_id', data.get('uid', '0')))
             user_info = data.get('uinfo', None)
             user_name = ""
             if user_info is not None and user_id != 0:
@@ -280,6 +309,29 @@ class AsyncMessageGenerator:
 
             # 将弹幕放入消息队列
             self.message_queue.put(info)
+
+            # 2. 检查是否为VIP用户，发送视频播放指令
+            vip_users = VIPConfig.load_json()
+            logger.info(f'**********VIP用户：{vip_users}')
+            if user_id in vip_users:
+                user_config = vip_users[user_id]
+                videos = user_config.get("videos", [])
+                if len(videos) > 0:
+                    video = random.choice(videos)
+                    video_url = video.get("url", "")
+                    logger.info(f"VIP用户入场: {user_name} (UID: {user_id})，触发视频播放: {video.get('url', '')}")
+
+                    video_command = {
+                        "type": "video_command",  # 特殊类型，用于区分
+                        "action": "play_video",
+                        "video_url": video_url,  # 已经是Flask静态路径
+                        "uid": user_id,
+                        "uname": user_name,
+                        "timestamp": datetime.now().isoformat()
+                    }
+                    # 放入消息队列，由消费者推送到前端
+                    self.message_queue.put(video_command)
+
         except Exception as e:
             logger.error(f"解析进入事件数据出错: {e}")
             logger.info(f"文字弹幕，原始数据: {event}")
