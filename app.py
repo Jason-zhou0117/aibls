@@ -18,6 +18,7 @@ from flask import session, render_template
 
 from aibls import db, config
 from aibls.decorators.decorator import check_session_go_login_decorator
+from aibls.views import vip_api
 from aibls.views.live_route import generator
 
 from aibls.views.room_route import room_service
@@ -59,6 +60,8 @@ def register_blueprint(app: Flask):
     app.register_blueprint(room_api)
     #注册弹幕API的蓝图
     app.register_blueprint(live_api)
+    #注册弹幕API的蓝图
+    app.register_blueprint(vip_api)
 
     print_registered_routes(app)
 

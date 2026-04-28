@@ -1,38 +1,444 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
+    <meta charset="UTF-8">
     <meta name="referrer" content="no-referrer" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bili批量处理系统</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/reset.css') }}" type="text/css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/head.css') }}" type="text/css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/chgpwd.css') }}" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>扫码登录 - BiliMon</title>
     <script src="{{ url_for('static', filename='js/head.js') }}" ></script>
     <script src="{{ url_for('static', filename='js/logins.js') }}" ></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: #1a1a2e;
+            min-height: 100vh;
+        }
+
+        /* ========== Header 样式 ========== */
+        .header {
+            background: linear-gradient(135deg, #1e1e2f 0%, #2d2d44 100%);
+            color: white;
+            padding: 12px 24px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .logo-icon {
+            font-size: 28px;
+        }
+
+        .logo-text {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .header-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 30px;
+            color: white;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .header-btn:hover {
+            background: rgba(255,255,255,0.18);
+            transform: translateY(-1px);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 4px 12px 4px 8px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 40px;
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            overflow: hidden;
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-name {
+            font-size: 13px;
+            max-width: 100px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ========== 登录主体区域 ========== */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(100vh - 70px);
+            padding: 40px 20px;
+        }
+
+        .login-card {
+            background: #0f0f14;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+            max-width: 450px;
+            width: 100%;
+        }
+
+        /* 标题区域 */
+        .login-title {
+            margin-bottom: 30px;
+        }
+
+        .login-title h2 {
+            color: white;
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .login-title p {
+            color: #888;
+            font-size: 14px;
+        }
+
+        /* 二维码区域 */
+        .qrcode-section {
+            margin-bottom: 30px;
+        }
+
+        .qrcode-wrapper {
+            display: inline-block;
+            background: white;
+            padding: 15px;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        .qrcode-placeholder {
+            width: 200px;
+            height: 200px;
+            background: repeating-linear-gradient(
+                45deg,
+                #e0e0e0 0px,
+                #e0e0e0 10px,
+                #f5f5f5 10px,
+                #f5f5f5 20px
+            );
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .qrcode-icon {
+            font-size: 64px;
+        }
+
+        .qrcode-placeholder span:last-child {
+            font-size: 14px;
+            color: #666;
+            background: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        /* 真实二维码图片（替换占位符） */
+        .qrcode-image {
+            width: 200px;
+            height: 200px;
+            border-radius: 8px;
+            display: block;
+        }
+
+        /* 提示信息 */
+        .qrcode-tip {
+            margin-top: 20px;
+            color: #aaa;
+            font-size: 13px;
+        }
+
+        .qrcode-tip .tip-step {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .tip-step span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+        }
+
+        .tip-step .step-icon {
+            width: 20px;
+            height: 20px;
+            background: rgba(102,126,234,0.2);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            color: #667eea;
+        }
+
+        /* 刷新按钮 */
+        .refresh-btn {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            color: white;
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .refresh-btn:hover {
+            background: rgba(255,255,255,0.15);
+            transform: translateY(-1px);
+        }
+
+        /* 过期提示 */
+        .expired-tip {
+            margin-top: 15px;
+            color: #FF9800;
+            font-size: 12px;
+            display: block;
+        }
+
+        /* 已登录状态 */
+        .loggedin-info {
+            display: none;
+            text-align: center;
+        }
+
+        .loggedin-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            margin: 0 auto 20px;
+            overflow: hidden;
+        }
+
+        .loggedin-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .loggedin-name {
+            color: white;
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .loggedin-uid {
+            color: #888;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        .logout-btn {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(244,67,54,0.3);
+            border-color: #f44336;
+        }
+
+        /* 底部链接 */
+        .login-footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .login-footer a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 12px;
+        }
+
+        .login-footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* 响应式 */
+        @media (max-width: 500px) {
+            .login-card {
+                padding: 30px 20px;
+            }
+            .qrcode-placeholder {
+                width: 160px;
+                height: 160px;
+            }
+            .qrcode-icon {
+                font-size: 48px;
+            }
+            .tip-step {
+                flex-direction: column;
+                gap: 8px !important;
+            }
+        }
+    </style>
 </head>
 <body>
-    <section>
-        <div class="spaceheader"></div>
-        <div class="binduser">
-            <div class="bindusertitle">
-                <img src="{{ url_for('static', filename='images/btn_refresh.png') }}" data-qrkey="" onclick="javascript:loginJs.refreshQrcode();"/>
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">
+                <span class="logo-icon">🎬</span>
+                <span class="logo-text">BiliMon</span>
             </div>
-            <div class="divqrcode" id="divqrcode">
+            <div class="header-buttons">
+                <a href="/live/" class="header-btn">
+                    <span>💬</span> 弹幕
+                </a>
+                <div class="user-info" id="userInfo">
+                    <div class="user-avatar" id="userAvatar">
+                        {% if user_face == '' %}
+                            👤
+                        {% else %}
+                            <img src="{{user_face}}" alt="头像"/>
+                        {% endif %}
+                    </div>
+                    <span class="user-name" id="userName">
+                        {% if nick_name %}
+                            {{nick_name}}
+                        {% else %}
+                            未登录
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <div class="login-container">
+        <!-- 未登录状态 - 二维码登录 -->
+        <div class="login-card" id="loginCard">
+            <div class="login-title">
+                <h2>扫码登录</h2>
+                <p>使用 B站 App 扫码登录</p>
+            </div>
+
+            <div class="qrcode-section">
+                <div class="qrcode-wrapper">
+                    <!-- 真实二维码图片（隐藏，实际使用时显示） -->
+                    <img class="qrcode-image" id="qrcodeImage" src="" alt="登录二维码" >
+                </div>
+
+                <div class="qrcode-tip">
+                    <div class="tip-step">
+                        <span><span class="step-icon">1</span> 打开B站App</span>
+                        <span><span class="step-icon">2</span> 点击右上角扫一扫</span>
+                        <span><span class="step-icon">3</span> 扫描二维码确认登录</span>
+                    </div>
+                </div>
+
+                <button class="refresh-btn" id="refreshBtn">
+                    🔄 刷新二维码
+                </button>
+                <div class="expired-tip" id="expiredTip">
+                    ⚠️ 二维码已过期，请点击刷新
+                </div>
+            </div>
+
+            <div class="login-footer">
+                <a href="#">遇到问题？</a>
             </div>
         </div>
 
-        <div class="spacefooter"></div>
-        <div class="mask_hidden" id="fullmask">
-            <div class="maskcontent">
-                <img src="{{ url_for('static', filename='images/g_loading.gif') }}" />
-                <div class="masktext"><span id="maskmsg">正在执行，请耐心等待……</span></div></div>
+        <!-- 已登录状态（隐藏） -->
+        <div class="login-card" id="loggedinCard" style="display: none;">
+            <div class="loggedin-info">
+                <div class="loggedin-avatar" id="loggedinAvatar">
+                    <span style="font-size: 40px; line-height: 80px;">👤</span>
+                </div>
+                <div class="loggedin-name" id="loggedinName">军哥</div>
+                <div class="loggedin-uid" id="loggedinUid">UID: 651952808</div>
+                <button class="logout-btn" id="logoutBtn">退出登录</button>
+            </div>
+            <div class="login-footer">
+                <a href="/live/vip_config">前往VIP配置</a>
+            </div>
         </div>
-    </section>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            loginJs.refreshQrcode();
+        });
+    </script>
 </body>
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-        loginJs.refreshQrcode();
-    });
-</script>
 </html>

@@ -28,7 +28,11 @@ def to_sync(awaitable):
 @user_api.route('/login/page')
 def login_page():
     """主页"""
-    return render_template('login.html')
+    login_user = session.get("login_user", {})
+    logger.info(f"登录页面的登录用户：{login_user}")
+    return render_template('login.html',
+                          nick_name=login_user.get("nick_name", "未登录"),
+                          user_face=login_user.get("user_face", ""))
 
 @user_api.route("/login/qrcode")
 def refresh_qrcode():

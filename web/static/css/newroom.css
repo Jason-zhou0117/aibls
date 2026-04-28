@@ -1,96 +1,94 @@
-section>.newroomtop{
-    margin-top:0.5rem;
-    margin-bottom:0.5rem;
-}
+* {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-.roomform{
-    height:3rem;
-    display:flex;
-    justify-content: center;
-    align-items: center;
-    background-color: white;
-}
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: #1a1a2e;
+            min-height: 100vh;
+        }
 
-.roomform .input {
-    width: 8rem;
-    height: 1.5rem;
-    padding-left: 0.6rem;
-    border-radius: 0.6rem;
-    border: 0.1rem solid silver;
-    /* 去除表单点击后出现的边框 */
-    outline: none;
-    font-size:0.8rem;
-    color: reb(107, 107, 107);
-}
-.roomform img {
-    width: 1rem;
-    height: 1rem;
-    margin-left:0.5rem;
-}
-.roomform .msgtxt {
-    width: 3rem;
-    height: 1rem;
-    margin-left:0.5rem;
-    color:red;
-    font-size:0.5rem;
-}
+        /* ========== Header 样式 ========== */
+        .header {
+            background: linear-gradient(135deg, #1e1e2f 0%, #2d2d44 100%);
+            color: white;
+            padding: 12px 24px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
 
-.roominfo{
-    height:6rem;
-    width:100%;
-    display:flex;
-    align-items: center;
-    margin-top:0.1rem;
-    justify-content: space-between;
-    background-color: white;
-    border-bottom:1px solid #bfbfbf;
-}
-.roominfo .cover{
-    width:9rem;
-    margin-left:0.5rem;
-    border-radius:0.5rem;
-}
-.roominfo .roomcontents{
-    width:12rem;
-    height:100%;
-    display:flex;
-    flex-direction:column;
-    justify-content: space-between;
-    background-color: white;
-    margin-left:0.5rem;
-}
-.roominfo .roomcontents .room_title{
-    font-size:0.8rem;
-    margin-top:0.5rem;
-    font-weight:bold;
-}
-.roominfo .roomcontents .roomidp{
-    font-size:0.7rem;
-    color: #bfbfbf;
-}
-.roominfo .roomcontents .upuserp{
-    font-size:0.7rem;
-    margin-bottom:0.8rem;
-    color: #bfbfbf;
-}
-.roominfo .buttons{
-    height:100%;
-    width:3rem;
-    display:block;
-    border-left: 1px solid #bfbfbf;
-}
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
 
-.roominfo .buttons .fav_button{
-    width:1.2rem;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top:0.5rem;
-}
-.roominfo .buttons .send_button{
-    width:1.2rem;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top:1.2rem;
-}
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 20px;
+            font-weight: bold;
+        }
 
+        .logo-icon {
+            font-size: 28px;
+        }
 
+        .header-buttons {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .header-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 30px;
+            color: white;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .header-btn:hover {
+            background: rgba(255,255,255,0.18);
+            transform: translateY(-1px);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 4px 12px 4px 8px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 40px;
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }

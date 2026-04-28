@@ -32,7 +32,6 @@ class VIPConfig:
         """
 
         file_path = cls.__get_file_path()
-        logger.info(f"获取VIP用户配置文件路径: {file_path}")
         # 如果变量为空，从文件加载
         if cls._vip_users is None:
             try:
@@ -123,7 +122,7 @@ class VIPConfig:
     def remove_user(cls,uid:str):
         json_data = cls.load_json()
 
-        if uid not in json_data:
+        if uid in json_data:
             # 可选：删除用户关联的视频文件
             user_data = json_data[uid]
             for video in user_data.get('videos', []):
@@ -177,7 +176,7 @@ class VIPConfig:
     def get_video_path(cls, filename: str) -> str:
         # 应用根目录
         app_root = os.getcwd()
-        folder_path = os.path.join(app_root, 'static/videos')
+        folder_path = os.path.join(app_root, 'web\\static\\videos')
         # 如果目录不存在，则生成目录
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)
