@@ -86,6 +86,7 @@ class VIPConfig:
             cls.save_to_file()
         except Exception as e:
             logger.error(f"添加VIP视频配置失败: {e}")
+            raise e
 
 
     @classmethod
@@ -101,3 +102,85 @@ class VIPConfig:
         """重新加载JSON文件"""
         cls._vip_users = None
         return cls.load_json()
+
+    @classmethod
+    def config_to_list(cls):
+        """将字典格式转换为列表格式（用于前端展示）"""
+        items = []
+        config_dict_data = cls.load_json()
+        for uid, user_data in config_dict_data.items():
+            items.append({
+                'userid': uid,
+                'name': user_data.get('name', ''),
+                'nickname': user_data.get('nickname', ''),
+                'face': user_data.get('face', ''),
+                'videos': user_data.get('videos', []),
+                'created_at': user_data.get('created_at', '')
+            })
+        return items
+
+    @classmethod
+    def remove_user(cls,uid:str):
+        json_data = cls.load_json()
+
+        if uid not in json_data:
+            # 可选：删除用户关联的视频文件
+            user_data = json_data[uid]
+            for video in user_data.get('videos', []):
+                video_path = video.get('path')
+                if video_path and os.path.exists(video_path):
+                    try:
+                        os.remove(video_path)
+                    except Exception as e:
+                        logger.error(f"删除视频文件失败: {e}")
+
+            del json_data[uid]
+            cls.save_to_file()
+
+    @classmethod
+    def add_video(cls, vip_user_id:str,video_item:Any):
+        try:
+            if cls._vip_users is None:
+                cls.load_json()
+            if vip_user_id not in cls._vip_users:
+                raise BaseException(-30001,f"用户ID:{vip_user_id}不存在")
+            cls._vip_users[vip_user_id].setdefault('videos', []).append(video_item)
+            cls.save_to_file()
+        except Exception as e:
+            logger.error(f"添加VIP视频文件失败: {e}")
+            raise e
+
+    @classmethod
+    def delete_video(cls, video_id: str):
+        try:
+            if cls._vip_users is None:
+                cls.load_json()
+
+            for uid, user_data in cls._vip_users.items():
+                videos = user_data.get('videos', [])
+                for i, video in enumerate(videos):
+                    if video.get('id') == video_id:
+                        # 删除视频文件
+                        video_path = video.get('path')
+                        if video_path and os.path.exists(video_path):
+                            try:
+                                os.remove(video_path)
+                            except Exception as e:
+                                logger.error(f"删除视频文件失败: {e}")
+
+                        del cls._vip_users[uid]['videos'][i]
+                        cls.save_to_file()
+        except Exception as e:
+            logger.error(f"删除VIP视频文件失败: {e}")
+
+    @classmethod
+    def get_video_path(cls, filename: str) -> str:
+        # 应用根目录
+        app_root = os.getcwd()
+        folder_path = os.path.join(app_root, 'static/videos')
+        # 如果目录不存在，则生成目录
+        if not os.path.exists(folder_path):
+            os.makedirs(folder_path)
+
+        file_path = os.path.join(folder_path, filename)
+        return file_path
