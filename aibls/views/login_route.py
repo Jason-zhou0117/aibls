@@ -11,6 +11,7 @@ from flask import jsonify, session, render_template
 from aibls.services.user_service_file import UserServiceFile
 from aibls.utils.snowflake import Snowflake
 from aibls.views import user_api
+from settings import APP_ROOT
 
 logger = logging.getLogger(__name__)
 
@@ -62,9 +63,8 @@ def refresh_qrcode():
 
 def _copy_qrcode_local(qrcode_url,qrcode_key):
     #应用根目录
-    rt_path = os.getcwd()
     #目标目录
-    dir_path = f'{rt_path}\\web\\static\\images\\qrcodes'
+    dir_path = f'{APP_ROOT}\\web\\static\\images\\qrcodes'
     logger.info("生成二维码的保存目录={}".format(dir_path))
     #如果目录不存在，则生成目录
     if not os.path.exists(dir_path):
@@ -120,8 +120,7 @@ def _clear_qrcode_file():
     if 'qrcode_key' in session:
         qrcode_key = session.get("qrcode_key")
         #组装文件路径
-        rt_path = os.getcwd()
-        file_path = f'{rt_path}\\web\\static\\images\\qrcodes\\qrcode_{qrcode_key}.png'
+        file_path = f'{APP_ROOT}\\web\\static\\images\\qrcodes\\qrcode_{qrcode_key}.png'
         logger.info("清除二维码文件={}".format(file_path))
         #删除文件
         if os.path.exists(file_path):
@@ -136,13 +135,13 @@ def _do_qrcode_event(event):
     :return:
     """
     if event == QrCodeLoginEvents.SCAN:
-        return {"code": 86101, "text": "请扫码二维码"}
+        return {"code": 86101, "text": "️️️⚠️请扫码二维码"}
     elif event == QrCodeLoginEvents.CONF:
-        return {"code": 86090, "text": "点下确认啊"}
+        return {"code": 86090, "text": "⚠️点下确认啊"}
     elif event == QrCodeLoginEvents.TIMEOUT:
-        return {"code": 86038, "text": "二维码过期，请扫新二维码"}
+        return {"code": 86038, "text": "❌二维码过期，请扫新二维码"}
     elif event == QrCodeLoginEvents.DONE:
-        return {"code": 0, "text": "成功"}
+        return {"code": 0, "text": "✅成功"}
 
     else:
         return None

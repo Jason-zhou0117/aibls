@@ -8,6 +8,7 @@ from bilibili_api import Credential, live, user
 
 from aibls.exceptions.BLSException import BLSException
 from aibls.services.response import ResponseResult
+from settings import ROOM_DIR
 
 logger = logging.getLogger(__name__)
 
@@ -18,10 +19,9 @@ class RoomServiceFile:
         获取默认房间信息的目录路径
         """
         logger.debug(f"获取默认房间文件路径...")
-        # 应用根目录
-        app_root_path = os.getcwd()
+
         # 目标目录
-        dir_path = f'{app_root_path}\\rooms\\'
+        dir_path = ROOM_DIR
         logger.debug(f"获取默认房间文件路径:{dir_path}")
         # 如果目录不存在，则生成目录
         if not os.path.exists(dir_path):

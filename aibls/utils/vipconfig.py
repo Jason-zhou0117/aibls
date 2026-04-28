@@ -3,6 +3,8 @@ import logging
 import os
 from typing import Optional, Dict, Any
 
+from settings import APP_ROOT, VIDEO_DIR, CONFIG_DIR
+
 logger = logging.getLogger(__name__)
 
 class VIPConfig:
@@ -13,13 +15,7 @@ class VIPConfig:
     @classmethod
     def __get_file_path(cls) -> str:
         # 应用根目录
-        app_root = os.getcwd()
-        folder_path = os.path.join(app_root, 'config')
-        # 如果目录不存在，则生成目录
-        if not os.path.exists(folder_path):
-            os.makedirs(folder_path)
-
-        file_path = os.path.join(folder_path, cls._file_path)
+        file_path = os.path.join(CONFIG_DIR, cls._file_path)
         return file_path
 
 
@@ -175,8 +171,7 @@ class VIPConfig:
     @classmethod
     def get_video_path(cls, filename: str) -> str:
         # 应用根目录
-        app_root = os.getcwd()
-        folder_path = os.path.join(app_root, 'web\\static\\videos')
+        folder_path = VIDEO_DIR
         # 如果目录不存在，则生成目录
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)

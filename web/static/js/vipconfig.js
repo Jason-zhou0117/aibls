@@ -394,6 +394,11 @@
         function bindEvents() {
             document.getElementById('addUserBtn').onclick = showAddUserPrompt;
             document.getElementById('addVideoBtn').onclick = showUploadModal;
+            document.getElementById('selectUserBtn').onclick = changeUser;
+        }
+
+        function changeUser(){
+            showMessage(`我没有功能，摆在这里仅为好看😊`, false);
         }
 
         // ========== 初始化 ==========
