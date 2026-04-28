@@ -92,7 +92,7 @@ class RoomServiceFile:
                 logger.info("如下是Room_ID={}的房主（uid={})的信息:{}".format(room_id, room_info["room_info"]["uid"],
                                                                                 room_owner))
                 try:
-                    room_key = f"{room_info["room_info"]["room_id"]}_{login_user_credential.dedeuserid}"
+                    room_key = f"{room_info['room_info']['room_id']}_{login_user_credential.dedeuserid}"
                     room_data: dict[str, Any] = self.__from_dict_to_db(room_info, room_owner,
                                                                        login_user_credential.dedeuserid, room_key)
                     #获取文件路径

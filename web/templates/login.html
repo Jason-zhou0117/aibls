@@ -365,19 +365,11 @@
                     <span>💬</span> 弹幕
                 </a>
                 <div class="user-info" id="userInfo">
-                    <div class="user-avatar" id="userAvatar">
-                        {% if user_face == '' %}
-                            👤
-                        {% else %}
-                            <img src="{{user_face}}" alt="头像"/>
-                        {% endif %}
+                    <div class="user-avatar" id="userAvatar">👤
+
                     </div>
                     <span class="user-name" id="userName">
-                        {% if nick_name %}
-                            {{nick_name}}
-                        {% else %}
-                            未登录
-                        {% endif %}
+                        未登录
                     </span>
                 </div>
             </div>

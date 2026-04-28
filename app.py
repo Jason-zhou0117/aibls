@@ -3,7 +3,10 @@
 
 import os
 import sys
-
+# 将当前目录添加到 Python 路径
+current_dir = os.path.dirname(os.path.abspath(__file__))
+if current_dir not in sys.path:
+    sys.path.insert(0, current_dir)
 # 先导入 settings（必须在最前面，因为其他模块可能需要）
 from settings import APP_ROOT, IS_EMBEDDED, DEBUG_MODE, ensure_directories
 
@@ -30,7 +33,7 @@ from flask import Flask, request, Response, jsonify
 from flask_session import Session
 from flask import session, render_template
 
-from aibls import db, config
+from aibls import config
 from aibls.decorators.decorator import check_session_go_login_decorator
 from aibls.views import vip_api
 from aibls.views.live_route import generator
@@ -57,7 +60,7 @@ def create_app():
     register_blueprint(app)
     register_log(app)
     Session(app)
-    db.init_app(app)
+    # db.init_app(app)
 
     return app
 

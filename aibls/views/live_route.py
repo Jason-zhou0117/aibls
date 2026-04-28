@@ -16,7 +16,7 @@ from flask_socketio import emit
 from aibls.decorators.decorator import check_session_2api_decorator, check_session_go_login_decorator
 from aibls.models.users import LoginCookie
 from aibls.services.danmu_handler import AsyncMessageGenerator
-from aibls.services.danmu_service import DanmuService
+
 from aibls.views import live_api
 from aibls.views.room_route import room_service
 
@@ -25,7 +25,6 @@ from stock_io import socketio, app, message_queue
 """日志对象的记录"""
 logger = logging.getLogger(__name__)
 
-danmu_service = DanmuService()
 
 # 创建生成器实例
 generator = AsyncMessageGenerator(message_queue)

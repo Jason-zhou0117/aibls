@@ -223,7 +223,7 @@ class AsyncMessageGenerator:
 
             info = {
                 "type": "guard",
-                "msg": f"{data['username']} 开通 {guard_name} x {data["num"]} 个月",
+                "msg": f"{data['username']} 开通 {guard_name} x {data['num']} 个月",
                 "uname": data["username"],
                 "uid": data["uid"],
                 "guard_level": data["guard_level"],

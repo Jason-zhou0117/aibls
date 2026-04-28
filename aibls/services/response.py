@@ -1,7 +1,6 @@
-from pydantic import BaseModel
 
 
-class ResponseResult(BaseModel):
+class ResponseResult:
     code:int
     message:str
 
