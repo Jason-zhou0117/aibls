@@ -9,10 +9,10 @@ from pathlib import Path
 from typing import Any
 
 from bilibili_api import Credential
-from flask import request, jsonify, session
+from flask import request, jsonify, session, render_template
 from werkzeug.utils import secure_filename
 
-from aibls.decorators.decorator import check_session_2api_decorator
+from aibls.decorators.decorator import check_session_2api_decorator, check_session_go_login_decorator
 from aibls.exceptions.BLSException import BLSException
 from aibls.models.users import LoginCookie
 from aibls.services.user_service_file import UserServiceFile
@@ -191,3 +191,11 @@ def upload_video():
         'message': '上传成功'
     })
 
+@vip_api.route('/vip_config')
+@check_session_go_login_decorator
+def vip_config_page():
+    """VIP配置页面"""
+    login_user = session.get("login_user", {})
+    return render_template('vip_config.html',
+                          nick_name=login_user.get("nick_name", "未登录"),
+                          user_face=login_user.get("user_face", ""))
