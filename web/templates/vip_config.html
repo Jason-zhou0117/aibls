@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIP入场视频配置 - BiliMon</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: #1a1a2e;
+            min-height: 100vh;
+        }
+
+        /* ========== Header 样式 ========== */
+        .header {
+            background: linear-gradient(135deg, #1e1e2f 0%, #2d2d44 100%);
+            color: white;
+            padding: 12px 24px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .logo-icon {
+            font-size: 28px;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .header-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 30px;
+            color: white;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .header-btn:hover {
+            background: rgba(255,255,255,0.18);
+            transform: translateY(-1px);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 4px 12px 4px 8px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 40px;
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* ========== 主体布局 ========== */
+        .main-container {
+            display: flex;
+            height: calc(100vh - 70px);
+            padding: 15px;
+            gap: 15px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* 左侧面板 */
+        .left-panel {
+            width: 320px;
+            background: #0f0f14;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .toolbar-btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .toolbar-btn:hover {
+            background: rgba(255,255,255,0.2);
+            transform: scale(1.05);
+        }
+
+        /* VIP用户列表 */
+        .user-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+        }
+
+        .user-item {
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .user-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .user-item.active {
+            background: rgba(102, 126, 234, 0.3);
+            border-left: 3px solid #667eea;
+        }
+
+        .user-avatar-small {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #2d2d44;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .user-avatar-small img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-info-small {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 4px;
+        }
+
+        .user-uid {
+            font-size: 11px;
+            color: #888;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-icon {
+            background: none;
+            border: none;
+            color: #aaa;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        .action-icon:hover {
+            color: white;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .action-icon.delete:hover {
+            color: #f44336;
+        }
+
+        /* 右侧面板 */
+        .right-panel {
+            flex: 1;
+            background: #0f0f14;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* 用户信息区域 */
+        .user-info-section {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #aaa;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #2d2d44;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 8px;
+        }
+
+        .profile-uid {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 15px;
+        }
+
+        .select-user-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+
+        .select-user-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        /* 视频列表区域 */
+        .video-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .video-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .video-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .video-item {
+            background: rgba(255,255,255,0.04);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+
+        .video-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .video-name {
+            font-size: 14px;
+            font-weight: bold;
+            color: #FF9800;
+        }
+
+        .video-delete {
+            background: none;
+            border: none;
+            color: #aaa;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 4px;
+        }
+
+        .video-delete:hover {
+            color: #f44336;
+        }
+
+        .video-url, .video-path {
+            font-size: 11px;
+            color: #666;
+            font-family: monospace;
+            margin-bottom: 4px;
+            word-break: break-all;
+        }
+
+        .empty-tip {
+            text-align: center;
+            color: #666;
+            padding: 40px;
+        }
+
+        /* ========== 弹窗样式 ========== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal {
+            background: #1e1e2f;
+            border-radius: 16px;
+            width: 500px;
+            max-width: 90%;
+            padding: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .modal-form-group {
+            margin-bottom: 20px;
+        }
+
+        .modal-label {
+            display: block;
+            font-size: 13px;
+            color: #aaa;
+            margin-bottom: 8px;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 10px 12px;
+            background: #0f0f14;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+        }
+
+        .modal-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-input-display {
+            padding: 10px 12px;
+            background: #0f0f14;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: #888;
+            font-size: 14px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 24px;
+        }
+
+        .modal-btn {
+            padding: 8px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+
+        .modal-btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .modal-btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .modal-btn-primary:hover {
+            transform: translateY(-1px);
+        }
+
+        .modal-btn-secondary:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        /* 提示输入框弹窗 */
+        .prompt-modal .modal {
+            width: 400px;
+        }
+
+        /* 滚动条 */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1a1a2e;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">
+                <span class="logo-icon">🎬</span>
+                <span>BiliMon</span>
+            </div>
+            <div class="header-buttons">
+                <button class="header-btn" onclick="window.location.href='/live/'">
+                    <span>💬</span> 弹幕
+                </button>
+                <button class="header-btn" onclick="openVideoPlayer()">
+                    <span>🎥</span> 打开视频页
+                </button>
+                <div class="user-info" id="userInfo">
+                    <div class="user-avatar" id="userAvatar">{{ nick_name|default('👤') }}</div>
+                    <span id="userName">{{ nick_name|default('未登录') }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <!-- 左侧面板 -->
+        <div class="left-panel">
+            <div class="panel-header">
+                <span class="panel-title">🎬 VIP用户入场视频配置</span>
+                <button class="toolbar-btn" id="addUserBtn" title="新增VIP用户配置">+</button>
+            </div>
+            <div class="user-list" id="userList">
+                <div class="empty-tip">暂无VIP用户配置<br>点击 [+] 添加</div>
+            </div>
+        </div>
+
+        <!-- 右侧面板 -->
+        <div class="right-panel">
+            <div class="user-info-section">
+                <div class="section-title">👤 用户信息</div>
+                <div class="user-profile">
+                    <div class="profile-avatar" id="profileAvatar">
+                        <span style="font-size: 40px;">👤</span>
+                    </div>
+                    <div class="profile-info">
+                        <div class="profile-name" id="profileName">未选择用户</div>
+                        <div class="profile-uid" id="profileUid"></div>
+                        <button class="select-user-btn" id="selectUserBtn">🔍 选择用户</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="video-section">
+                <div class="video-header">
+                    <div class="section-title">🎬 入场视频列表</div>
+                    <button class="toolbar-btn" id="addVideoBtn" title="新增入场视频">+</button>
+                </div>
+                <div class="video-list" id="videoList">
+                    <div class="empty-tip">请先选择用户，然后添加视频</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== 全局变量 ==========
+        let currentUser = null;      // 当前选中的用户
+        let vipUsers = [];            // VIP用户列表
+
+        // ========== 工具函数 ==========
+        function showMessage(msg, isError = false) {
+            // 简单的alert，可以换成更美观的toast
+            if (isError) {
+                console.error(msg);
+                alert('❌ ' + msg);
+            } else {
+                console.log(msg);
+                alert('✅ ' + msg);
+            }
+        }
+
+        function showPrompt(title, placeholder, callback) {
+            // 创建弹窗
+            const overlay = document.createElement('div');
+            overlay.className = 'modal-overlay';
+            overlay.innerHTML = `
+                <div class="modal prompt-modal">
+                    <div class="modal-title">${title}</div>
+                    <div class="modal-form-group">
+                        <input type="text" class="modal-input" id="promptInput" placeholder="${placeholder}">
+                    </div>
+                    <div class="modal-buttons">
+                        <button class="modal-btn modal-btn-secondary" id="cancelBtn">取消</button>
+                        <button class="modal-btn modal-btn-primary" id="confirmBtn">确定</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+
+            const input = overlay.querySelector('#promptInput');
+            input.focus();
+
+            const close = () => overlay.remove();
+
+            overlay.querySelector('#confirmBtn').onclick = () => {
+                const value = input.value.trim();
+                if (value) {
+                    callback(value);
+                }
+                close();
+            };
+            overlay.querySelector('#cancelBtn').onclick = close;
+            overlay.onclick = (e) => {
+                if (e.target === overlay) close();
+            };
+        }
+
+        function showUploadModal(userUid) {
+            const overlay = document.createElement('div');
+            overlay.className = 'modal-overlay';
+            overlay.innerHTML = `
+                <div class="modal">
+                    <div class="modal-title">📤 新增入场视频</div>
+                    <div class="modal-form-group">
+                        <label class="modal-label">选择视频文件</label>
+                        <div class="file-input-wrapper">
+                            <input type="file" id="videoFile" accept="video/mp4,video/webm,video/avi,video/mov,video/mkv">
+                            <div class="file-input-display" id="fileDisplay">点击选择文件</div>
+                        </div>
+                    </div>
+                    <div class="modal-form-group">
+                        <label class="modal-label">视频名称</label>
+                        <input type="text" class="modal-input" id="videoName" placeholder="例如：VIP欢迎视频">
+                    </div>
+                    <div class="modal-buttons">
+                        <button class="modal-btn modal-btn-secondary" id="cancelBtn">取消</button>
+                        <button class="modal-btn modal-btn-primary" id="confirmBtn">提交</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+
+            const fileInput = overlay.querySelector('#videoFile');
+            const fileDisplay = overlay.querySelector('#fileDisplay');
+            const videoNameInput = overlay.querySelector('#videoName');
+
+            fileInput.onchange = () => {
+                if (fileInput.files.length > 0) {
+                    fileDisplay.textContent = fileInput.files[0].name;
+                } else {
+                    fileDisplay.textContent = '点击选择文件';
+                }
+            };
+
+            const close = () => overlay.remove();
+
+            overlay.querySelector('#confirmBtn').onclick = async () => {
+                const file = fileInput.files[0];
+                const videoName = videoNameInput.value.trim();
+
+                if (!file) {
+                    showMessage('请选择视频文件', true);
+                    return;
+                }
+                if (!videoName) {
+                    showMessage('请输入视频名称', true);
+                    return;
+                }
+
+                // 上传文件
+                const formData = new FormData();
+                formData.append('video', file);
+
+                try {
+                    showMessage('上传中...');
+                    const uploadResp = await fetch('/live/api/upload/video', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const uploadData = await uploadResp.json();
+
+                    if (uploadData.code !== 0) {
+                        showMessage(uploadData.message, true);
+                        return;
+                    }
+
+                    // 添加视频记录
+                    const addResp = await fetch('/live/api/vip/videos', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            uid: userUid,
+                            video_name: videoName,
+                            video_url: uploadData.data.url,
+                            video_path: uploadData.data.path
+                        })
+                    });
+                    const addData = await addResp.json();
+
+                    if (addData.code === 0) {
+                        showMessage('添加成功');
+                        close();
+                        if (currentUser && currentUser.userid === userUid) {
+                            await loadUserVideos(userUid);
+                        }
+                        await loadUserList();
+                    } else {
+                        showMessage(addData.message, true);
+                    }
+                } catch (error) {
+                    showMessage('操作失败: ' + error.message, true);
+                }
+            };
+            overlay.querySelector('#cancelBtn').onclick = close;
+            overlay.onclick = (e) => { if (e.target === overlay) close(); };
+        }
+
+        // ========== API 调用 ==========
+        async function loadUserList() {
+            try {
+                const resp = await fetch('/live/api/vip/users');
+                const data = await resp.json();
+                if (data.code === 0) {
+                    vipUsers = data.data;
+                    renderUserList();
+                }
+            } catch (error) {
+                console.error('加载用户列表失败:', error);
+            }
+        }
+
+        async function loadUserVideos(uid) {
+            try {
+                const resp = await fetch(`/live/api/vip/users/${uid}/videos`);
+                const data = await resp.json();
+                if (data.code === 0) {
+                    renderVideoList(data.data);
+                }
+            } catch (error) {
+                console.error('加载视频列表失败:', error);
+            }
+        }
+
+        async function addUserFromBili(uid) {
+            try {
+                const resp = await fetch(`/live/api/bili/user/${uid}`);
+                const data = await resp.json();
+                if (data.code !== 0) {
+                    showMessage(data.message, true);
+                    return false;
+                }
+
+                const userInfo = data.data;
+                const addResp = await fetch('/live/api/vip/users', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        uid: userInfo.uid,
+                        uname: userInfo.uname,
+                        face: userInfo.face
+                    })
+                });
+                const addData = await addResp.json();
+
+                if (addData.code === 0) {
+                    showMessage(`成功添加用户: ${userInfo.uname}`);
+                    await loadUserList();
+                    // 自动选中新添加的用户
+                    const newUser = vipUsers.find(u => u.userid === userInfo.uid);
+                    if (newUser) {
+                        selectUser(newUser);
+                    }
+                    return true;
+                } else {
+                    showMessage(addData.message, true);
+                    return false;
+                }
+            } catch (error) {
+                showMessage('添加失败: ' + error.message, true);
+                return false;
+            }
+        }
+
+        async function deleteUser(uid, name) {
+            if (!confirm(`确定删除用户 "${name}" 的所有配置吗？`)) return;
+
+            try {
+                const resp = await fetch(`/live/api/vip/users/${uid}`, { method: 'DELETE' });
+                const data = await resp.json();
+                if (data.code === 0) {
+                    showMessage('删除成功');
+                    if (currentUser && currentUser.userid === uid) {
+                        clearRightPanel();
+                    }
+                    await loadUserList();
+                } else {
+                    showMessage(data.message, true);
+                }
+            } catch (error) {
+                showMessage('删除失败: ' + error.message, true);
+            }
+        }
+
+        async function deleteVideo(videoId) {
+            if (!confirm('确定删除这个视频吗？')) return;
+
+            try {
+                const resp = await fetch(`/live/api/vip/videos/${videoId}`, { method: 'DELETE' });
+                const data = await resp.json();
+                if (data.code === 0) {
+                    showMessage('删除成功');
+                    if (currentUser) {
+                        await loadUserVideos(currentUser.userid);
+                    }
+                } else {
+                    showMessage(data.message, true);
+                }
+            } catch (error) {
+                showMessage('删除失败: ' + error.message, true);
+            }
+        }
+
+        // ========== 渲染函数 ==========
+        function renderUserList() {
+            const container = document.getElementById('userList');
+            if (!vipUsers.length) {
