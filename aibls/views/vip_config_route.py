@@ -213,8 +213,15 @@ def test_play_video():
     from stock_io import socketio
 
     data = request.get_json()
-    video_url = data.get('video_url')
-    video_name = data.get('video_name', '测试视频')
+    video_id = data.get('videoid')
+
+    video =VIPConfig.get_video(video_id)
+    if not video:
+        return jsonify({'code': -1, 'message': '视频ID不正确'})
+
+    video_url = video.get('url')
+    video_name = video.get('title', '测试视频')
+    video_path = video.get('path', '')
 
     if not video_url:
         return jsonify({'code': -1, 'message': '缺少视频URL参数'})
@@ -225,6 +232,7 @@ def test_play_video():
         'action': 'play_video',
         'video_url': video_url,
         'video_name': video_name,
+        'video_path': video_path,
         'is_test': True,  # 标记为测试消息
         'timestamp': datetime.now().isoformat()
     }
@@ -232,7 +240,7 @@ def test_play_video():
     # 通过 SocketIO 推送到视频播放器
     socketio.emit('video_command', test_command)
 
-    logger.info(f"测试播放视频: {video_name} ({video_url})")
+    logger.info(f"测试播放视频: {video_name} ({video_url}),path: {video_path}")
 
     return jsonify({
         'code': 0,

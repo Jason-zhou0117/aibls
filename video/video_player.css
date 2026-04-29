@@ -1,0 +1,80 @@
+/* video_player.css - 竖屏版视频播放器样式 */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    background: transparent;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* 视频播放器容器 */
+.video-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    z-index: 100;
+}
+
+.video-container.show {
+    display: block;
+}
+
+video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    background: transparent;
+}
+
+/* 状态指示器 */
+.status {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 12px;
+    font-family: monospace;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 6px 12px;
+    border-radius: 20px;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+    pointer-events: none;
+}
+
+.status.connected {
+    color: #4CAF50;
+}
+
+.status.disconnected {
+    color: #f44336;
+}
+
+.status.playing {
+    color: #FF9800;
+}
+
+/* 隐藏视频控制条 */
+video::-webkit-media-controls {
+    display: none !important;
+}
+video::-webkit-media-controls-enclosure {
+    display: none !important;
+}

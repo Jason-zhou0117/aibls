@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>欢迎视频播放器 - 竖屏版</title>
+    <link rel="icon" href="https://www.bilibili.com/favicon.ico">
+    <link rel="stylesheet" href="video_player.css">
+    <script src="https://cdn.socket.io/4.5.1/socket.io.min.js"></script>
+</head>
+<body>
+    <div class="video-container" id="videoContainer">
+        <video id="welcomeVideo" autoplay playsinline>
+            <source src="" type="video/mp4">
+            <source src="" type="video/webm">
+            您的浏览器不支持 video 标签
+        </video>
+    </div>
+    <div class="status disconnected" id="status">⚫ 等待连接...</div>
+
+    <script src="video_player.js"></script>
+</body>
+</html>

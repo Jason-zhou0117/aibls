@@ -355,7 +355,7 @@
             container.innerHTML = videos.map(video => `
                 <div class="video-item">
                     <div class="video-item-header">
-                        <span class="video-name" onclick="testPlayVideo('${escapeHtml(video.url)}', '${escapeHtml(video.title || video.name)}')" style="cursor: pointer;">
+                        <span class="video-name" onclick="testPlayVideo('${escapeHtml(video.url)}','${escapeHtml(video.id)}',  '${escapeHtml(video.title || video.name)}')" style="cursor: pointer;">
                         🎥 ${escapeHtml(video.title || video.name)} &nbsp;&nbsp;[点我可以测试播放视频]</span>
                         <button class="video-delete" onclick="deleteVideo('${video.id}')" title="删除">🗑</button>
                     </div>
@@ -366,7 +366,7 @@
         }
 
         // 测试播放函数
-        async function testPlayVideo(videoUrl, videoName) {
+        async function testPlayVideo(videoUrl, videoid,videoName) {
             console.log('测试播放:', videoName, videoUrl);
 
             // 显示加载提示
@@ -380,6 +380,7 @@
                     },
                     body: JSON.stringify({
                         video_url: videoUrl,
+                        videoid:videoid,
                         video_name: videoName
                     })
                 });

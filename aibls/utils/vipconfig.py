@@ -184,6 +184,22 @@ class VIPConfig:
             logger.error(f"删除VIP视频文件失败: {e}")
 
     @classmethod
+    def get_video(cls, video_id: str) -> Any:
+        try:
+            if cls._vip_users is None:
+                cls.load_json()
+
+            for uid, user_data in cls._vip_users.items():
+                videos = user_data.get('videos', [])
+                for i, video in enumerate(videos):
+                    if video.get('id') == video_id:
+                        return video
+            return None
+        except Exception as e:
+            logger.error(f"删除VIP视频文件失败: {e}")
+            return None
+
+    @classmethod
     def get_video_path(cls, filename: str) -> str:
         # 应用根目录
         folder_path = VIDEO_DIR
