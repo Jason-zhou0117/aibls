@@ -20,22 +20,7 @@
     "name": "军184",
     "nickname": "军184",
     "face": "https://i2.hdslb.com/bfs/face/eda659f1c67814d644b1dbfbb3c2ed05d2fd9c8d.jpg",
-    "videos": [
-      {
-        "id": "b20f9f61",
-        "title": "妮妮-透明底",
-        "url": "/static/videos/49853884effc.webm",
-        "path": "E:\\pycodes\\aibls\\web\\static\\videos\\49853884effc.webm",
-        "created_at": "2026-04-29T00:47:01.515142"
-      },
-      {
-        "id": "2fe0866f",
-        "title": "路飞舰长进场",
-        "url": "/static/videos/b3bd8e8c4b3f.webm",
-        "path": "E:\\pycodes\\aibls\\web\\static\\videos\\b3bd8e8c4b3f.webm",
-        "created_at": "2026-04-29T00:47:06.976576"
-      }
-    ],
+    "videos": [],
     "created_at": "2026-04-29T00:46:53.779513"
   }
 }

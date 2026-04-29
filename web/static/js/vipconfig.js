@@ -355,13 +355,46 @@
             container.innerHTML = videos.map(video => `
                 <div class="video-item">
                     <div class="video-item-header">
-                        <span class="video-name">🎥 ${escapeHtml(video.title || video.name)}</span>
+                        <span class="video-name" onclick="testPlayVideo('${escapeHtml(video.url)}', '${escapeHtml(video.title || video.name)}')" style="cursor: pointer;">
+                        🎥 ${escapeHtml(video.title || video.name)} &nbsp;&nbsp;[点我可以测试播放视频]</span>
                         <button class="video-delete" onclick="deleteVideo('${video.id}')" title="删除">🗑</button>
                     </div>
                     <div class="video-url">URL: ${escapeHtml(video.url || '')}</div>
                     ${video.path ? `<div class="video-path">路径: ${escapeHtml(video.path)}</div>` : ''}
                 </div>
             `).join('');
+        }
+
+        // 测试播放函数
+        async function testPlayVideo(videoUrl, videoName) {
+            console.log('测试播放:', videoName, videoUrl);
+
+            // 显示加载提示
+            showMessage(`正在发送播放指令: ${videoName}...`, false);
+
+            try {
+                const response = await fetch('/api/video/test_play', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        video_url: videoUrl,
+                        video_name: videoName
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.code === 0) {
+                    showMessage(`✅ 正在播放: ${videoName}`, false);
+                } else {
+                    showMessage(`❌ 播放失败: ${data.message}`, true);
+                }
+            } catch (error) {
+                console.error('测试播放失败:', error);
+                showMessage('❌ 请求失败: ' + error.message, true);
+            }
         }
 
         function selectUserById(uid) {
@@ -398,7 +431,22 @@
         }
 
         function changeUser(){
-            showMessage(`我没有功能，摆在这里仅为好看😊`, false);
+            try {
+
+                const resp = await fetch(`/api/vip/update/${uid}`, {});
+                const data = await resp.json();
+                if (data.code === 0) {
+                    showMessage('删除成功');
+                    if (currentUser && currentUser.userid === uid) {
+                        clearRightPanel();
+                    }
+                    await loadUserList();
+                } else {
+                    showMessage(data.message, true);
+                }
+            } catch (error) {
+                showMessage('删除失败: ' + error.message, true);
+            }
         }
 
         // ========== 初始化 ==========

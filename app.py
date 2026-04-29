@@ -183,11 +183,21 @@ if __name__ == "__main__":
         print("访问地址: http://localhost:5000")
         print("=" * 60)
 
-        socketio.run(app,
-                     debug=DEBUG_MODE,
-                     port=5000,
-                     allow_unsafe_werkzeug=True,
-                     use_reloader=not IS_EMBEDDED)
+        if DEBUG_MODE:
+            # PyCharm 调试模式：单进程，开启调试
+            socketio.run(app,
+                         debug=True,
+                         port=5000,
+                         use_reloader=False,  # 关键：关闭重载器
+                         log_output=True)
+        else:
+            # 其他环境
+            socketio.run(app,
+                         debug=DEBUG_MODE,
+                         port=5000,
+                         allow_unsafe_werkzeug=True,
+                         use_reloader=not IS_EMBEDDED)
+
 
     except KeyboardInterrupt:
         print("\n👋 正在关闭服务器...")

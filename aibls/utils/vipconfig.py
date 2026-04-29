@@ -83,6 +83,21 @@ class VIPConfig:
             logger.error(f"添加VIP视频配置失败: {e}")
             raise e
 
+    @classmethod
+    def update_user_config(cls, target_id,user_config: Any):
+        try:
+            if cls._vip_users is None:
+                cls.load_json()
+            if target_id in cls._vip_users:
+                user_data = cls._vip_users[target_id]
+                user_data["name"] =  user_config["name"]
+                user_data["nickname"] =  user_config["nickname"]
+                user_data["face"] =  user_config["face"]
+                cls._vip_users[target_id] = user_config
+                cls.save_to_file()
+        except Exception as e:
+            logger.error(f"添加VIP视频配置失败: {e}")
+            raise e
 
     @classmethod
     def clear(cls, save_to_file: bool = True) -> None:

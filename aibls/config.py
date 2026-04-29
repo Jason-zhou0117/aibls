@@ -19,7 +19,7 @@ class AppConfig:
     SESSION_KEY_PREFIX: str = str(os.getenv('SESSION_KEY_PREFIX', "session"))
     SESSION_TYPE: str = str(os.getenv('SESSION_TYPE', "filesystem"))
 
-    SECRET_KEY= urandom(24)
+    SECRET_KEY= 'bilibili-danmu-monitor-secret-key-2024'
 
     class Config:
         env_file = ".env"
