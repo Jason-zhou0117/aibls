@@ -75,6 +75,8 @@ class UserServiceFile:
     def get_user_info(self,target_uid:str,login_user_credential:Credential) -> dict[str, Any] | None:
         try:
             # 根据房间号，获取房主的用户信息
+            logger.info("开始获取用户信息：target_uid={}".format(target_uid))
+
             user_obj = user.User(int(target_uid), credential=login_user_credential)
             user_info: dict[str, Any] = asyncio.run(user_obj.get_user_info())
             logger.info("如下是获取的用户信息：昵称={}（uid={})的信息:{}".format(user_info["name"],target_uid,

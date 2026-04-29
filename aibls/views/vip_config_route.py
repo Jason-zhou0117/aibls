@@ -47,7 +47,9 @@ def get_vip_users():
 def add_vip_user():
     """添加VIP用户（获取B站信息后保存）"""
     data = request.get_json()
+    logger.info("开始添加用户信息：request={}".format(data))
     uid = str(data.get('uid'))
+    logger.info("开始获取用户信息：target_uid={}".format(uid))
     if not uid :
         return jsonify({'code': -1, 'message': 'UID不能为空'})
 
@@ -82,6 +84,7 @@ def add_vip_user():
 @check_session_2api_decorator
 def delete_vip_user(uid):
     """删除VIP用户"""
+    logger.info(f"进入删除用户={uid}")
     VIPConfig.remove_user(uid)
     return jsonify({'code': 0, 'message': '删除成功'})
 
@@ -162,15 +165,17 @@ def upload_video():
         return jsonify({'code': -1, 'message': '没有选择文件'})
 
     file = request.files['video']
+
     if file.filename == '':
         return jsonify({'code': -1, 'message': '文件名为空'})
 
     if not allowed_file(file.filename):
         return jsonify({'code': -1, 'message': '不支持的文件格式，请上传 mp4/webm/avi/mov/mkv'})
-
+    logger.info(f"上传视频文件得文件名为={file.filename}")
     # 生成安全的文件名
     original_name = secure_filename(file.filename)
-    file_ext = original_name.rsplit('.', 1)[1].lower()
+    logger.info(f"上传视频文件得文件名为={original_name}")
+    file_ext = file.filename.rsplit('.', 1)[1].lower()
     new_filename = f"{uuid.uuid4().hex[:12]}.{file_ext}"
     save_path = VIPConfig.get_video_path(new_filename)
 

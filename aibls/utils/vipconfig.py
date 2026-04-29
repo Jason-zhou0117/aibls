@@ -3,6 +3,8 @@ import logging
 import os
 from typing import Optional, Dict, Any
 
+from settings import APP_ROOT, VIDEO_DIR, CONFIG_DIR
+
 logger = logging.getLogger(__name__)
 
 class VIPConfig:
@@ -13,13 +15,7 @@ class VIPConfig:
     @classmethod
     def __get_file_path(cls) -> str:
         # 应用根目录
-        app_root = os.getcwd()
-        folder_path = os.path.join(app_root, 'config')
-        # 如果目录不存在，则生成目录
-        if not os.path.exists(folder_path):
-            os.makedirs(folder_path)
-
-        file_path = os.path.join(folder_path, cls._file_path)
+        file_path = os.path.join(CONFIG_DIR, cls._file_path)
         return file_path
 
 
@@ -32,7 +28,6 @@ class VIPConfig:
         """
 
         file_path = cls.__get_file_path()
-        logger.info(f"获取VIP用户配置文件路径: {file_path}")
         # 如果变量为空，从文件加载
         if cls._vip_users is None:
             try:
@@ -123,7 +118,7 @@ class VIPConfig:
     def remove_user(cls,uid:str):
         json_data = cls.load_json()
 
-        if uid not in json_data:
+        if uid in json_data:
             # 可选：删除用户关联的视频文件
             user_data = json_data[uid]
             for video in user_data.get('videos', []):
@@ -176,8 +171,7 @@ class VIPConfig:
     @classmethod
     def get_video_path(cls, filename: str) -> str:
         # 应用根目录
-        app_root = os.getcwd()
-        folder_path = os.path.join(app_root, 'static/videos')
+        folder_path = VIDEO_DIR
         # 如果目录不存在，则生成目录
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)

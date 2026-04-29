@@ -2,9 +2,13 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta name="referrer" content="no-referrer">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>B站弹幕监控</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}" type="text/css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/head.css') }}" type="text/css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/danmu2.css') }}" type="text/css">
+
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
     <script src="{{ url_for('static', filename='js/head.js') }}" ></script>
     <script src="{{ url_for('static', filename='js/danmu.js') }}" ></script>
@@ -47,6 +51,9 @@
                     <span>配置</span>
                 </button>
 
+                <button class="header-btn" onclick="headJs.openPlayer()">
+                    <span>🎥</span> 打开视频页
+                </button>
                 <!-- 登录用户按钮/用户信息 -->
                 <div id="user_area">
                     <!-- 已登录状态显示用户信息 -->

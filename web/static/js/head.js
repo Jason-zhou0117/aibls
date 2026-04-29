@@ -19,5 +19,11 @@ headJs.openLogin = function(){
 去配置
 */
 headJs.openConfig = function(){
-    window.location.href='/login.html';
+    window.open('/vip_config');
+}
+/*
+打开视频侧视页面
+*/
+headJs.openPlayer = function(){
+    window.open('/static/video_player.html');
 }

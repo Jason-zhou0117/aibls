@@ -316,6 +316,11 @@ danmuJs.applyFilter = function () {
 
 danmuJs.changeRoom = function (){
     let room_id = prompt('请输入房间号：');
+    // 取消处理
+    if (room_id === null) {
+//        showMessage('已取消输入', false);
+        return;
+    }
     if (room_id == ""){
         alert("请输入房间号");
         return
