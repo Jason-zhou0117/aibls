@@ -115,17 +115,6 @@ socketio.init_app(app,
 
 # ==================== 路由 ====================
 
-@app.route("/index")
-@check_session_go_login_decorator
-def index():
-    login_user: dict[str, Any] = session.get("login_user")
-    result_data = room_service.load_rooms_by_filter(None)
-    return render_template('index.html',
-                           nick_name=login_user["nick_name"],
-                           user_face=login_user["user_face"],
-                           rooms=result_data["items"])
-
-
 @app.route('/proxy/image')
 def proxy_image():
     try:
@@ -180,21 +169,21 @@ if __name__ == "__main__":
         print(f"生成器ID: {generator.generator_id}")
         print(f"队列大小: {message_queue.qsize()}")
         print("=" * 60)
-        print("访问地址: http://localhost:5000")
+        print("访问地址: http://localhost:5001")
         print("=" * 60)
 
         if DEBUG_MODE:
             # PyCharm 调试模式：单进程，开启调试
             socketio.run(app,
                          debug=True,
-                         port=5000,
+                         port=5001,
                          use_reloader=False,  # 关键：关闭重载器
                          log_output=True)
         else:
             # 其他环境
             socketio.run(app,
                          debug=DEBUG_MODE,
-                         port=5000,
+                         port=5001,
                          allow_unsafe_werkzeug=True,
                          use_reloader=not IS_EMBEDDED)
 

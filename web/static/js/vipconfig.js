@@ -431,22 +431,7 @@
         }
 
         function changeUser(){
-            try {
 
-                const resp = await fetch(`/api/vip/update/${uid}`, {});
-                const data = await resp.json();
-                if (data.code === 0) {
-                    showMessage('删除成功');
-                    if (currentUser && currentUser.userid === uid) {
-                        clearRightPanel();
-                    }
-                    await loadUserList();
-                } else {
-                    showMessage(data.message, true);
-                }
-            } catch (error) {
-                showMessage('删除失败: ' + error.message, true);
-            }
         }
 
         // ========== 初始化 ==========

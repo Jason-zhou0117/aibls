@@ -240,7 +240,7 @@ def test_play_video():
         'data': test_command
     })
 
-@vip_api.route('/api/vip/update/<uid>', methods=['DELETE'])
+@vip_api.route('/api/vip/update/<uid>')
 @check_session_2api_decorator
 def update_vip_user(uid):
     """删除VIP用户"""
