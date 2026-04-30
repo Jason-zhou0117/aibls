@@ -1,0 +1,79 @@
+# aibls/services/message_consumer.py
+import logging
+import queue
+import time
+from datetime import datetime
+
+from aibls.stock_io import socketio, message_queue
+
+logger = logging.getLogger(__name__)
+
+
+class MessageConsumer:
+    """消息消费者 - 独立线程运行"""
+
+    def __init__(self):
+        self.running = True
+        self.stats = {
+            'total_pushed': 0,
+            'last_push_time': None,
+            'queue_size_history': []
+        }
+
+    def run(self):
+        """运行消费者"""
+        print(f"[{datetime.now().strftime('%H:%M:%S')}] 消息消费者线程已启动")
+
+        while self.running:
+            try:
+                self._process_one_message()
+            except Exception as e:
+                logger.error(f"消费消息错误: {e}")
+                time.sleep(0.5)
+
+    def _process_one_message(self):
+        """处理单条消息"""
+        try:
+            if message_queue.empty():
+                time.sleep(0.1)
+                return
+
+            message = message_queue.get(timeout=0.5)
+            self._push_message(message)
+            message_queue.task_done()
+
+        except queue.Empty:
+            time.sleep(0.1)
+
+    def _push_message(self, message):
+        """推送消息到前端"""
+        try:
+            message['pushed_at'] = datetime.now().isoformat()
+            logger.info(f"推送消息: {message}")
+
+            msg_type = message.get("type")
+
+            if msg_type == "video_command":
+                socketio.emit('video_command', message)
+                logger.info(f"已推送视频指令: {message.get('uname')}")
+            else:
+                socketio.emit(msg_type, message)
+
+            # 更新统计
+            self.stats['total_pushed'] += 1
+            self.stats['last_push_time'] = datetime.now().isoformat()
+            self.stats['queue_size_history'].append(message_queue.qsize())
+
+            if len(self.stats['queue_size_history']) > 50:
+                self.stats['queue_size_history'].pop(0)
+
+        except Exception as e:
+            logger.error(f"推送消息错误: {e}")
+
+    def stop(self):
+        """停止消费者"""
+        self.running = False
+
+
+# 全局消费者实例
+message_consumer = MessageConsumer()

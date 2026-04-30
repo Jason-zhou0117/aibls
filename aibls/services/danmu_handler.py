@@ -7,7 +7,7 @@ from datetime import datetime
 
 from bilibili_api import Credential, live, sync, user
 
-from aibls.utils.vipconfig import VIPConfig
+from aibls.utils import VIPConfig
 
 logger = logging.getLogger(__name__)
 
@@ -41,16 +41,6 @@ class AsyncMessageGenerator:
         else:
             logger.warning(f"线程还在运行中，无法重新启动")
             return False
-
-        if self.thread is None or not self.thread.is_alive():
-            self.running = True
-            self.thread = threading.Thread(target=self._run_async_loop)
-            self.thread.daemon = True
-            self.thread.name = f"异步调用B站弹幕-{self.generator_id}"
-            self.thread.start()
-            logger.info(f"[{datetime.now().strftime('%H:%M:%S')}] 消息生成器 {self.generator_id} 已启动")
-            return True
-        return False
 
     def stop(self):
         """停止消息生成器"""
@@ -319,6 +309,7 @@ class AsyncMessageGenerator:
                 if len(videos) > 0:
                     video = random.choice(videos)
                     video_url = video.get("url", "")
+                    video_path = video.get("path", "")
                     logger.info(f"VIP用户入场: {user_name} (UID: {user_id})，触发视频播放: {video.get('url', '')}")
 
                     video_command = {
@@ -326,6 +317,7 @@ class AsyncMessageGenerator:
                         "action": "play_video",
                         "video_url": video_url,  # 已经是Flask静态路径
                         "uid": user_id,
+                        "video_path": video_path,
                         "uname": user_name,
                         "timestamp": datetime.now().isoformat()
                     }
@@ -335,12 +327,6 @@ class AsyncMessageGenerator:
         except Exception as e:
             logger.error(f"解析进入事件数据出错: {e}")
             logger.info(f"文字弹幕，原始数据: {event}")
-
-    async def load_user_info(self,user_id):
-        user_obj = user.User(user_id,self.credential)
-        user_info = await user_obj.get_user_info()
-        print(user_info)
-        return user_info
 
     async def on_interaction(self, event):
         """进入直播间事件回调"""

@@ -3,7 +3,7 @@ import logging
 import os
 from typing import Optional, Dict, Any
 
-from settings import APP_ROOT, VIDEO_DIR, CONFIG_DIR
+from aibls.settings import VIDEO_DIR, CONFIG_DIR
 
 logger = logging.getLogger(__name__)
 

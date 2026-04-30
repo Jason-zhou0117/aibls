@@ -8,7 +8,7 @@ from bilibili_api import Credential, live, user
 
 from aibls.exceptions.BLSException import BLSException
 from aibls.services.response import ResponseResult
-from settings import ROOM_DIR
+from aibls.settings import ROOM_DIR
 
 logger = logging.getLogger(__name__)
 

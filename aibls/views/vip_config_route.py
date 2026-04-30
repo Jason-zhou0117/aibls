@@ -1,22 +1,20 @@
 # aibls/views/vip_config_route.py
 
-import json
 import os
 import uuid
 import logging
 from datetime import datetime
-from pathlib import Path
 from typing import Any
 
 from bilibili_api import Credential
 from flask import request, jsonify, session, render_template
 from werkzeug.utils import secure_filename
 
-from aibls.decorators.decorator import check_session_2api_decorator, check_session_go_login_decorator
-from aibls.exceptions.BLSException import BLSException
-from aibls.models.users import LoginCookie
-from aibls.services.user_service_file import UserServiceFile
-from aibls.utils.vipconfig import VIPConfig
+from aibls.decorators import check_session_2api_decorator, check_session_go_login_decorator
+from aibls.exceptions import BLSException
+from aibls.models import LoginCookie
+from aibls.services import UserServiceFile
+from aibls.utils import VIPConfig
 from aibls.views import vip_api
 
 logger = logging.getLogger(__name__)
@@ -210,7 +208,7 @@ def vip_config_page():
 @check_session_2api_decorator
 def test_play_video():
     """测试播放视频（不触发入场，直接发送播放指令）"""
-    from stock_io import socketio
+    from aibls.stock_io import socketio
 
     data = request.get_json()
     video_id = data.get('videoid')

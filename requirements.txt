@@ -10,3 +10,5 @@ requests==2.31.0
 Werkzeug==3.1.0
 pydantic==2.12.4
 pydantic_core==2.41.5
+Flask-SQLAlchemy==3.1.1
+SQLAlchemy==2.0.36

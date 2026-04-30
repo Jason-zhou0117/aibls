@@ -1,33 +1,48 @@
 import logging
 import os
+from datetime import timedelta
 from functools import lru_cache
-from os import urandom
 
-#from pydantic.v1 import BaseSettings, Field
+from aibls.settings import APP_ROOT, SESSION_DIR
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
 class AppConfig:
-  
-    #Session设置
-    SESSION_FILE_THRESHOLD: int = int(os.getenv('SESSION_FILE_THRESHOLD', 500))
-    SESSION_FILE_MODE: int = int(os.getenv('SESSION_FILE_MODE', 384))
-    SESSION_PERMANENT: bool = bool(os.getenv('SESSION_PERMANENT', False))
-    SESSION_USE_SIGNER: bool = bool(os.getenv('SESSION_USE_SIGNER', False))
-    SESSION_KEY_PREFIX: str = str(os.getenv('SESSION_KEY_PREFIX', "session"))
-    SESSION_TYPE: str = str(os.getenv('SESSION_TYPE', "filesystem"))
+    """Flask 配置类"""
 
-    SECRET_KEY= 'bilibili-danmu-monitor-secret-key-2024'
+    # ==================== 基础配置 ====================
+    SECRET_KEY = 'bili-danmu-monitor-secret-key-2024'
 
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
-        case_sensitive = False  # 环境变量不区分大小写
-        validate_all = True  # 验证所有字段
+    # ==================== 数据库配置 ====================
+    # SQLite 数据库路径
+    SQLALCHEMY_DATABASE_URI = f'sqlite:///{os.path.join(APP_ROOT, "bili_mon.db")}'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_ECHO = False  # 设为True可查看SQL日志
+
+    # ==================== Session 配置 ====================
+    SESSION_TYPE = 'filesystem'
+    SESSION_FILE_DIR = SESSION_DIR
+    SESSION_PERMANENT = True
+    SESSION_USE_SIGNER = True
+    PERMANENT_SESSION_LIFETIME = timedelta(days=7)
+    SESSION_FILE_THRESHOLD = 500
+    SESSION_KEY_PREFIX = 'bili_'
+    SESSION_REFRESH_EACH_REQUEST = True
+
+    # ==================== Cookie 配置 ====================
+    SESSION_COOKIE_NAME = 'bili_session'
+    SESSION_COOKIE_PATH = '/'
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    SESSION_COOKIE_SECURE = False
+
+    # ==================== 文件上传配置 ====================
+    MAX_CONTENT_LENGTH = 100 * 1024 * 1024  # 100MB
+    UPLOAD_FOLDER = os.path.join(APP_ROOT, 'web', 'static', 'videos')
+
 
 @lru_cache()
-def get_app_settings() -> AppConfig:
+def get_app_config() -> AppConfig:
     """获取异步数据库配置（缓存单例）"""
     return AppConfig()

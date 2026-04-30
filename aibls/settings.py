@@ -6,17 +6,27 @@
 import os
 import sys
 
+
 def get_app_dir():
-    """获取应用程序根目录"""
+    """获取应用程序根目录（项目根目录，不是 aibls 目录）"""
+    # 当前文件在 aibls 目录下，向上取一层就是项目根目录
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.dirname(current_dir)
+
     if getattr(sys, 'frozen', False):
         return os.path.dirname(sys.executable)
     else:
-        return os.path.dirname(os.path.abspath(__file__))
+        return project_root
 
 # ==================== 路径配置 ====================
 
 # 项目根目录
 APP_ROOT = get_app_dir()
+
+# ==================== Session 配置 ====================
+SESSION_DIR = os.path.join(APP_ROOT, 'flask_sessions')
+# 确保目录存在
+os.makedirs(SESSION_DIR, exist_ok=True)
 
 # 嵌入式Python的路径（用于脚本）
 RUNTIME_DIR = os.path.join(APP_ROOT, 'runtime')
@@ -29,10 +39,8 @@ VIDEO_DIR = os.path.join(APP_ROOT, 'web', 'static', 'videos')
 CONFIG_DIR = os.path.join(APP_ROOT, 'config')
 LOG_DIR = os.path.join(APP_ROOT, 'logs')
 ROOM_DIR = os.path.join(APP_ROOT, 'rooms')
-SESSION_DIR = os.path.join(APP_ROOT, 'sessions')
 
 # ==================== 运行环境判断 ====================
-
 # 是否为嵌入式运行
 IS_EMBEDDED = os.path.exists(RUNTIME_DIR) and os.path.exists(os.path.join(RUNTIME_DIR, 'python.exe'))
 

@@ -1,90 +1,100 @@
-import asyncio
+# aibls/views/room_route.py
 import logging
-from typing import Any
 
 from bilibili_api import Credential
-from flask import Blueprint, session, request, jsonify, render_template
+from flask import session, request, jsonify
 
-from aibls.decorators.decorator import check_session_2api_decorator, check_session_go_login_decorator
-from aibls.models.users import LoginCookie
-from aibls.services.response import ResponseResult
-from aibls.services.room_service_file import RoomServiceFile
+from aibls.decorators import check_session_2api_decorator
+from aibls.models import LoginCookie
+from aibls.services import RoomServiceFile
 from aibls.views import room_api
 
-"""日志对象的记录"""
 logger = logging.getLogger(__name__)
 
 room_service = RoomServiceFile()
 
-@room_api.route('/api/updateroom', methods=['GET','POST'])
+
+def _get_login_credential() -> Credential:
+    """获取当前登录用户的凭证"""
+    login_user = session.get("login_user")
+    return LoginCookie.dic_to_credential(login_user)
+
+
+def _get_room_id_from_request() -> int | None:
+    """从请求中获取房间号"""
+    room_id_str = request.form.get("room_id", "")
+    if not room_id_str:
+        return None
+    return int(room_id_str)
+
+
+# ==================== 路由 ====================
+
+@room_api.route('/api/updateroom', methods=['GET', 'POST'])
 @check_session_2api_decorator
 def update_room():
-    """
-    更新房间信息的API
-    :return:
-    """
-    api_resp = {"code": 0, "message": "成功"}
+    """更新房间信息"""
     try:
-        #获取房间号
-        room_id_str = request.form["room_id"]
-        if room_id_str == "":
-            api_resp = {"code":2102,"text":"请输入房间号"}
-        room_id :int = int(room_id_str)
+        room_id = _get_room_id_from_request()
+        if room_id is None:
+            return jsonify({"code": 2102, "message": "请输入房间号"})
 
-        #准备当前登录用户
-        login_user : dict[str,Any] = session.get("login_user")
-        user_credential:Credential = LoginCookie.dic_to_credential(login_user)
-        resp: ResponseResult = room_service.save_room(user_credential, room_id_str)
-        logger.info("保存房间数据的结果：{}".format(resp))
-        api_resp = resp.to_dict()
+        credential = _get_login_credential()
+        resp = room_service.save_room(credential, str(room_id))
+        logger.info(f"保存房间数据结果: {resp}")
+
+        return jsonify(resp.to_dict())
+
     except Exception as e:
-        logger.error(e)
-        api_resp = {"code": -210001, "message": str(e)}
-    finally:
-        return jsonify(api_resp)
+        logger.error(f"更新房间信息失败: {e}")
+        return jsonify({"code": -210001, "message": str(e)})
+
 
 @room_api.route("/api/searchrooms")
 @check_session_2api_decorator
 def search_room_list():
-    api_resp = {"code": 0, "message": "查询成功"}
+    """搜索房间列表"""
     try:
-        login_user : dict[str,Any] = session.get("login_user")
-        filters:dict = {"login_id":login_user["login_id"]}
-        #如果页面传输的筛选条件
-        room_id :str = request.args.get("room_id")
-        if room_id and room_id != "":
+        login_user = session.get("login_user")
+        filters = {"login_id": login_user["login_id"]}
+
+        # 添加筛选条件
+        room_id = request.args.get("room_id")
+        if room_id:
             filters["room_id"] = room_id
-        #查询数据
+
         result_data = room_service.load_rooms_by_filter(filters)
-        api_resp["rooms"] = result_data["items"]
-        api_resp["count"] = result_data["count"]
+
+        return jsonify({
+            "code": 0,
+            "message": "查询成功",
+            "rooms": result_data["items"],
+            "count": result_data["count"]
+        })
 
     except Exception as e:
-        logger.error(e)
-        api_resp = {"code": -210002, "text": str(e)}
-    finally:
-        return jsonify(api_resp)
+        logger.error(f"搜索房间列表失败: {e}")
+        return jsonify({"code": -210002, "message": str(e)})
 
-@room_api.route('/api/updatefav', methods=['GET','POST'])
+
+@room_api.route('/api/updatefav', methods=['GET', 'POST'])
 @check_session_2api_decorator
 def update_fav():
-    api_resp = {"code": 0, "message": "成功"}
+    """更新收藏状态"""
     try:
-        # 获取房间号
-        room_id_str = request.form["room_id"]
-        if room_id_str == "":
-            api_resp = {"code": 2102, "text": "请输入房间号"}
+        room_id = request.form.get("room_id")
+        is_fav = request.form.get("is_favorites")
 
-        is_fav:str = request.form["is_favorites"]
-        if is_fav == "":
-            api_resp = {"code": 2103, "text": "请输入收藏信息"}
+        if not room_id:
+            return jsonify({"code": 2102, "message": "请输入房间号"})
+        if is_fav is None:
+            return jsonify({"code": 2103, "message": "请输入收藏信息"})
 
-        # 准备当前登录用户
-        login_user: dict[str, Any] = session.get("login_user")
-        resp: ResponseResult = room_service.set_favorites(room_id_str,login_user["login_id"],is_fav)
-        api_resp = resp.to_dict()
+        login_user = session.get("login_user")
+        resp = room_service.set_favorites(room_id, login_user["login_id"], is_fav)
+
+        return jsonify(resp.to_dict())
+
     except Exception as e:
-        logger.error(e)
-        api_resp = {"code": -210001, "message": str(e)}
-    finally:
-        return jsonify(api_resp)
+        logger.error(f"更新收藏状态失败: {e}")
+        return jsonify({"code": -210001, "message": str(e)})
