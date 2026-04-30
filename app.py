@@ -14,6 +14,8 @@ import requests
 from flask import Flask, request, Response, jsonify
 from flask_session import Session
 
+from aibls.generator_manager import init_generator
+
 # ==================== 环境初始化 ====================
 
 # 将当前目录添加到 Python 路径
@@ -63,6 +65,7 @@ def create_app():
     #     from aibls.utils.migrate_json_to_db import migrate_json_to_db
     #     migrate_json_to_db()
 
+    init_generator(app)
 
     return app
 
@@ -107,6 +110,8 @@ def register_log(app: Flask):
 # ==================== 初始化应用 ====================
 
 app = create_app()
+# ✅ 立即初始化 generator
+init_generator(app)
 
 # SocketIO 初始化（必须在 app 创建之后）
 socketio.init_app(app,
@@ -143,7 +148,6 @@ if __name__ == "__main__":
         print(f"运行环境: {'嵌入式运行' if IS_EMBEDDED else '开发环境'}")
         print(f"项目目录: {APP_ROOT}")
         print(f"启动服务器...")
-        print(f"生成器ID: {generator.generator_id}")
         print(f"队列大小: {message_queue.qsize()}")
         print("=" * 60)
         print(f"访问地址: http://localhost:{PORT}")

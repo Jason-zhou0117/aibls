@@ -12,14 +12,17 @@ from flask_socketio import emit
 
 from aibls.decorators import check_session_2api_decorator, check_session_go_login_decorator
 from aibls.models import LoginCookie
-from aibls.services import AsyncMessageGenerator,message_consumer,room_service_file
+from aibls.services import message_consumer,room_service_file
 from aibls.views import live_api
 from aibls.stock_io import socketio, message_queue
 
 logger = logging.getLogger(__name__)
 
-# 创建生成器实例
-generator = AsyncMessageGenerator(message_queue)
+# live_route.py
+from aibls.generator_manager import get_generator, reset_generator
+
+# 使用
+generator = get_generator()
 
 # 启动消费者线程
 consumer_thread = threading.Thread(target=message_consumer.run, daemon=True, name="MessageConsumer")
@@ -35,14 +38,13 @@ def danmu_page():
     """弹幕监控主页"""
     global generator
 
-    # 销毁旧的生成器
-    if generator:
-        generator.stop()
-        time.sleep(0.5)
-        generator = None
+    # 重新获取生成器（确保是最新的）
+    generator = get_generator()
+    if generator is None:
+        return "系统未就绪，请稍后重试", 503
 
-    # 创建新的生成器
-    generator = AsyncMessageGenerator(message_queue)
+    # ✅ 重置生成器（停止旧的，创建新的）
+    generator = reset_generator()
 
     login_user = session.get("login_user")
     user_credential:Credential = LoginCookie.dic_to_credential(login_user)

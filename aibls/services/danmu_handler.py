@@ -7,21 +7,20 @@ from datetime import datetime
 
 from bilibili_api import Credential, live, sync, user
 
-from aibls.utils import VIPConfig
-
 logger = logging.getLogger(__name__)
 
 
 class AsyncMessageGenerator:
     """异步消息生成器 - 在单个线程中使用 asyncio.new_event_loop"""
 
-    def __init__(self, message_queue):
+    def __init__(self, message_queue,app = None):
         self.message_queue = message_queue
         self.loop = None
         self.thread = None
         self.running = False
         self.generator_id = random.randint(1000, 9999)
         self._room = None
+        self.app = app
 
     def connect(self, user_credential: Credential, room_id: int):
         self.credential = user_credential
@@ -300,29 +299,40 @@ class AsyncMessageGenerator:
             # 将弹幕放入消息队列
             self.message_queue.put(info)
 
+            logger.info(f"准备查询VIP视频 {user_id}")
             # 2. 检查是否为VIP用户，发送视频播放指令
-            vip_users = VIPConfig.load_json()
-            logger.info(f'**********VIP用户：{vip_users}')
-            if user_id in vip_users:
-                user_config = vip_users[user_id]
-                videos = user_config.get("videos", [])
-                if len(videos) > 0:
-                    video = random.choice(videos)
-                    video_url = video.get("url", "")
-                    video_path = video.get("path", "")
-                    logger.info(f"VIP用户入场: {user_name} (UID: {user_id})，触发视频播放: {video.get('url', '')}")
+            # 在函数内部导入，避免循环导入
+            from aibls.services.vip_service import vip_service
+            if self.app:
+                with self.app.app_context():
+                    vip_videos,error = vip_service.get_user_videos(user_id)
+            else:
+                # 如果没传入 app，尝试使用 current_app
+                from flask import current_app
+                with current_app.app_context():
+                    vip_videos,error = vip_service.get_user_videos(user_id)
 
-                    video_command = {
-                        "type": "video_command",  # 特殊类型，用于区分
-                        "action": "play_video",
-                        "video_url": video_url,  # 已经是Flask静态路径
-                        "uid": user_id,
-                        "video_path": video_path,
-                        "uname": user_name,
-                        "timestamp": datetime.now().isoformat()
-                    }
-                    # 放入消息队列，由消费者推送到前端
-                    self.message_queue.put(video_command)
+
+            logger.info(f"查询到用户 {user_id}下的VIP视频数为{len(vip_videos)}")
+
+            if len(vip_videos) > 0:
+                video = random.choice(vip_videos)
+                video_url = video.get("url", "")
+                video_path = video.get("path", "")
+                video_title = video.get("title", "")
+                logger.info(f"VIP用户入场: {user_name} (UID: {user_id})，触发视频播放: {video.get('url', '')}")
+
+                video_command = {
+                    "type": "video_command",  # 特殊类型，用于区分
+                    "action": "play_video",
+                    "video_url": video_url,  # 已经是Flask静态路径
+                    "uid": user_id,
+                    "video_path": video_path,
+                    "video_name": video_title,
+                    "timestamp": datetime.now().isoformat()
+                }
+                # 放入消息队列，由消费者推送到前端
+                self.message_queue.put(video_command)
 
         except Exception as e:
             logger.error(f"解析进入事件数据出错: {e}")
