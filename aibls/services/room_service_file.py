@@ -149,3 +149,5 @@ class RoomServiceFile:
                 "count": 1,
                 "items": [default_room]
             }
+
+room_service_file = RoomServiceFile()

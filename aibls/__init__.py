@@ -20,6 +20,7 @@ from .stock_io import socketio, message_queue
 from .db_init import init_db
 from .models import db, VIPUser, UserVideo,VideoInfo,LoginCookie
 from .views import user_api,room_api,live_api,vip_api
+from .services import bili_user_service,vip_service
 
 __all__ = [
     'APP_ROOT',
@@ -43,5 +44,7 @@ __all__ = [
     'user_api',
     'room_api',
     'live_api',
-    'vip_api'              # 添加
+    'vip_api',
+    'bili_user_service'  ,
+    'vip_service'            # 添加
 ]

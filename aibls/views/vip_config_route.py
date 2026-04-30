@@ -1,105 +1,116 @@
 # aibls/views/vip_config_route.py
-
 import os
 import uuid
 import logging
 from datetime import datetime
+from pathlib import Path
 from typing import Any
 
 from bilibili_api import Credential
 from flask import request, jsonify, session, render_template
 from werkzeug.utils import secure_filename
 
+from aibls import LoginCookie
 from aibls.decorators import check_session_2api_decorator, check_session_go_login_decorator
-from aibls.exceptions import BLSException
-from aibls.models import LoginCookie
-from aibls.services import UserServiceFile
+from aibls.models import db
+from aibls.services import vip_service,bili_user_service
 from aibls.utils import VIPConfig
-from aibls.views import vip_api
+from aibls.views import  vip_api
 
 logger = logging.getLogger(__name__)
 
+# 上传配置
+UPLOAD_FOLDER = Path(__file__).parent.parent.parent / 'web' / 'static' / 'videos'
 ALLOWED_EXTENSIONS = {'mp4', 'webm', 'avi', 'mov', 'mkv'}
 
+UPLOAD_FOLDER.mkdir(parents=True, exist_ok=True)
+
+
 def allowed_file(filename):
-    """检查文件扩展名是否允许"""
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-user_service = UserServiceFile()
 
 # ==================== VIP用户管理 API ====================
 
 @vip_api.route('/api/vip/users', methods=['GET'])
 @check_session_2api_decorator
 def get_vip_users():
-    """获取VIP用户列表 - 返回列表格式"""
-    data = VIPConfig.config_to_list()
-    return jsonify({
-        'code': 0,
-        'data': data
-    })
+    """获取VIP用户列表"""
+    users = vip_service.get_all_users()
+    return jsonify({'code': 0, 'data': users})
 
 
 @vip_api.route('/api/vip/users', methods=['POST'])
 @check_session_2api_decorator
 def add_vip_user():
-    """添加VIP用户（获取B站信息后保存）"""
+    """添加VIP用户"""
     data = request.get_json()
-    logger.info("开始添加用户信息：request={}".format(data))
     uid = str(data.get('uid'))
-    logger.info("开始获取用户信息：target_uid={}".format(uid))
-    if not uid :
+    if not uid:
         return jsonify({'code': -1, 'message': 'UID不能为空'})
+
+
 
     try:
         # 准备当前登录用户
         login_user: dict[str, Any] = session.get("login_user")
         user_credential: Credential = LoginCookie.dic_to_credential(login_user)
         # 获取Bili用户信息
-        bili_user = user_service.get_user_info(uid,user_credential)
+        bili_user = bili_user_service.get_user_info(uid,user_credential)
 
         if bili_user is None:
             return jsonify({'code': -2, 'message': 'B站查询该用户信息失败，请确认UID是否正确'})
 
-        # 添加新用户
-        user_config = {
-            'userid': uid,
-            'name': bili_user["name"],
-            'nickname':  bili_user["name"],
-            'face': bili_user["face"],
-            'videos': [],
-            'created_at': datetime.now().isoformat()
-        }
+        name = bili_user.get("name","")
+        face = bili_user.get("face","")
 
-        VIPConfig.add_user_config(user_config)
-        return jsonify({'code': 0, 'data': user_config, 'message': '添加成功'})
+
+        user, error = vip_service.add_user(uid, name, name,face)
+        if error:
+            return jsonify({'code': -1, 'message': error})
+
+        return jsonify({'code': 0, 'data': user, 'message': '添加成功'})
     except Exception as e:
         return jsonify({'code': -2, 'message': '保存用户信息失败'})
 
+
+@vip_api.route('/api/vip/users/<uid>', methods=['PUT'])
+@check_session_2api_decorator
+def update_vip_user(uid):
+    """更新VIP用户信息"""
+    data = request.get_json()
+    user, error = vip_service.update_user(
+        uid,
+        name=data.get('name'),
+        nickname=data.get('nickname'),
+        face=data.get('face')
+    )
+    if error:
+        return jsonify({'code': -1, 'message': error})
+
+    return jsonify({'code': 0, 'data': user, 'message': '更新成功'})
 
 
 @vip_api.route('/api/vip/users/<uid>', methods=['DELETE'])
 @check_session_2api_decorator
 def delete_vip_user(uid):
     """删除VIP用户"""
-    logger.info(f"进入删除用户={uid}")
-    VIPConfig.remove_user(uid)
-    return jsonify({'code': 0, 'message': '删除成功'})
+    success, message = vip_service.delete_user(uid)
+    if not success:
+        return jsonify({'code': -1, 'message': message})
+
+    return jsonify({'code': 0, 'message': message})
 
 
 @vip_api.route('/api/vip/users/<uid>', methods=['GET'])
 @check_session_2api_decorator
 def get_vip_user_detail(uid):
     """获取单个VIP用户详情"""
-    vip_users = VIPConfig.load_json()
-
-    if uid not in vip_users:
+    user = vip_service.get_user_by_uid(uid)
+    if not user:
         return jsonify({'code': -1, 'message': '用户不存在'})
 
-    return jsonify({
-        'code': 0,
-        'data': vip_users[uid]
-    })
+    return jsonify({'code': 0, 'data': user.to_dict()})
 
 
 # ==================== 入场视频管理 API ====================
@@ -108,15 +119,11 @@ def get_vip_user_detail(uid):
 @check_session_2api_decorator
 def get_user_videos(uid):
     """获取指定用户的入场视频列表"""
-    vip_users = VIPConfig.load_json()
+    videos, error = vip_service.get_user_videos(uid)
+    if error:
+        return jsonify({'code': -1, 'message': error})
 
-    if uid not in vip_users:
-        return jsonify({'code': -1, 'message': '用户不存在'})
-
-    return jsonify({
-        'code': 0,
-        'data': vip_users[uid].get('videos', [])
-    })
+    return jsonify({'code': 0, 'data': videos})
 
 
 @vip_api.route('/api/vip/videos', methods=['POST'])
@@ -125,32 +132,30 @@ def add_video():
     """添加入场视频"""
     data = request.get_json()
     uid = str(data.get('uid'))
+    video_id = str(uuid.uuid4())[:8]
     video_title = data.get('video_name')
     video_url = data.get('video_url')
     video_path = data.get('video_path')
-    try:
-        video_id = str(uuid.uuid4())[:8]
-        new_video = {
-            'id': video_id,
-            'title': video_title,
-            'url': video_url,
-            'path': video_path,
-            'created_at': datetime.now().isoformat()
-        }
-        VIPConfig.add_video(uid,new_video)
-        return jsonify({'code': 0, 'data': new_video, 'message': '添加成功'})
-    except BLSException as e:
-        return jsonify({'code': -1, 'message': e.msg})
-    except Exception as ex:
-        return jsonify({'code': -1, 'message': "添加视频时失败"})
+
+    if not uid or not video_title:
+        return jsonify({'code': -1, 'message': '参数不完整'})
+
+    video, error = vip_service.add_video(uid, video_id,video_title, video_url, video_path)
+    if error:
+        return jsonify({'code': -1, 'message': error})
+
+    return jsonify({'code': 0, 'data': video, 'message': '添加成功'})
 
 
-@vip_api.route('/api/vip/videos/<video_id>', methods=['DELETE'])
+@vip_api.route('/api/vip/videos/<video_id_key>', methods=['DELETE'])
 @check_session_2api_decorator
-def delete_video(video_id):
+def delete_video(video_id_key):
     """删除入场视频"""
-    VIPConfig.delete_video(video_id)
-    return jsonify({'code': 0, 'message': '删除成功'})
+    success, message = vip_service.delete_video(video_id_key)
+    if not success:
+        return jsonify({'code': -1, 'message': message})
+
+    return jsonify({'code': 0, 'message': message})
 
 
 # ==================== 视频文件上传 API ====================
@@ -194,6 +199,7 @@ def upload_video():
         'message': '上传成功'
     })
 
+
 @vip_api.route('/vip_config')
 @check_session_go_login_decorator
 def vip_config_page():
@@ -211,15 +217,18 @@ def test_play_video():
     from aibls.stock_io import socketio
 
     data = request.get_json()
-    video_id = data.get('videoid')
+    video_id_key = data.get('id_key')
 
-    video =VIPConfig.get_video(video_id)
+    logger.info(f'测试时的={video_id_key}')
+
+    video = vip_service.get_video_by_id(video_id_key)
     if not video:
         return jsonify({'code': -1, 'message': '视频ID不正确'})
 
-    video_url = video.get('url')
-    video_name = video.get('title', '测试视频')
-    video_path = video.get('path', '')
+    video_dic = video.to_dict()
+    video_url = video_dic.get('url')
+    video_name = video_dic.get('title', '测试视频')
+    video_path = video_dic.get('path', '')
 
     if not video_url:
         return jsonify({'code': -1, 'message': '缺少视频URL参数'})
@@ -245,37 +254,3 @@ def test_play_video():
         'message': f'正在播放: {video_name}',
         'data': test_command
     })
-
-@vip_api.route('/api/vip/update/<uid>')
-@check_session_2api_decorator
-def update_vip_user(uid):
-    """删除VIP用户"""
-    logger.info(f"进入删除用户={uid}")
-    user_id = str(uid)
-    if not user_id:
-        return jsonify({'code': -1, 'message': 'UID不能为空'})
-
-    try:
-        # 准备当前登录用户
-        login_user: dict[str, Any] = session.get("login_user")
-        user_credential: Credential = LoginCookie.dic_to_credential(login_user)
-        # 获取Bili用户信息
-        bili_user = user_service.get_user_info(user_id, user_credential)
-
-        if bili_user is None:
-            return jsonify({'code': -2, 'message': 'B站查询该用户信息失败，请确认UID是否正确'})
-
-        # 添加新用户
-        user_config = {
-            'userid': user_id,
-            'name': bili_user["name"],
-            'nickname': bili_user["name"],
-            'face': bili_user["face"],
-            'videos': [],
-            'created_at': datetime.now().isoformat()
-        }
-
-        VIPConfig.update_user_config(user_id,user_config)
-        return jsonify({'code': 0, 'data': user_config, 'message': '更新用户信息成功'})
-    except Exception as e:
-        return jsonify({'code': -2, 'message': '更新用户信息失败'})

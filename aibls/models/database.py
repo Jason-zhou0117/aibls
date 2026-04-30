@@ -55,6 +55,7 @@ class UserVideo(db.Model):
     def to_dict(self):
         """转换为字典"""
         return {
+            'id': self.id,
             'video_id': self.video_id,
             'title': self.title,
             'url': self.url,

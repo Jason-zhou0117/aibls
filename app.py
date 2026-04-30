@@ -58,6 +58,12 @@ def create_app():
     register_blueprint(app)
     register_log(app)
 
+    #迁移数据
+    # with app.app_context():
+    #     from aibls.utils.migrate_json_to_db import migrate_json_to_db
+    #     migrate_json_to_db()
+
+
     return app
 
 

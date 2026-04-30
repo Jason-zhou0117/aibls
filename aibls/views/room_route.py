@@ -6,12 +6,12 @@ from flask import session, request, jsonify
 
 from aibls.decorators import check_session_2api_decorator
 from aibls.models import LoginCookie
-from aibls.services import RoomServiceFile
+from aibls.services import room_service_file
 from aibls.views import room_api
 
 logger = logging.getLogger(__name__)
 
-room_service = RoomServiceFile()
+
 
 
 def _get_login_credential() -> Credential:
@@ -40,7 +40,7 @@ def update_room():
             return jsonify({"code": 2102, "message": "请输入房间号"})
 
         credential = _get_login_credential()
-        resp = room_service.save_room(credential, str(room_id))
+        resp = room_service_file.save_room(credential, str(room_id))
         logger.info(f"保存房间数据结果: {resp}")
 
         return jsonify(resp.to_dict())
@@ -63,7 +63,7 @@ def search_room_list():
         if room_id:
             filters["room_id"] = room_id
 
-        result_data = room_service.load_rooms_by_filter(filters)
+        result_data = room_service_file.load_rooms_by_filter(filters)
 
         return jsonify({
             "code": 0,
@@ -91,7 +91,7 @@ def update_fav():
             return jsonify({"code": 2103, "message": "请输入收藏信息"})
 
         login_user = session.get("login_user")
-        resp = room_service.set_favorites(room_id, login_user["login_id"], is_fav)
+        resp = room_service_file.set_favorites(room_id, login_user["login_id"], is_fav)
 
         return jsonify(resp.to_dict())
 

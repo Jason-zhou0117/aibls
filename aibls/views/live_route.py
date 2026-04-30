@@ -12,7 +12,7 @@ from flask_socketio import emit
 
 from aibls.decorators import check_session_2api_decorator, check_session_go_login_decorator
 from aibls.models import LoginCookie
-from aibls.services import AsyncMessageGenerator,message_consumer,RoomServiceFile
+from aibls.services import AsyncMessageGenerator,message_consumer,room_service_file
 from aibls.views import live_api
 from aibls.stock_io import socketio, message_queue
 
@@ -26,7 +26,6 @@ consumer_thread = threading.Thread(target=message_consumer.run, daemon=True, nam
 consumer_thread.start()
 print(f"[{datetime.now().strftime('%H:%M:%S')}] 消费者线程已启动")
 
-room_service = RoomServiceFile()
 
 # ==================== 路由 ====================
 
@@ -48,7 +47,7 @@ def danmu_page():
     login_user = session.get("login_user")
     user_credential:Credential = LoginCookie.dic_to_credential(login_user)
 
-    room_data = room_service.get_default_live_room()
+    room_data = room_service_file.get_default_live_room()
     room_id = "000000"
     room_owner = "未设置房间"
 
