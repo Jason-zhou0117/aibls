@@ -6,7 +6,6 @@
 import os
 import sys
 
-
 def get_app_dir():
     """获取应用程序根目录（项目根目录，不是 aibls 目录）"""
     # 当前文件在 aibls 目录下，向上取一层就是项目根目录
@@ -69,3 +68,4 @@ def ensure_directories():
 
 # 自动创建目录
 ensure_directories()
+

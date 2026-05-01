@@ -1,0 +1,1345 @@
+{
+  "ad_banner_info": {
+    "data": [
+      {
+        "ad_transparent_content": None,
+        "area_id": 530,
+        "av_id": 0,
+        "id": 291880,
+        "is_ad": False,
+        "link": "https://live.bilibili.com/5332",
+        "live_status": 1,
+        "location": "room_advertisement",
+        "parent_area_id": 1,
+        "pic": "https://i0.hdslb.com/bfs/live/156e99b838d41fa86420b94eeeda6660f69bb808.jpg",
+        "position": 1,
+        "room_id": 5332,
+        "show_ad_icon": False,
+        "title": "萤火虫动漫游戏嘉年华 广州站 38th",
+        "up_id": 7433611,
+        "weight": 0
+      }
+    ]
+  },
+  "anchor_info": {
+    "base_info": {
+      "face": "https://i0.hdslb.com/bfs/face/bae5b2aeced85ab6a55f1a132db3c2b428ee57c5.jpg",
+      "gender": "男",
+      "official_info": {
+        "desc": "",
+        "is_nft": 0,
+        "nft_dmark": "https://i0.hdslb.com/bfs/live/9f176ff49d28c50e9c53ec1c3297bd1ee539b3d6.gif",
+        "role": -1,
+        "title": ""
+      },
+      "uname": "闭家琐-"
+    },
+    "gift_info": {
+      "price": 0,
+      "price_update_time": 0
+    },
+    "live_info": {
+      "current": [
+        3730000,
+        15613810
+      ],
+      "level": 31,
+      "level_color": 16746162,
+      "next": [
+        5000000,
+        20613810
+      ],
+      "rank": "",
+      "score": 17777969,
+      "upgrade_score": 2835841
+    },
+    "medal_info": {
+      "fansclub": 145,
+      "medal_id": 1183637,
+      "medal_name": "锁财"
+    },
+    "relation_info": {
+      "attention": 138754
+    }
+  },
+  "area_mask_info": {
+    "area_masks": {
+      "full_mask": None,
+      "horizontal_masks": None,
+      "vertical_masks": None
+    }
+  },
+  "area_rank_info": {
+    "areaRank": {
+      "index": 0,
+      "rank": ""
+    },
+    "liveRank": {
+      "rank": ""
+    }
+  },
+  "area_rank_info_v2": {
+    "items": None,
+    "rotation_cycle_time": 5,
+    "user_ab_flag": False,
+    "user_last_rank_result": {
+      "show_special": False,
+      "show_special_count": 0
+    }
+  },
+  "battle_info": None,
+  "battle_rank_entry_info": None,
+  "big_card_info": {
+    "card_type": 0,
+    "extra": ""
+  },
+  "block_info": {
+    "block": False,
+    "business": 0,
+    "desc": ""
+  },
+  "charm_chat_rank": None,
+  "chat_room_info": {
+    "background": ""
+  },
+  "cloud_game_info": {
+    "is_gaming": 0
+  },
+  "cny": None,
+  "cny_26_activity": {
+    "red_packet": None
+  },
+  "cny_26_info": None,
+  "cny_quiz_guide": False,
+  "collaboration_live_info": None,
+  "danmu_extra": {
+    "chronos_kv": "",
+    "danmu_player_config": None,
+    "danmu_settings": None,
+    "input_plus": {
+      "buttons": [
+        {
+          "button_type": 1,
+          "icon": "https://i0.hdslb.com/bfs/live/0453a38319dfd6d9c102813d5f0089cca91ee5a4.png",
+          "title": "动态"
+        },
+        {
+          "button_type": 2,
+          "icon": "https://i0.hdslb.com/bfs/live/b41168adedfc79c8c2e2d5757c84d038c67c586c.png",
+          "title": "稿件"
+        }
+      ]
+    },
+    "laugh_room_info": {},
+    "screen_switch_off": False
+  },
+  "dm_activity": {
+    "activity_list": [],
+    "material_list": [
+      {
+        "activity_id": 4955567,
+        "backup_url": "http://i0.hdslb.com/bfs/live/30bb010289edaf889575251b8b29718296229e15.zip",
+        "mod_resource": {
+          "mobi_module": "special_dm_v2_750004",
+          "mobi_module_version": 1,
+          "mobi_pool": "live"
+        },
+        "related_id": "34313"
+      },
+      {
+        "activity_id": 20551672,
+        "backup_url": "http://i0.hdslb.com/bfs/live/26d1e6a99c4bd833ecfbfed9dfbb6f08f594aa91.zip",
+        "mod_resource": {
+          "mobi_module": "special_dm_v2_960014",
+          "mobi_module_version": 1,
+          "mobi_pool": "live"
+        },
+        "related_id": "35007"
+      },
+      {
+        "activity_id": 16067488,
+        "backup_url": "http://i0.hdslb.com/bfs/live/88143d71f994e696e3ffceeb4d573f545ee7020e.zip",
+        "mod_resource": {
+          "mobi_module": "special_dm_v2_660009",
+          "mobi_module_version": 1,
+          "mobi_pool": "live"
+        },
+        "related_id": "34771"
+      }
+    ],
+    "ts": 1777613265
+  },
+  "dm_brush_info": {
+    "brush_count": 100,
+    "min_time": 700,
+    "slice_count": 2,
+    "storage_time": 3000
+  },
+  "dm_combo": None,
+  "dm_emoticon_info": {
+    "is_open_emoticon": 1,
+    "is_shield_emoticon": 0
+  },
+  "dm_interaction_ab": {
+    "102": 1,
+    "103": 1,
+    "104": 1,
+    "105": 1,
+    "106": 1
+  },
+  "dm_pin": {
+    "pins": None
+  },
+  "dm_reply": {
+    "show_reply": True,
+    "show_reply_esports": False
+  },
+  "dm_tag_info": {
+    "dm_chronos_extra": "",
+    "dm_mode": None,
+    "dm_setting_switch": 0,
+    "dm_tag": 0,
+    "extra": "",
+    "material_conf": None,
+    "platform": None
+  },
+  "dm_vote": None,
+  "fake_device": {
+    "delay": 0,
+    "is_fake": False
+  },
+  "game_info": {
+    "game_status": 0
+  },
+  "gift_memory_info": {
+    "list": None
+  },
+  "gift_menu": {
+    "gift_menu_items": None,
+    "is_show": False
+  },
+  "gift_star": {
+    "display_widget_ab_group": 3,
+    "show": True
+  },
+  "guard_info": {
+    "anchor_guard_achieve_level": 0,
+    "count": 49
+  },
+  "guard_intimacy_rank_status": {
+    "guard_rank_new_ab": 1,
+    "guard_rank_new_month_status": 1,
+    "guard_rank_new_total_status": 1,
+    "guard_rank_new_week_status": 1
+  },
+  "guard_leader": {
+    "anchor_background_url": "",
+    "avatar_src": "",
+    "background_url": "",
+    "display_src": "",
+    "entry_effect_id": 0,
+    "face": "",
+    "icon_src": "",
+    "input_background_url": "",
+    "jump_url": "",
+    "name": "",
+    "newly": 0,
+    "rank_top_background_light_url1": "",
+    "rank_top_background_light_url2": "",
+    "rank_top_background_url1": "",
+    "rank_top_background_url2": "",
+    "rank_top_icon1": "",
+    "rank_top_icon2": "",
+    "show": 0,
+    "text": "",
+    "uid": 0
+  },
+  "hot_rank_entrance_info": None,
+  "hot_rank_info": None,
+  "hot_rank_info_v3": {
+    "item": {
+      "countdown": 135,
+      "on_rank_name_by_type": "全站",
+      "rank": 0,
+      "rank_name_by_type": "热门榜",
+      "rank_type": 5,
+      "sub_rank_type": 1,
+      "timestamp": 1777613265,
+      "url": "https://live.bilibili.com/p/html/live-app-hotrank/index.html?is_live_half_webview=1&hot_type=1&hybrid_rotate_d=1&hybrid_half_ui=1,3,100p,70p,0,0,30,100,12;2,2,375,100p,0,0,30,100,0;3,3,100p,70p,0,0,30,100,12;4,2,375,100p,0,0,30,100,0;5,3,100p,70p,0,0,30,100,0;6,3,100p,70p,0,0,30,100,0;7,3,100p,70p,0,0,30,100,0;8,3,100p,70p,0,0,30,100,0&pc_ui=338,465,f4eefa,0#/hotv3"
+    },
+    "room_hot_rank_v3_ab": 1
+  },
+  "interactive_game_tag": {
+    "action": 0,
+    "game_id": "",
+    "game_name": ""
+  },
+  "like_info_v3": {
+    "click_block": False,
+    "cooldown": 0.35,
+    "count_block": False,
+    "count_show_time": 15,
+    "dm_icons": [
+      "https://i0.hdslb.com/bfs/live/ecc2c5a2efc1c40a1125bb0d648d891e0e8cbd3b.png",
+      "https://i0.hdslb.com/bfs/live/391b45ed00617391b863f6441d5d040165c4d1b4.png",
+      "https://i0.hdslb.com/bfs/live/ad7c7adc9ee0c778cea161dea6c5a96c4ff7f845.png",
+      "https://i0.hdslb.com/bfs/live/c6a4781558d84838cc4963fcf94792e54beabe15.png",
+      "https://i0.hdslb.com/bfs/live/6920410aca21e3397f23ee7ae5ddbf8f1c625943.png",
+      "https://i0.hdslb.com/bfs/live/7e671e053c365f91a0a0f4837ec92ac9581977ec.png"
+    ],
+    "eggshells_icon": "https://i0.hdslb.com/bfs/live/ea6454847e9b9d1b6be03f04f829620b4f0a5d46.svga",
+    "guide_icon_ratio": 1.3,
+    "guide_icon_urls": [
+      "https://i0.hdslb.com/bfs/live/2e9145b42b5acbd4a13de1540b42e709832f9bae.webp",
+      "https://i0.hdslb.com/bfs/live/b0faa7d645c035cd1d61de5011cdc3880ef232d6.webp"
+    ],
+    "guild_dm_text": "点赞30次可以帮主播冲刺热门榜哦～",
+    "guild_emo_text": "试试双击点赞 让主播被更多人看到吧～",
+    "hand_icons": [
+      "https://i0.hdslb.com/bfs/live/1aac78a01b4cba5aa3f7c935c49b0a0bd8992ce1.webp",
+      "https://i0.hdslb.com/bfs/live/81c69596db4a94c53bebed567c1e457c8240e91c.webp",
+      "https://i0.hdslb.com/bfs/live/f281abe0bb186253acfe7b82d54d62fd25f5fee3.webp",
+      "https://i0.hdslb.com/bfs/live/e99441bacfb0a516a08455c5eb9266e7d6174a5c.webp",
+      "https://i0.hdslb.com/bfs/live/2e9145b42b5acbd4a13de1540b42e709832f9bae.webp",
+      "https://i0.hdslb.com/bfs/live/09f36c21175ca217268896305f1d248f3f64add0.webp",
+      "https://i0.hdslb.com/bfs/live/8e90f8aedd66237922958654efb36d97ac4a5701.webp",
+      "https://i0.hdslb.com/bfs/live/29b65444d287680263b1024a6a0d479f7ad41ad7.webp",
+      "https://i0.hdslb.com/bfs/live/b0faa7d645c035cd1d61de5011cdc3880ef232d6.webp",
+      "https://i0.hdslb.com/bfs/live/10fe45806cb0c3e13ef5c9a3ca03a0707667934b.webp"
+    ],
+    "hand_use_face": True,
+    "icon": "https://i0.hdslb.com/bfs/live/fe8e848118e8f18eccbd11cad62b29105c51a797.png",
+    "like_dm_text": "谢谢你的赞，每点赞30次有概率为主播增加曝光哦～",
+    "process_color": "#4DFF6699",
+    "process_icon": "https://i0.hdslb.com/bfs/live/6d96e9de0cc5c80acf3537fe9a23d94da0ab5ff5.png",
+    "report_click_limit": 15,
+    "report_time_max": 10,
+    "report_time_min": 5,
+    "total_likes": 2332
+  },
+  "live_play_info": {
+    "show_left_entry": True,
+    "show_widget_banner": True,
+    "widget_version": 1
+  },
+  "location": {
+    "label": "在广州"
+  },
+  "lol_info": None,
+  "module_control_infos": {
+    "anchor_module": {
+      "allow_click_face": False,
+      "allow_follow": False,
+      "heat_index": None
+    },
+    "audience_module": None,
+    "cmd_list": [
+      "LOG_IN_NOTICE",
+      "CUT_OFF",
+      "WARNING",
+      "LIVE",
+      "REENTER_LIVE_ROOM",
+      "PREPARING",
+      "ROOM_REFRESH",
+      "ROOM_BLOCK_MSG",
+      "ROOM_LIVE_FORBID",
+      "ROOM_LOCK",
+      "ROOM_LIMIT",
+      "ROOM_SILENT_ON",
+      "ROOM_SILENT_OFF",
+      "ROOM_CHANGE",
+      "CHASE_FRAME_SWITCH",
+      "LIVE_INTERNAL_ROOM_LOGIN",
+      "REDIRECT_EMPTY_PAGE",
+      "FULL_SCREEN_MASK_OPEN",
+      "RECALL_DANMU_MSG",
+      "room_admin_entrance",
+      "ROOM_ADMIN_REVOKE",
+      "MULTI_VOICE_APPLICATION_ANCHOR",
+      "MULTI_VOICE_APPLICATION_USER",
+      "MULTI_VOICE_APPLICATION",
+      "MULTI_VOICE_PK_STATUS_V2",
+      "UNIVERSAL_INTERACT_INVITATION",
+      "UNIVERSAL_INTERACT_JOIN",
+      "UNIVERSAL_INTERACT_OPERATION",
+      "UNIVERSAL_EVENT_GIFT_V2",
+      "WATCH_ROOM_TOAST_MESSAGE",
+      "PAY_LIVE_VALIDATE"
+    ],
+    "danmu_module": None,
+    "danmu_setting_module": False,
+    "display_right_interaction_modules": False,
+    "interactive_animation_module": False,
+    "like_module": False,
+    "player_module": {
+      "watermark": False
+    },
+    "super_chat_module": False
+  },
+  "multi_voice": {
+    "battle_info": None,
+    "biz_session_id": "",
+    "hat_list": None,
+    "invoking_time": 0,
+    "members": [],
+    "mode_details": None,
+    "mv_role": 0,
+    "pk": None,
+    "seat_type": 0,
+    "switch_status": 2,
+    "version": 0
+  },
+  "new_area_rank_info": {
+    "items": None,
+    "rotation_cycle_time_web": 10000
+  },
+  "new_switch_info": {
+    "brand-follow-switch": 0,
+    "brand-user-card-web-switch": 0,
+    "bubble": 1,
+    "chronos_danmu_style": 1,
+    "danmu_click_switch": 1,
+    "danmu_setting_show_switch": 1,
+    "dm_pin_switch": 1,
+    "enter_room_warning": 1,
+    "fans-club": 1,
+    "fans-medal-progress": 1,
+    "gift-bay-screen": 1,
+    "h5_pop_up": 1,
+    "input_plus_switch": 0,
+    "mic_user_gift": 1,
+    "new-room-area-rank": 1,
+    "popular_rank_anchor_ab": 1,
+    "room-activity": 1,
+    "room-anchor_rank": 1,
+    "room-board": 1,
+    "room-danmaku-editor": 1,
+    "room-effect": 1,
+    "room-enter": 1,
+    "room-fans_medal": 1,
+    "room-feedback": 1,
+    "room-hot-rank": 1,
+    "room-hour_rank": 1,
+    "room-info-integral": 1,
+    "room-info-popularity": 1,
+    "room-my-idol": 1,
+    "room-player-watermark": 1,
+    "room-popular-rank": 1,
+    "room-prop-send": 1,
+    "room-recommend-live_off": 1,
+    "room-report": 1,
+    "room-sailing": 1,
+    "room-silver_seeds-box": 1,
+    "room-socket": 1,
+    "room-super-chat": 1,
+    "room-supplication": 1,
+    "room-tab": 1,
+    "room-topic": 1,
+    "room-web_banner": 1,
+    "room-week_rank": 1,
+    "room-wishing_bottle": 1,
+    "room_hot_rank_v3": 1,
+    "room_rank_rearrange": 1,
+    "title": 1,
+    "wealth_medal": 1,
+    "web-gift-batter-bar": 1
+  },
+  "new_tab_info": {
+    "button": None
+  },
+  "news_info": {
+    "content": "",
+    "ctime": "2025-09-26 15:55:13",
+    "uid": 3537114010487448
+  },
+  "online_gold_rank_info_v2": None,
+  "pk_info": None,
+  "pk_info_v2": {
+    "audience_open": False,
+    "invite_pk_resp": None,
+    "members": [
+      {
+        "assist_info": None,
+        "capsules": None,
+        "capsules_v2": None,
+        "date_streak": 0,
+        "face": "https://i0.hdslb.com/bfs/face/ca3b984d1df6b0250ffcde5bd192ba8e5b3dc6cb.jpg",
+        "golds": 6000,
+        "group_id": 0,
+        "is_follow": 0,
+        "is_latest_streak": False,
+        "is_winner": 0,
+        "order": 0,
+        "pk_cards": None,
+        "pk_multiple_status": 0,
+        "play": {
+          "play_status": 0
+        },
+        "power": "",
+        "rank": 4,
+        "rank_v2": 0,
+        "room_id": 1939979572,
+        "status": 0,
+        "uid": 3706963143690642,
+        "uname": "不吃麻麻鱼i",
+        "votes": 60,
+        "votes_text": "60"
+      },
+      {
+        "assist_info": None,
+        "capsules": None,
+        "capsules_v2": None,
+        "date_streak": 0,
+        "face": "https://i2.hdslb.com/bfs/face/e459cadfc3c76cf880fc6bac83d1b7e76472be2a.jpg",
+        "golds": 11200,
+        "group_id": 0,
+        "is_follow": 0,
+        "is_latest_streak": False,
+        "is_winner": 0,
+        "order": 0,
+        "pk_cards": None,
+        "pk_multiple_status": 0,
+        "play": {
+          "play_status": 0
+        },
+        "power": "",
+        "rank": 3,
+        "rank_v2": 0,
+        "room_id": 1884963465,
+        "status": 0,
+        "uid": 3546876253046975,
+        "uname": "肉肉大王-呀",
+        "votes": 112,
+        "votes_text": "112"
+      },
+      {
+        "assist_info": None,
+        "capsules": None,
+        "capsules_v2": None,
+        "date_streak": 0,
+        "face": "https://i0.hdslb.com/bfs/face/efbad72db0592fefc128664f31d4aed6dba5032c.jpg",
+        "golds": 0,
+        "group_id": 0,
+        "is_follow": 0,
+        "is_latest_streak": False,
+        "is_winner": 0,
+        "order": 0,
+        "pk_cards": None,
+        "pk_multiple_status": 0,
+        "play": {
+          "play_status": 0
+        },
+        "power": "",
+        "rank": 0,
+        "rank_v2": 0,
+        "room_id": 1822151778,
+        "status": 0,
+        "uid": 3493281914686296,
+        "uname": "草莓嗳开心",
+        "votes": 0,
+        "votes_text": "0"
+      },
+      {
+        "assist_info": None,
+        "capsules": None,
+        "capsules_v2": None,
+        "date_streak": 0,
+        "face": "https://i1.hdslb.com/bfs/face/d04494963105ed5086c672ec2fed7e5a4f4f8b67.jpg",
+        "golds": 300,
+        "group_id": 0,
+        "is_follow": 0,
+        "is_latest_streak": False,
+        "is_winner": 0,
+        "order": 0,
+        "pk_cards": None,
+        "pk_multiple_status": 0,
+        "play": {
+          "play_status": 0
+        },
+        "power": "",
+        "rank": 5,
+        "rank_v2": 0,
+        "room_id": 1837225476,
+        "status": 0,
+        "uid": 3546981842553571,
+        "uname": "牛牛夹馍-",
+        "votes": 3,
+        "votes_text": "3"
+      },
+      {
+        "assist_info": None,
+        "capsules": None,
+        "capsules_v2": None,
+        "date_streak": 0,
+        "face": "https://i0.hdslb.com/bfs/face/bae5b2aeced85ab6a55f1a132db3c2b428ee57c5.jpg",
+        "golds": 26100,
+        "group_id": 0,
+        "is_follow": 0,
+        "is_latest_streak": False,
+        "is_winner": 0,
+        "order": 0,
+        "pk_cards": None,
+        "pk_multiple_status": 0,
+        "play": {
+          "play_status": 0
+        },
+        "power": "",
+        "rank": 2,
+        "rank_v2": 0,
+        "room_id": 30509542,
+        "status": 0,
+        "uid": 3537114010487448,
+        "uname": "闭家琐-",
+        "votes": 261,
+        "votes_text": "261"
+      },
+      {
+        "assist_info": None,
+        "capsules": None,
+        "capsules_v2": None,
+        "date_streak": 0,
+        "face": "https://i1.hdslb.com/bfs/face/818d92e85d59a78b7097c15d094ae1d1a9355baa.jpg",
+        "golds": 30000,
+        "group_id": 0,
+        "is_follow": 0,
+        "is_latest_streak": False,
+        "is_winner": 0,
+        "order": 0,
+        "pk_cards": None,
+        "pk_multiple_status": 0,
+        "play": {
+          "play_status": 0
+        },
+        "power": "",
+        "rank": 1,
+        "rank_v2": 0,
+        "room_id": 1813447961,
+        "status": 0,
+        "uid": 3546966889859668,
+        "uname": "小芊Yolo_",
+        "votes": 300,
+        "votes_text": "300"
+      },
+      {
+        "assist_info": None,
+        "capsules": None,
+        "capsules_v2": None,
+        "date_streak": 0,
+        "face": "https://i1.hdslb.com/bfs/face/2de61faf4aff64b81a11d6bbe1dfa90e11361c4e.jpg",
+        "golds": 0,
+        "group_id": 0,
+        "is_follow": 0,
+        "is_latest_streak": False,
+        "is_winner": 0,
+        "order": 0,
+        "pk_cards": None,
+        "pk_multiple_status": 0,
+        "play": {
+          "play_status": 0
+        },
+        "power": "",
+        "rank": 0,
+        "rank_v2": 0,
+        "room_id": 1938416790,
+        "status": 0,
+        "uid": 1703115817,
+        "uname": "铁乜咯",
+        "votes": 0,
+        "votes_text": "0"
+      }
+    ],
+    "mill_timestamp": 1777613265359,
+    "pk_basic": {
+      "biz_session_id": "17776128301653706963143690642",
+      "end_time": 1777616710,
+      "init_id": 1884963465,
+      "init_uid": 3546876253046975,
+      "main_page": "https://live.bilibili.com/activity/live-activity-battle/index.html?show_refresh=0&show_close=0&app_name=chaos&is_live_half_webview=1&hybrid_rotate_d=1&hybrid_half_ui=1,3,100p,70p,0,0,0,0,12,0;2,2,375,100p,0,0,0,0,12,0;3,3,100p,70p,0,0,0,0,12,0;4,2,375,100p,0,0,0,0,12,0;5,3,100p,70p,0,0,0,0,12,0;6,3,100p,70p,0,0,0,0,12,0;7,3,100p,70p,0,0,0,0,12,0;8,3,100p,70p,0,0,0,0,12,0&pc_ui=375,600,0,2&with_menu=0",
+      "muti_pk_type": 0,
+      "pk_id": 394978184,
+      "punish_end_time": 0,
+      "punish_text": "惩罚",
+      "satellite_info": None,
+      "season_id": 10001,
+      "sprint_duration": 10,
+      "start_time": 1777613110,
+      "status": 201,
+      "status_msg": "",
+      "sub_type": 100,
+      "template_id": "multi_conn_grid",
+      "type": 8
+    },
+    "pk_group": None,
+    "pk_match_info": None,
+    "pk_play": None,
+    "timestamp": 1777613265
+  },
+  "play_together_info": None,
+  "play_together_voiceroom_dispatch": {
+    "dispatch_id": 0,
+    "end_ts": 0,
+    "game_icon": "",
+    "game_name": "",
+    "gender": 0,
+    "icon_url": "",
+    "jump_url": "",
+    "max_price": 0,
+    "min_price": 0,
+    "mode": 0,
+    "notify_num": 0,
+    "remark": "",
+    "ts": 0
+  },
+  "player_throttle_info": {
+    "fullscreen_sleep_time": 3600,
+    "normal_sleep_time": 1800,
+    "prompt_time": 30,
+    "status": 1,
+    "tab_sleep_time": 1800
+  },
+  "player_watermark": {
+    "url": ""
+  },
+  "popular_rank_info": {
+    "countdown": 1936,
+    "default_url": "https://live.bilibili.com/p/html/live-app-hotrank/index.html?is_live_half_webview=1&hybrid_rotate_d=1&hybrid_half_ui=1,3,100p,70p,0,0,30,100,12;2,2,375,100p,0,0,30,100,0;3,3,100p,70p,0,0,30,100,12;4,2,375,100p,0,0,30,100,0;5,3,100p,70p,0,0,30,100,0;6,3,100p,70p,0,0,30,100,0;7,3,100p,70p,0,0,30,100,0;8,3,100p,70p,0,0,30,100,0&pc_ui=338,465,f4eefa,0&redirect=v2&anchorId=3537114010487448",
+    "on_rank_name": "人气",
+    "on_rank_name_by_type": "",
+    "rank": 0,
+    "rank_by_type": 0,
+    "rank_name": "人气榜",
+    "rank_name_by_type": "人气榜",
+    "timestamp": 1777613265,
+    "url": "https://live.bilibili.com/p/html/live-app-hotrank/index.html?is_live_half_webview=1&hybrid_rotate_d=1&hybrid_half_ui=1,3,100p,70p,0,0,30,100,12;2,2,375,100p,0,0,30,100,0;3,3,100p,70p,0,0,30,100,12;4,2,375,100p,0,0,30,100,0;5,3,100p,70p,0,0,30,100,0;6,3,100p,70p,0,0,30,100,0;7,3,100p,70p,0,0,30,100,0;8,3,100p,70p,0,0,30,100,0&pc_ui=338,465,f4eefa,0&redirect=v2&anchorId=3537114010487448",
+    "url_by_type": "https://live.bilibili.com/p/html/live-app-hotrank/index.html?is_live_half_webview=1&hybrid_rotate_d=1&hybrid_half_ui=1,3,100p,70p,0,0,30,100,12;2,2,375,100p,0,0,30,100,0;3,3,100p,70p,0,0,30,100,12;4,2,375,100p,0,0,30,100,0;5,3,100p,70p,0,0,30,100,0;6,3,100p,70p,0,0,30,100,0;7,3,100p,70p,0,0,30,100,0;8,3,100p,70p,0,0,30,100,0&pc_ui=338,465,f4eefa,0&redirect=v2&anchorId=3537114010487448"
+  },
+  "popularity": {
+    "online_displayable": False,
+    "popularity": 69507,
+    "popularity_text": "7.0万人气",
+    "type": 0
+  },
+  "program_info": None,
+  "progress_for_widget": {
+    "collection_praise_process": {
+      "audit_status": 0,
+      "benefit": "",
+      "current_praise": 0,
+      "current_praise_text": "",
+      "end_time": 0,
+      "exist": False,
+      "icon_url": "https://i0.hdslb.com/bfs/live/fb44b6cc32793f15eb588ca93d2d3fc522c31dfd.png",
+      "id": 0,
+      "isSuccess": False,
+      "jump_url": "",
+      "live_id": "",
+      "start_time": 0,
+      "target_praise": 0,
+      "uid": 0
+    },
+    "gift_star_process": None,
+    "star_knight": None,
+    "wish_process": None,
+    "wish_process_v2": None
+  },
+  "pure_room_info": {
+    "function_control": None,
+    "player_bg_color": ""
+  },
+  "rankdb_info": {
+    "color": "",
+    "h5_url": "",
+    "rank_desc": "",
+    "roomid": 0,
+    "timestamp": 0,
+    "web_url": ""
+  },
+  "record_switch_info": None,
+  "reenter_room_info": None,
+  "revenue_demotion": {
+    "global_gift_config_demotion": False
+  },
+  "revenue_material_md5": None,
+  "room_anonymous": {
+    "open_anonymous": False
+  },
+  "room_config_info": {
+    "dm_text": "发个弹幕呗~",
+    "is_default": True
+  },
+  "room_info": {
+    "area_id": 145,
+    "area_name": "颜值",
+    "background": "",
+    "cover": "https://i0.hdslb.com/bfs/live/new_room_cover/46c8edc5cdc99eb2799f09a3bf2661689a15b9f9.jpg",
+    "description": "",
+    "hidden_status": 0,
+    "hidden_time": 0,
+    "is_studio": False,
+    "keyframe": "https://i0.hdslb.com/bfs/live-key-frame/keyframe050113260000305095420d1yql.jpg",
+    "live_id": 692661135476885990,
+    "live_id_str": "692661135476885990",
+    "live_model": 0,
+    "live_platform": "pc_link",
+    "live_screen_type": 1,
+    "live_start_time": 1777608412,
+    "live_status": 1,
+    "lock_status": 0,
+    "lock_time": 0,
+    "official_room_id": 0,
+    "official_room_info": None,
+    "on_voice_join": 0,
+    "online": 69507,
+    "parent_area_id": 1,
+    "parent_area_name": "娱乐",
+    "pendants": {
+      "frame": {
+        "desc": "",
+        "name": "沙漠公路",
+        "value": "https://i0.hdslb.com/bfs/live/06116ce98e72d9a51f5cbe6c7295768da7cd8716.png"
+      }
+    },
+    "pk_status": 0,
+    "radio_background_type": 0,
+    "room_id": 30509542,
+    "room_type": {
+      "3-101": 0,
+      "3-21": 0,
+      "3-50": 1,
+      "3-70": 0
+    },
+    "short_id": 0,
+    "special_type": 0,
+    "sub_session_key": "692661135476885990sub_time:1777608412",
+    "tags": "",
+    "title": "羞耻开播 泳装奉上",
+    "uid": 3537114010487448,
+    "up_session": "692661135476885990",
+    "voice_background": ""
+  },
+  "room_rank_info": {
+    "anchor_rank_entry": None,
+    "user_rank_entry": {
+      "user_contribution_rank_entry": {
+        "count": 144,
+        "count_text": "144",
+        "item": [
+          {
+            "face": "https://i0.hdslb.com/bfs/face/member/noface.jpg",
+            "guard_level": 0,
+            "icon_show": False,
+            "is_mystery": False,
+            "medal_info": {
+              ...
+            },
+            "name": "骑车未戴安全帽",
+            "rank": 1,
+            "score": 260,
+            "uid": 3546970505349192,
+            "uinfo": {
+              ...
+            },
+            "wealth_level": 16
+          },
+          {
+            "face": "https://i0.hdslb.com/bfs/face/bae5b2aeced85ab6a55f1a132db3c2b428ee57c5.jpg",
+            "guard_level": 0,
+            "icon_show": False,
+            "is_mystery": False,
+            "medal_info": None,
+            "name": "闭家琐-",
+            "rank": 2,
+            "score": 3,
+            "uid": 3537114010487448,
+            "uinfo": {
+              ...
+            },
+            "wealth_level": 19
+          },
+          {
+            "face": "https://i0.hdslb.com/bfs/face/member/noface.jpg",
+            "guard_level": 0,
+            "icon_show": False,
+            "is_mystery": False,
+            "medal_info": None,
+            "name": "總是硬梆梆",
+            "rank": 3,
+            "score": 3,
+            "uid": 3546648277944538,
+            "uinfo": {
+              ...
+            },
+            "wealth_level": 0
+          },
+          {
+            "face": "https://i1.hdslb.com/bfs/face/a3b4a090d2fa70562c5d0df948b670769d892820.jpg",
+            "guard_level": 0,
+            "icon_show": False,
+            "is_mystery": False,
+            "medal_info": {
+              ...
+            },
+            "name": "绵绵青山",
+            "rank": 4,
+            "score": 1,
+            "uid": 8016517,
+            "uinfo": {
+              ...
+            },
+            "wealth_level": 6
+          },
+          {
+            "face": "http://i0.hdslb.com/bfs/face/13b14bf426e16c10a4b611a6cd6975b5fef12448.jpg",
+            "guard_level": 0,
+            "icon_show": False,
+            "is_mystery": False,
+            "medal_info": {
+              ...
+            },
+            "name": "颠倒的不周山",
+            "rank": 5,
+            "score": 1,
+            "uid": 30331872,
+            "uinfo": {
+              ...
+            },
+            "wealth_level": 13
+          },
+          {
+            "face": "https://i0.hdslb.com/bfs/face/0a1ce892f411960e2b86158ddf96e1cd08557107.jpg",
+            "guard_level": 0,
+            "icon_show": False,
+            "is_mystery": False,
+            "medal_info": None,
+            "name": "MisutesuKUN",
+            "rank": 6,
+            "score": 0,
+            "uid": 171741,
+            "uinfo": {
+              ...
+            },
+            "wealth_level": 0
+          },
+          {
+            "face": "https://i0.hdslb.com/bfs/face/dd1c2eb96ccca7cd751260a865ffc9db09af5d52.jpg",
+            "guard_level": 0,
+            "icon_show": False,
+            "is_mystery": False,
+            "medal_info": {
+              ...
+            },
+            "name": "国之大为民",
+            "rank": 7,
+            "score": 0,
+            "uid": 399244860,
+            "uinfo": {
+              ...
+            },
+            "wealth_level": 6
+          }
+        ],
+        "non_expandable": False,
+        "show_max": 7
+      }
+    },
+    "user_rank_tab_list": {
+      "tab": [
+        {
+          "comment": "",
+          "default": 1,
+          "desc_url": "",
+          "status": 1,
+          "sub_tab": [
+            {
+              ...
+            },
+            {
+              ...
+            },
+            {
+              ...
+            },
+            {
+              ...
+            }
+          ],
+          "switch": None,
+          "title": "房间观众",
+          "type": "contribution_tab"
+        },
+        {
+          "comment": "头号粉丝大航海，上船后可上榜",
+          "default": 0,
+          "desc_url": "",
+          "status": 1,
+          "sub_tab": None,
+          "switch": None,
+          "title": "大航海",
+          "type": "guard_tab"
+        },
+        {
+          "comment": "",
+          "default": 0,
+          "desc_url": "",
+          "status": 1,
+          "sub_tab": [
+            {
+              ...
+            },
+            {
+              ...
+            },
+            {
+              ...
+            }
+          ],
+          "switch": None,
+          "title": "大航海",
+          "type": "guard_tab_v2"
+        }
+      ]
+    }
+  },
+  "second_create_info": None,
+  "show_reserve_status": False,
+  "silent_room_info": {
+    "expire_time": 0,
+    "level": 0,
+    "second": 0,
+    "type": ""
+  },
+  "skin_info": {
+    "current_time": 1777613265,
+    "end_time": 1777676101,
+    "id": 711,
+    "show_text": "",
+    "skin_config": "{"zip":"http://i0.hdslb.com/bfs/live/c2ca1133f614f90cd625fc4eba14b44b66de8393.zip","md5":"0398E2A1EF10EE210F25D76329ECF105","platform":"web","version":"1","headInfoBgPic":"http://i0.hdslb.com/bfs/live/3519fccec2e0848640965bb46d54d8d631666cc0.jpg","giftControlBgPic":"http://i0.hdslb.com/bfs/live/4869401956cd35577235078bb0f57fd7ba5c209c.jpg","rankListBgPic":"http://i0.hdslb.com/bfs/live/8b2b86272b4cad48b3e066958732bcc2862c5ff2.jpg","mainText":"#FFffffff","normalText":"#FFffffff","highlightContent":"#FFff6699","border":"#FFffffff","infoCardBgPic":""}",
+    "skin_name": "沙漠公路",
+    "skin_url": "https://i0.hdslb.com/bfs/live/f61e5fcff103a59def8fc2773c089521e0c2453f.png",
+    "start_time": 1777611301
+  },
+  "super_chat_info": {
+    "icon": "https://i0.hdslb.com/bfs/live/0a9ebd72c76e9cbede9547386dd453475d4af6fe.png",
+    "jump_url": "https://live.bilibili.com/p/html/live-app-superchat2/index.html?is_live_half_webview=1&hybrid_half_ui=1,3,100p,70p,12101a,0,30,100,12,0;2,2,375,100p,12101a,0,30,100,0,0;3,3,100p,70p,12101a,0,30,100,12,0;4,2,375,100p,12101a,0,30,100,0,0;5,3,100p,60p,12101a,0,30,100,12,0;6,3,100p,60p,12101a,0,30,100,12,0;7,3,100p,60p,12101a,0,30,100,12,0;8,3,100p,60p,12101a,0,30,100,0,0&app_common=open&pc_ui=375,626,17181a,2",
+    "message_list": [],
+    "ranked_mark": 0,
+    "sc_manager": False,
+    "status": 1
+  },
+  "switch_info": {
+    "close_danmaku": False,
+    "close_gift": False,
+    "close_guard": False,
+    "close_online": False
+  },
+  "tab_info": {
+    "list": [
+      {
+        "apiPrefix": "",
+        "desc": "高能用户",
+        "eventType": "",
+        "isEvent": 0,
+        "isFirst": 1,
+        "listType": "",
+        "rank_name": "room_7day",
+        "type": "seven-rank"
+      },
+      {
+        "apiPrefix": "",
+        "desc": "大航海",
+        "eventType": "",
+        "isEvent": 0,
+        "isFirst": 0,
+        "listType": "top-list",
+        "rank_name": "",
+        "type": "guard"
+      }
+    ]
+  },
+  "tab_switches": {
+    "lol_player_grade": None,
+    "realtime_data": None,
+    "subtitle": 0,
+    "wzry_player_grade": None
+  },
+  "topic_info": {
+    "topic_id": 0,
+    "topic_name": ""
+  },
+  "topic_room_info": {
+    "interactive_h5_url": "",
+    "watermark": 1
+  },
+  "transfer_flow_info": None,
+  "universal_interact_info": None,
+  "universal_interact_info_v2": {
+    "biz_extra_data": {
+      "multi_conn": {
+        "show_score": 1,
+        "support_full_zoom": 2
+      }
+    },
+    "biz_session_id": "17776128301653706963143690642",
+    "business_label": "universal_multi_conn",
+    "channel_users": [
+      3537114010487448,
+      3706963143690642,
+      3546876253046975,
+      3493281914686296,
+      3546981842553571,
+      3546966889859668,
+      1703115817
+    ],
+    "interact_channel_id": "4727361320956928",
+    "interact_template": {
+      "layout_id": "left1_right6",
+      "layout_version": 14,
+      "show_interact_ui": True,
+      "template_id": "multi_conn_grid"
+    },
+    "invoking_time": 2,
+    "members": [
+      {
+        "biz_extra_data": {
+          "multi_conn": {
+            "price": 26200,
+            "price_text": "262"
+          }
+        },
+        "display_name": "本房主播",
+        "face": "https://i0.hdslb.com/bfs/face/bae5b2aeced85ab6a55f1a132db3c2b428ee57c5.jpg",
+        "fans_num": 0,
+        "gender": 1,
+        "join_time": 1777612946,
+        "join_time_ts": 0,
+        "link_id": "73195834",
+        "position": 0,
+        "room_id": 30509542,
+        "uid": 3537114010487448,
+        "uname": "闭家琐-"
+      },
+      {
+        "biz_extra_data": {
+          "multi_conn": {
+            "price": 6000,
+            "price_text": "60"
+          }
+        },
+        "display_name": "不吃麻麻鱼i",
+        "face": "https://i0.hdslb.com/bfs/face/ca3b984d1df6b0250ffcde5bd192ba8e5b3dc6cb.jpg",
+        "fans_num": 0,
+        "gender": -1,
+        "join_time": 1777612833,
+        "join_time_ts": 0,
+        "link_id": "73195678",
+        "position": 1,
+        "room_id": 1939979572,
+        "uid": 3706963143690642,
+        "uname": "不吃麻麻鱼i"
+      },
+      {
+        "biz_extra_data": {
+          "multi_conn": {
+            "price": 21200,
+            "price_text": "212"
+          }
+        },
+        "display_name": "肉肉大王-呀",
+        "face": "https://i2.hdslb.com/bfs/face/e459cadfc3c76cf880fc6bac83d1b7e76472be2a.jpg",
+        "fans_num": 0,
+        "gender": 0,
+        "join_time": 1777612833,
+        "join_time_ts": 0,
+        "link_id": "73195679",
+        "position": 2,
+        "room_id": 1884963465,
+        "uid": 3546876253046975,
+        "uname": "肉肉大王-呀"
+      },
+      {
+        "biz_extra_data": {
+          "multi_conn": {
+            "price": 0,
+            "price_text": "0"
+          }
+        },
+        "display_name": "草莓嗳开心",
+        "face": "https://i0.hdslb.com/bfs/face/efbad72db0592fefc128664f31d4aed6dba5032c.jpg",
+        "fans_num": 0,
+        "gender": -1,
+        "join_time": 1777612898,
+        "join_time_ts": 0,
+        "link_id": "73195777",
+        "position": 3,
+        "room_id": 1822151778,
+        "uid": 3493281914686296,
+        "uname": "草莓嗳开心"
+      },
+      {
+        "biz_extra_data": {
+          "multi_conn": {
+            "price": 300,
+            "price_text": "3"
+          }
+        },
+        "display_name": "牛牛夹馍-",
+        "face": "https://i1.hdslb.com/bfs/face/d04494963105ed5086c672ec2fed7e5a4f4f8b67.jpg",
+        "fans_num": 0,
+        "gender": -1,
+        "join_time": 1777612900,
+        "join_time_ts": 0,
+        "link_id": "73195781",
+        "position": 4,
+        "room_id": 1837225476,
+        "uid": 3546981842553571,
+        "uname": "牛牛夹馍-"
+      },
+      {
+        "biz_extra_data": {
+          "multi_conn": {
+            "price": 21000,
+            "price_text": "210"
+          }
+        },
+        "display_name": "小芊Yolo_",
+        "face": "https://i1.hdslb.com/bfs/face/818d92e85d59a78b7097c15d094ae1d1a9355baa.jpg",
+        "fans_num": 0,
+        "gender": -1,
+        "join_time": 1777612993,
+        "join_time_ts": 0,
+        "link_id": "73195893",
+        "position": 5,
+        "room_id": 1813447961,
+        "uid": 3546966889859668,
+        "uname": "小芊Yolo_"
+      },
+      {
+        "biz_extra_data": {
+          "multi_conn": {
+            "price": 0,
+            "price_text": "0"
+          }
+        },
+        "display_name": "铁乜咯",
+        "face": "https://i1.hdslb.com/bfs/face/2de61faf4aff64b81a11d6bbe1dfa90e11361c4e.jpg",
+        "fans_num": 0,
+        "gender": -1,
+        "join_time": 1777613090,
+        "join_time_ts": 0,
+        "link_id": "73196036",
+        "position": 6,
+        "room_id": 1938416790,
+        "uid": 1703115817,
+        "uname": "铁乜咯"
+      }
+    ],
+    "members_version": 2895173476,
+    "room_owner": 3706963143690642,
+    "room_start_at": "2026-05-01 13:22:26",
+    "room_start_at_ts": 318,
+    "room_status": 1,
+    "session_start_at": "2026-05-01 13:20:33",
+    "session_start_at_ts": 431,
+    "session_status": 1,
+    "stream_control": None,
+    "system_time_unix": 1777613264,
+    "trace_id": "11252d28622307d637c22c240269f439",
+    "version": 1777613264548
+  },
+  "video_connection_info": None,
+  "video_enhancement": {
+    "default_switch_status": 2,
+    "desc": "仅针对超清及以下生效",
+    "highest_quality": 250,
+    "is_enabled": True,
+    "title": "画质增强"
+  },
+  "voice_join_info": {
+    "icons": {
+      "icon_close": "https://i0.hdslb.com/bfs/live/a176d879dffe8de1586a5eb54c2a08a0c7d31392.png",
+      "icon_open": "https://i0.hdslb.com/bfs/live/70f0844c9a12d29db1e586485954290144534be9.png",
+      "icon_starting": "https://i0.hdslb.com/bfs/live/948433d1647a0704f8216f017c406224f9fff518.gif",
+      "icon_wait": "https://i0.hdslb.com/bfs/live/1049bb88f1e7afd839cc1de80e13228ccd5807e8.png"
+    },
+    "status": {
+      "anchor_open": 1,
+      "current_time": 1777613265,
+      "guard": 0,
+      "head_pic": "",
+      "open": 1,
+      "start_at": 0,
+      "status": 0,
+      "uid": 0,
+      "user_name": ""
+    },
+    "web_share_link": "https://live.bilibili.com/h5/30509542"
+  },
+  "watch_off": True,
+  "watched_show": {
+    "icon": "",
+    "icon_location": 0,
+    "icon_web": "",
+    "num": 30462,
+    "switch": True,
+    "text_large": "3.0万人看过",
+    "text_small": "3.0万"
+  },
+  "xtemplate_config": {
+    "dm_brush_info": {
+      "landScape": None,
+      "verticalscreen": {
+        "brush_count": 50,
+        "is_hide_anti_brush": 0,
+        "min_time": 500,
+        "slice_count": 2,
+        "storage_time": 500
+      }
+    },
+    "dm_pool_info": {
+      "landScape": None,
+      "verticalscreen": {
+        "guest_config": [
+          {
+            "consume": 80,
+            "dm_max": 150,
+            "score_ceiling": 999999,
+            "score_floor": 80
+          },
+          {
+            "consume": 10,
+            "dm_max": 100,
+            "score_ceiling": 79,
+            "score_floor": 32
+          },
+          {
+            "consume": 10,
+            "dm_max": 100,
+            "score_ceiling": 31,
+            "score_floor": 0
+          }
+        ],
+        "master_ceiling": 100,
+        "master_count": 1,
+        "timeout": 30000,
+        "unusual_score": 50
+      }
+    },
+    "dm_speed_info": {
+      "landScape": None,
+      "verticalscreen": {
+        "interval": 10000,
+        "peak": {
+          "animationtime": 0,
+          "consumecount": 3,
+          "consumetime": 600
+        },
+        "proportion": 30,
+        "valley": {
+          "animationtime": 0,
+          "consumecount": 2,
+          "consumetime": 500
+        }
+      }
+    }
+  }
+}

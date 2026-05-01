@@ -5,14 +5,13 @@ import os
 
 from bilibili_api import Credential
 from bilibili_api.login_v2 import QrCodeLogin, QrCodeLoginEvents
-from flask import jsonify, session, render_template
+from flask import jsonify, session, render_template, current_app
 
 from aibls.services import user_service_file
 from aibls.utils import Snowflake
 from aibls.views import user_api
 from aibls.settings import STATIC_DIR, APP_ROOT
 
-logger = logging.getLogger(__name__)
 
 qrcode_login = QrCodeLogin()
 
@@ -37,6 +36,7 @@ def _get_qrcode_path(qrcode_key: int) -> str:
 
 
 def _clear_qrcode_file(qrcode_key: int = None):
+    logger = current_app.logger
     """清除二维码文件"""
     if qrcode_key is None:
         qrcode_key = session.pop('qrcode_key', None)
@@ -76,6 +76,7 @@ def _do_qrcode_event(event) -> dict | None:
 
 @user_api.route('/login/page')
 def login_page():
+    logger = current_app.logger
     """登录页面"""
     login_user = session.get("login_user", {})
     logger.info(f"登录页面的登录用户：{login_user}")
@@ -86,6 +87,8 @@ def login_page():
 
 @user_api.route("/login/qrcode")
 def refresh_qrcode():
+    logger = current_app.logger
+
     """刷新登录二维码"""
     logger.info("开始生成登录二维码")
 
@@ -112,6 +115,8 @@ def refresh_qrcode():
 @user_api.route("/login/poll")
 def poll_status():
     """轮询扫码状态"""
+
+    logger = current_app.logger
     try:
         qrcode_key = session.get("qrcode_key")
         logger.info(f"校验扫码状态, KEY={qrcode_key}")

@@ -355,12 +355,14 @@
             container.innerHTML = videos.map(video => `
                 <div class="video-item">
                     <div class="video-item-header">
-                        <span class="video-name" onclick="testPlayVideo('${escapeHtml(video.url)}','${escapeHtml(video.id)}',  '${escapeHtml(video.title || video.name)}')" style="cursor: pointer;">
-                        🎥 ${escapeHtml(video.title || video.name)} &nbsp;&nbsp;[点我可以测试播放视频]</span>
+                        <span class="video-name">
+                        🎥 ${escapeHtml(video.title || video.name)}</span>
                         <button class="video-delete" onclick="deleteVideo('${video.id}')" title="删除">🗑</button>
                     </div>
                     <div class="video-url">URL: ${escapeHtml(video.url || '')}</div>
                     ${video.path ? `<div class="video-path">路径: ${escapeHtml(video.path)}</div>` : ''}
+                    <button class="test-play-btn" onclick="testPlayVideo('${escapeHtml(video.url)}','${escapeHtml(video.id)}',  '${escapeHtml(video.title || video.name)}')">▶ 测试播放</button>
+
                 </div>
             `).join('');
         }
@@ -431,8 +433,21 @@
             document.getElementById('selectUserBtn').onclick = changeUser;
         }
 
-        function changeUser(){
+        async function changeUser(){
+            try {
+                const response = await fetch('/api/vip/refresh');
 
+                const data = await response.json();
+
+                if (data.code === 0) {
+                    showMessage(`✅ 同步VIP用户信息成功`, false);
+                } else {
+                    showMessage(`❌ 同步VIP用户信息失败: ${data.message}`, true);
+                }
+            } catch (error) {
+                console.error('同步VIP用户信息失败:', error);
+                showMessage('❌ 请求失败: ' + error.message, true);
+            }
         }
 
         // ========== 初始化 ==========

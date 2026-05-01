@@ -7,6 +7,7 @@
     <title>VIP入场视频配置 - BiliMon</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}" type="text/css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/vipconfig.css') }}" type="text/css">
+    <script src="{{ url_for('static', filename='js/head.js') }}" ></script>
     <script src="{{ url_for('static', filename='js/vipconfig.js') }}" ></script>
 </head>
 <body>
@@ -17,9 +18,9 @@
                 <span>BiliMon</span>
             </div>
             <div class="header-buttons">
-                <button class="header-btn" onclick="showMessage('还没做这个功能！')">
+                <a href="/gift_config" class="header-btn">
                     <span>🎁</span> 礼物特效
-                </button>
+                </a>
                 <div class="user-info" id="userInfo"  onclick="headJs.openLogin()">
                     <div class="user-avatar" id="userAvatar"><img src="{{user_face|default('👤')}}" alt="头像"/></div>
                     <span class="user-name" id="userName">{{ nick_name|default('未登录') }}</span>
@@ -51,7 +52,7 @@
                     <div class="profile-info">
                         <div class="profile-name" id="profileName">未选择用户</div>
                         <div class="profile-uid" id="profileUid"></div>
-                        <button class="select-user-btn"  id="selectUserBtn">🔍 更换用户</button>
+                        <button class="select-user-btn"  id="selectUserBtn">🔍 同步B站用户信息到本地</button>
                     </div>
                 </div>
             </div>

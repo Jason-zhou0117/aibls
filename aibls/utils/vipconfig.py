@@ -3,9 +3,10 @@ import logging
 import os
 from typing import Optional, Dict, Any
 
+from flask import current_app
+
 from aibls.settings import VIDEO_DIR, CONFIG_DIR
 
-logger = logging.getLogger(__name__)
 
 class VIPConfig:
     # 静态变量 - JSON对象
@@ -27,6 +28,7 @@ class VIPConfig:
             JSON对象（字典）
         """
 
+        logger = current_app.logger
         file_path = cls.__get_file_path()
         # 如果变量为空，从文件加载
         if cls._vip_users is None:
@@ -54,6 +56,8 @@ class VIPConfig:
         """
         将当前JSON对象写入文件
         """
+
+        logger = current_app.logger
         try:
             save_path = cls.__get_file_path()
 
@@ -72,6 +76,8 @@ class VIPConfig:
 
     @classmethod
     def add_user_config(cls, user_config:Any):
+
+        logger = current_app.logger
         try:
             if cls._vip_users is None:
                 cls.load_json()
@@ -85,6 +91,8 @@ class VIPConfig:
 
     @classmethod
     def update_user_config(cls, target_id,user_config: Any):
+
+        logger = current_app.logger
         try:
             if cls._vip_users is None:
                 cls.load_json()
@@ -131,6 +139,8 @@ class VIPConfig:
 
     @classmethod
     def remove_user(cls,uid:str):
+
+        logger = current_app.logger
         json_data = cls.load_json()
 
         if uid in json_data:
@@ -149,6 +159,8 @@ class VIPConfig:
 
     @classmethod
     def add_video(cls, vip_user_id:str,video_item:Any):
+
+        logger = current_app.logger
         try:
             if cls._vip_users is None:
                 cls.load_json()
@@ -162,6 +174,8 @@ class VIPConfig:
 
     @classmethod
     def delete_video(cls, video_id: str):
+
+        logger = current_app.logger
         try:
             if cls._vip_users is None:
                 cls.load_json()
@@ -185,6 +199,8 @@ class VIPConfig:
 
     @classmethod
     def get_video(cls, video_id: str) -> Any:
+
+        logger = current_app.logger
         try:
             if cls._vip_users is None:
                 cls.load_json()

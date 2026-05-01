@@ -5,12 +5,12 @@ import os
 from typing import Any
 
 from bilibili_api import Credential, live, user
+from flask import current_app
 
 from aibls.exceptions.BLSException import BLSException
 from aibls.services.response import ResponseResult
 from aibls.settings import ROOM_DIR
 
-logger = logging.getLogger(__name__)
 
 class RoomServiceFile:
 
@@ -18,6 +18,7 @@ class RoomServiceFile:
         """
         获取默认房间信息的目录路径
         """
+        logger = current_app.logger
         logger.debug(f"获取默认房间文件路径...")
 
         # 目标目录
@@ -44,6 +45,8 @@ class RoomServiceFile:
         :param login_user_credential: 当前登录用户凭据
         :return: 房间的基本信息
         """
+
+        logger = current_app.logger
         try:
             # 获取房间信息
             live_obj = live.LiveRoom(int(room_id), login_user_credential)
@@ -58,6 +61,8 @@ class RoomServiceFile:
         获取默认需要检控官的房间信息
         :return: 房间的基本信息
         """
+
+        logger = current_app.logger
         try:
             #获取默认房间信息的数据
             file_path = self.get_file_path()
@@ -80,6 +85,8 @@ class RoomServiceFile:
         :param room_id: 房间号
         :return: 无
         """
+
+        logger = current_app.logger
         try:
             # 获取房间信息
             live_obj = live.LiveRoom(int(room_id), login_user_credential)

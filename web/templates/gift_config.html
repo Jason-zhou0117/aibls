@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="referrer" content="no-referrer">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>礼物特效配置 - BiliMon</title>
+    <link rel="stylesheet" href="/static/css/gift_config.css">
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">
+                <span class="logo-icon">🎬</span>
+                <span>BiliMon</span>
+            </div>
+            <div class="header-buttons">
+                <a href="/vip_config" class="header-btn">
+                    <span>👑</span> VIP入场
+                </a>
+                <div class="user-info" id="userInfo"  onclick="headJs.openLogin()">
+                    <div class="user-avatar" id="userAvatar"><img src="{{user_face|default('👤')}}" alt="头像"/></div>
+                    <span class="user-name" id="userName">{{ nick_name|default('未登录') }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <!-- 左侧：上架礼物列表 -->
+        <div class="left-panel">
+            <div class="panel-header">
+                <span class="panel-title">📦 上架/管理礼物 <span class="count" id="activeCount">(0)</span></span>
+<!--                <button class="toolbar-btn" id="addGiftBtn" title="新增礼物">+</button>-->
+            </div>
+            <div class="search-box">
+                <input type="text" class="search-input" id="activeSearch" placeholder="🔍 搜索礼物名称或ID...">
+            </div>
+            <div class="gift-list" id="activeGiftList">
+                <div class="empty-tip">暂无上架礼物<br>点击 [+] 添加</div>
+            </div>
+        </div>
+
+        <!-- 中间：礼物详情 + 特效视频 -->
+        <div class="detail-panel">
+            <div class="gift-info-section">
+                <div class="section-title">🎁 礼物信息</div>
+                <div class="gift-profile">
+                    <div class="profile-icon" id="profileIcon">
+                        <span style="font-size: 48px;">🎁</span>
+                    </div>
+                    <div class="profile-info">
+                        <div class="profile-name" id="profileName">未选择礼物</div>
+                        <div class="profile-id" id="profileId"></div>
+                        <div class="profile-price" id="profilePrice"></div>
+                        <button class="select-gift-btn" id="selectGiftBtn">🔍 同步B站礼物到本地</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="video-section">
+                <div class="video-header">
+                    <div class="section-title">🎬 礼物特效视频列表</div>
+                    <button class="toolbar-btn" id="addVideoBtn" title="新增特效视频">+</button>
+                </div>
+                <div class="video-list" id="videoList">
+                    <div class="empty-tip">请先选择礼物，然后添加视频</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧：已下架礼物列表 -->
+        <div class="right-panel">
+            <div class="panel-header">
+                <span class="panel-title">📦 下架/未管理礼物 <span class="count" id="inactiveCount">(0)</span></span>
+            </div>
+            <div class="search-box">
+                <input type="text" class="search-input" id="inactiveSearch" placeholder="🔍 搜索礼物名称或ID...">
+            </div>
+            <div class="gift-list" id="inactiveGiftList">
+                <div class="empty-tip">暂无下架礼物</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/gift_config.js"></script>
+</body>
+</html>

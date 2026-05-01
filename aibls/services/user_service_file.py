@@ -4,10 +4,10 @@ from typing import Any
 
 from bilibili_api import Credential, user
 from bilibili_api.user import User
+from flask import current_app
 
 from aibls.exceptions.BLSException import BLSException
 
-logger = logging.getLogger(__name__)
 
 class UserServiceFile:
 
@@ -18,6 +18,7 @@ class UserServiceFile:
         :return: 登录用户信息
         """
 
+        logger = current_app.logger
         logger.info("登录用户的凭据：UID={},AC_TIME_VALUE={}"
                     .format(credential.dedeuserid, credential.ac_time_value))
         # 获取Bili用户对象
@@ -47,6 +48,8 @@ class UserServiceFile:
         :param credential: 扫二维码后的登录凭证
         :return: 登录用户信息
         """
+
+        logger = current_app.logger
         logger.info("登录用户的凭据：UID={},AC_TIME_VALUE={}"
                     .format(credential.dedeuserid, credential.ac_time_value))
         try:
@@ -73,6 +76,8 @@ class UserServiceFile:
             raise BLSException(-10001, "实时获取用户信息时出错")
 
     def get_user_info(self,target_uid:str,login_user_credential:Credential) -> dict[str, Any] | None:
+
+        logger = current_app.logger
         try:
             # 根据房间号，获取房主的用户信息
             logger.info("开始获取用户信息：target_uid={}".format(target_uid))

@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from bilibili_api import Credential
-from flask import request, jsonify, session, render_template
+from flask import request, jsonify, session, render_template, current_app
 from werkzeug.utils import secure_filename
 
 from aibls import LoginCookie
@@ -17,7 +17,6 @@ from aibls.services import vip_service,bili_user_service
 from aibls.utils import VIPConfig
 from aibls.views import  vip_api
 
-logger = logging.getLogger(__name__)
 
 # 上传配置
 UPLOAD_FOLDER = Path(__file__).parent.parent.parent / 'web' / 'static' / 'videos'
@@ -29,6 +28,10 @@ UPLOAD_FOLDER.mkdir(parents=True, exist_ok=True)
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+def _get_login_credential() -> Credential:
+    """获取当前登录用户的凭证"""
+    login_user = session.get("login_user")
+    return LoginCookie.dic_to_credential(login_user)
 
 # ==================== VIP用户管理 API ====================
 
@@ -163,6 +166,7 @@ def delete_video(video_id_key):
 @vip_api.route('/api/upload/video', methods=['POST'])
 @check_session_2api_decorator
 def upload_video():
+    logger = current_app.logger
     """上传视频文件"""
     if 'video' not in request.files:
         return jsonify({'code': -1, 'message': '没有选择文件'})
@@ -213,6 +217,7 @@ def vip_config_page():
 @vip_api.route('/api/video/test_play', methods=['POST'])
 @check_session_2api_decorator
 def test_play_video():
+    logger = current_app.logger
     """测试播放视频（不触发入场，直接发送播放指令）"""
     from aibls.stock_io import socketio
 
@@ -253,4 +258,14 @@ def test_play_video():
         'code': 0,
         'message': f'正在播放: {video_name}',
         'data': test_command
+    })
+
+@vip_api.route('/api/vip/refresh')
+@check_session_2api_decorator
+def refresh_vip_config():
+    login_credential = _get_login_credential()
+    vip_service.sync_from_bili(login_credential)
+    return jsonify({
+        "code": 0,
+        "message": "同步VIP用户信息成功"
     })

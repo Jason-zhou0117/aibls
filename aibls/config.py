@@ -1,11 +1,9 @@
-import logging
 import os
 from datetime import timedelta
 from functools import lru_cache
 
 from aibls.settings import APP_ROOT, SESSION_DIR
 
-logger = logging.getLogger(__name__)
 
 
 class AppConfig:

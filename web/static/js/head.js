@@ -27,3 +27,9 @@ headJs.openConfig = function(){
 headJs.openPlayer = function(){
     window.open('/static/video_player.html');
 }
+/*
+去配置
+*/
+headJs.openGiftConfig = function(){
+    window.open('/gift_config');
+}

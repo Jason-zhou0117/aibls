@@ -16,18 +16,12 @@ from aibls.services import message_consumer,room_service_file
 from aibls.views import live_api
 from aibls.stock_io import socketio, message_queue
 
-logger = logging.getLogger(__name__)
 
 # live_route.py
 from aibls.generator_manager import get_generator, reset_generator
 
 # 使用
 generator = get_generator()
-
-# 启动消费者线程
-consumer_thread = threading.Thread(target=message_consumer.run, daemon=True, name="MessageConsumer")
-consumer_thread.start()
-print(f"[{datetime.now().strftime('%H:%M:%S')}] 消费者线程已启动")
 
 
 # ==================== 路由 ====================

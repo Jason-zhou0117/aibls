@@ -12,11 +12,13 @@
 
 from .danmu_handler import AsyncMessageGenerator
 from .response import ResponseResult
+from .bili_user_service import bili_user_service
+from .bili_live_service import bili_live_service
 from .user_service_file import user_service_file
 from .room_service_file import room_service_file
 from .message_consumer import message_consumer
-from .bili_user_service import bili_user_service
 from .vip_service import vip_service
+from .gift_service import gift_service
 
 
 __all__ = [
@@ -25,6 +27,8 @@ __all__ = [
     'user_service_file',
     'room_service_file',
     'bili_user_service',
+    'bili_live_service',
     'vip_service',
+    'gift_service',
     'message_consumer'
 ]

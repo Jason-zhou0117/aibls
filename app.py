@@ -15,6 +15,7 @@ from flask import Flask, request, Response, jsonify
 from flask_session import Session
 
 from aibls.generator_manager import init_generator
+from aibls.services.message_consumer import MessageConsumer
 
 # ==================== 环境初始化 ====================
 
@@ -32,7 +33,7 @@ from aibls import (
     db
 )
 from aibls.settings import APP_ROOT, IS_EMBEDDED, DEBUG_MODE, LOG_DIR, STATIC_DIR, TEMPLATE_DIR
-from aibls.views import user_api, room_api, live_api, vip_api
+from aibls.views import user_api, room_api, live_api, vip_api,gift_api
 from aibls.views.live_route import generator
 
 # 切换到项目根目录
@@ -64,9 +65,6 @@ def create_app():
     # with app.app_context():
     #     from aibls.utils.migrate_json_to_db import migrate_json_to_db
     #     migrate_json_to_db()
-
-    init_generator(app)
-
     return app
 
 
@@ -76,6 +74,7 @@ def register_blueprint(app: Flask):
     app.register_blueprint(room_api)
     app.register_blueprint(live_api)
     app.register_blueprint(vip_api)
+    app.register_blueprint(gift_api)
 
     print_registered_routes(app)
 
@@ -93,18 +92,51 @@ def print_registered_routes(app):
 
 def register_log(app: Flask):
     """配置日志"""
+    # 清除默认的处理器，避免重复
+    app.logger.handlers.clear()
+
+    # 设置根日志级别
     app.logger.setLevel(logging.DEBUG)
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+    # 日志格式
+    formatter = logging.Formatter(
+        '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
+
+    # 1. 文件处理器（记录 INFO 及以上级别）
     str_day = time.strftime("%Y-%m-%d", time.localtime())
+    log_dir = os.path.join(APP_ROOT, 'logs')
+    os.makedirs(log_dir, exist_ok=True)
 
     file_handler = RotatingFileHandler(
-        os.path.join(LOG_DIR, f'log-{str_day}.log'),
+        os.path.join(log_dir, f'log-{str_day}.log'),
         maxBytes=10 * 1024 * 1024,
-        backupCount=10
+        backupCount=10,
+        encoding='utf-8'
     )
+    file_handler.setLevel(logging.INFO)  # 文件只记录 INFO 及以上
     file_handler.setFormatter(formatter)
-    file_handler.setLevel(logging.INFO)
     app.logger.addHandler(file_handler)
+
+    # 2. 控制台处理器（记录 DEBUG 及以上级别，便于调试）
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(logging.DEBUG)  # 控制台记录所有
+    console_handler.setFormatter(formatter)
+    app.logger.addHandler(console_handler)
+
+    # 3. 错误文件处理器（单独记录错误）
+    error_handler = RotatingFileHandler(
+        os.path.join(log_dir, f'error-{str_day}.log'),
+        maxBytes=10 * 1024 * 1024,
+        backupCount=5,
+        encoding='utf-8'
+    )
+    error_handler.setLevel(logging.ERROR)  # 只记录 ERROR 及以上
+    error_handler.setFormatter(formatter)
+    app.logger.addHandler(error_handler)
+
+    app.logger.info("日志系统初始化完成")
 
 
 # ==================== 初始化应用 ====================
@@ -112,6 +144,14 @@ def register_log(app: Flask):
 app = create_app()
 # ✅ 立即初始化 generator
 init_generator(app)
+
+# 初始化消费者并传入 app
+message_consumer = MessageConsumer(app)
+# ✅ 启动消费者线程
+import threading
+consumer_thread = threading.Thread(target=message_consumer.run, daemon=True)
+consumer_thread.start()
+app.logger.info("消息消费者线程已启动")
 
 # SocketIO 初始化（必须在 app 创建之后）
 socketio.init_app(app,

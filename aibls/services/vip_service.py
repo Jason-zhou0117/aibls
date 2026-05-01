@@ -4,10 +4,11 @@ import uuid
 import logging
 from datetime import datetime
 
-from aibls.models.database import db, VIPUser, UserVideo, VideoInfo
+from bilibili_api import Credential
+from flask import current_app
 
-logger = logging.getLogger(__name__)
-
+from aibls.models.database import db, VIPUser, UserVideo
+from aibls.services import bili_user_service
 
 class VIPService:
     """VIP用户服务类"""
@@ -61,6 +62,7 @@ class VIPService:
 
     @staticmethod
     def delete_user(uid):
+        logger = current_app.logger
         """删除VIP用户（级联删除关联视频）"""
         user = VIPUser.query.filter_by(userid=str(uid)).first()
         if not user:
@@ -91,6 +93,7 @@ class VIPService:
     @staticmethod
     def add_video(uid, video_id,title, url, path):
         """为VIP用户添加入场视频"""
+        logger = current_app.logger
         user = VIPUser.query.filter_by(userid=str(uid)).first()
         if not user:
             return None, "用户不存在"
@@ -115,6 +118,7 @@ class VIPService:
     @staticmethod
     def delete_video(id_key):
         """删除入场视频"""
+        logger = current_app.logger
         video = UserVideo.query.filter_by(id=id_key).first()
         if not video:
             return False, "视频不存在"
@@ -136,5 +140,27 @@ class VIPService:
         """根据UID获取用户"""
         return UserVideo.query.get(video_id)
 
+    @staticmethod
+    def sync_from_bili(loginCredential:Credential):
+        """从B站同步礼物数据（批量）"""
+        logger = current_app.logger
+
+        try:
+            user_list = VIPUser.query.all()
+            logger.info(f'同步的VIP用户數量：{len(user_list)}')
+            for u in user_list:
+                bili_user = bili_user_service.get_user_info(u.userid,loginCredential)
+                u.name = bili_user.get("name")
+                u.nickname =  bili_user.get("name")
+                u.face =  bili_user.get("face")
+
+                db.session.add(u)
+
+            db.session.commit()
+            return True, "同步成功"
+        except Exception as e:
+            logger.error(f"同步VIP用户失败: {e}")
+            db.session.rollback()
+            return False, str(e)
 # 全局服务实例
 vip_service = VIPService()

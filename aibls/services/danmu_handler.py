@@ -4,10 +4,10 @@ import logging
 import random
 import threading
 from datetime import datetime
+from typing import Any
 
 from bilibili_api import Credential, live, sync, user
 
-logger = logging.getLogger(__name__)
 
 
 class AsyncMessageGenerator:
@@ -29,6 +29,7 @@ class AsyncMessageGenerator:
 
     def start(self):
         """启动消息生成器线程"""
+        logger = self.app.logger
         # 关键修复：检查线程是否活着，而不是检查 None
         if self.thread is None or not self.thread.is_alive():
             self.running = True
@@ -44,7 +45,7 @@ class AsyncMessageGenerator:
     def stop(self):
         """停止消息生成器"""
         self.running = False
-
+        logger = self.app.logger
         # 关键：主动断开B站WebSocket连接
         if self._room:
             try:
@@ -64,6 +65,7 @@ class AsyncMessageGenerator:
 
     def _run_async_loop(self):
         """在新线程中运行异步事件循环"""
+        logger = self.app.logger
         # 创建新的事件循环
         self.loop = asyncio.new_event_loop()
         asyncio.set_event_loop(self.loop)
@@ -78,6 +80,7 @@ class AsyncMessageGenerator:
             logger.info(f"异步事件循环已关闭")
 
     async def _run_listener(self):
+        logger = self.app.logger
         self._room.add_event_listener("DANMU_MSG", self.on_danmaku) #普通弹幕
         self._room.add_event_listener("SEND_GIFT", self.on_gift)  # 赠送礼物
         self._room.add_event_listener("GUARD_BUY", self.on_buy_guard)  # 购买舰长
@@ -95,6 +98,7 @@ class AsyncMessageGenerator:
         弹幕事件回调 (由bilibili-api触发)
         正确的事件数据结构：
         """
+        logger = self.app.logger
         try:
 
             logger.info(f"文字弹幕，原始数据: {event}")
@@ -158,51 +162,117 @@ class AsyncMessageGenerator:
 
     async def on_gift(self, event):
         """礼物事件回调"""
+        logger = self.app.logger
         try:
 
-            logger.info(f"---------礼物弹幕，原始数据: {event}")
+            logger.info(f"************礼物弹幕，原始数据: {event}")
 
             data = event["data"]["data"]
-            print(data)
-            gift_info =  data["gift_info"]
-            gift_img = gift_info["gif"] if "gif" in gift_info else gift_info["img_basic"]
-            print(gift_img)
-            #粉丝灯牌
-            medal_info = data["medal_info"]
-            medal_name = medal_info["medal_name"] if medal_info is not None and "medal_name" in medal_info else ""
-            medal_level = medal_info["medal_level"] if medal_info is not None and "medal_level" in medal_info else 0
-            print(f"投喂-粉丝灯牌{gift_img}")
 
-            send_user  = data["sender_uinfo"]["base"]
-            user_face = send_user["face"] if send_user is not None and "face" in send_user else ""
-            print(f"投喂-用户头像{user_face}")
-            # 礼物数据结构: https://github.com/Nemo2011/bilibili-api/blob/main/bilibili_api/live.py
+            #送礼物人信息
+            sender_uinfo:dict = data.get("sender_uinfo")
+            sender_uid = str(sender_uinfo.get("uid"))
+            sender_base:dict = sender_uinfo.get("base")
+            sender_name = sender_base.get("name")
+            sender_face = sender_base.get("face")
+            logger.info(f"************礼物弹幕，送礼人:uid= {sender_uid},昵称={sender_name}")
+
+            #收礼物人信息
+            room_id = self.room_id
+            receiver_info: dict = data.get("receiver_uinfo")
+            receiver_uid = str(receiver_info.get("uid"))
+            receiver_base: dict = receiver_info.get("base")
+            receiver_name = receiver_base.get("name")
+            receiver_face = receiver_base.get("face")
+            logger.info(f"************礼物弹幕，收礼人:房间号={room_id},uid= {receiver_uid},昵称={receiver_name}")
+
+
+            #礼物信息
+            gift_id = data.get("giftId")
+            gift_name = data.get("giftName")
+            gift_type = data.get("giftType")
+            gift_num = data.get("num")
+            gift_price = data.get("price")
+            gift_total_coin = data.get("total_coin")
+            logger.info(f"************礼物弹幕，礼物信息:礼物={gift_name}（{gift_id}）,类型= {gift_type},数量={gift_num},单价={gift_price},总数={gift_total_coin}")
+
+            #盲盒相关信息
+            blind_gift = data.get("blind_gift")
+            #如果是盲盒
+            blind_gift_id = 0
+            blind_gift_name = ""
+            blind_gift_price = 0
+            blind_gift_total = 0
+            if blind_gift:
+                blind_gift_id = blind_gift.get("original_gift_id")
+                blind_gift_name = blind_gift.get("original_gift_name")
+                blind_gift_price = blind_gift.get("original_gift_price")
+                blind_gift_total = gift_num * blind_gift_price
+                logger.info(
+                    f"************礼物弹幕，礼物信息:盲盒爆出={blind_gift_name}（{blind_gift_id}）,盲盒单价={blind_gift_price},盲盒总数={blind_gift_total}")
+
+            total_scope = gift_total_coin - blind_gift_total
+
             info = {
                 "type": "gift",
-                "msg": f"弹幕-礼物: {data['uname']} {data['action']} {data['giftName']} x{data['num']}",  # 弹幕内容 (info[1])
-                "uname": data["uname"],
-                "uid": data["uid"],
-                "user_face" : user_face,
-                "medal_name": medal_name,  # 粉丝牌名称
-                "medal_level":medal_level,  # 粉丝牌等级 粉丝牌等级
-                "gift_name": data["giftName"],
-                "gift_img": gift_img,
-                "gift_num": data["num"],
-                "action": data["action"],  # 赠送动作，如 "赠送"
-                "price": data["price"],  # 单价 (金瓜子)
-                "total_coin": data["total_coin"] ,
-                "raw_info": event
+                "msg": f"弹幕-礼物: {sender_name} 投喂 {gift_name} x{gift_num}",  # 弹幕内容 (info[1])
+                "uname": sender_name,
+                "uid": sender_uid,
+                "user_face" : sender_face,
+                "gift_id": gift_id,
+                "gift_name": gift_name,
+                "gift_num": gift_num,
+                "price": gift_price,  # 单价 (金瓜子)
+                "total_coin": gift_total_coin,
+                "blind_gift_id": blind_gift_id,
+                "blind_gift_name": blind_gift_name,
+                "blind_gift_price": blind_gift_price,
+                "blind_gift_total": blind_gift_total,
+                "total_scope": total_scope
             }
-            logger.info(f"弹幕-礼物: {data['uname']} {data['action']} {data['giftName']} x{data['num']}")
-
             #将弹幕放入消息队列
             self.message_queue.put(info)
+
+            logger.info(f"准备查询礼物视频，礼物编号={gift_id}")
+            # 2. 检查是否为VIP用户，发送视频播放指令
+            # 在函数内部导入，避免循环导入
+            from aibls.services.gift_service import gift_service
+            if self.app:
+                with self.app.app_context():
+                    gift_videos, error = gift_service.get_gift_videos(gift_id)
+            else:
+                # 如果没传入 app，尝试使用 current_app
+                from flask import current_app
+                with current_app.app_context():
+                    gift_videos, error = gift_service.get_gift_videos(gift_id)
+
+            logger.info(f"查询到礼物 {gift_id}下的V视频数为{len(gift_videos)}")
+
+            if len(gift_videos) > 0:
+                video = random.choice(gift_videos)
+                video_url = video.get("url", "")
+                video_path = video.get("path", "")
+                video_title = video.get("title", "")
+                logger.info(f"礼物特效: {gift_name} (UID: {gift_id})，触发视频播放: {video.get('url', '')}")
+
+                video_command = {
+                    "type": "video_command",  # 特殊类型，用于区分
+                    "action": "play_video",
+                    "video_url": video_url,  # 已经是Flask静态路径
+                    "uid": gift_id,
+                    "video_path": video_path,
+                    "video_name": video_title,
+                    "timestamp": datetime.now().isoformat()
+                }
+                # 放入消息队列，由消费者推送到前端
+                self.message_queue.put(video_command)
 
         except Exception as e:
             logger.error(f"解析礼物数据出错: {e}")
 
     async def on_buy_guard(self, event):
         """上舰事件回调"""
+        logger = self.app.logger
         try:
             logger.info(f"***********上舰: {event}")
             data = event["data"]["data"]
@@ -230,6 +300,7 @@ class AsyncMessageGenerator:
 
     async def on_super_chat(self, event):
         """超级聊天（醒目留言）事件回调"""
+        logger = self.app.logger
         try:
             logger.info(f"+++++++++醒目留言: {event}")
             data = event["data"]["data"]
@@ -251,6 +322,7 @@ class AsyncMessageGenerator:
 
     async def on_user_enter(self, event):
         """(新版)进入直播间事件回调"""
+        logger = self.app.logger
         try:
             logger.info(f"==========进入直播间: {event}")
             # 新协议的数据结构通常如下，你可以打印出来看看具体字段
@@ -340,6 +412,7 @@ class AsyncMessageGenerator:
 
     async def on_interaction(self, event):
         """进入直播间事件回调"""
+        logger = self.app.logger
         try:
             logger.info(f"==========进入直播间: {event}")
             data = event["data"]["data"]

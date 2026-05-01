@@ -18,9 +18,9 @@ from .settings import (
 from .config import get_app_config
 from .stock_io import socketio, message_queue
 from .db_init import init_db
-from .models import db, VIPUser, UserVideo,VideoInfo,LoginCookie
-from .views import user_api,room_api,live_api,vip_api
-from .services import bili_user_service,vip_service
+from .models import db, VIPUser, UserVideo,GiftInfo,GiftVideo,LoginCookie
+from .views import user_api,room_api,live_api,vip_api,gift_api
+from .services import bili_user_service,bili_live_service,vip_service,gift_service
 
 __all__ = [
     'APP_ROOT',
@@ -39,12 +39,16 @@ __all__ = [
     'db',                  # 添加
     'VIPUser',             # 添加
     'UserVideo'   ,             # 添加
-    'VideoInfo' ,             # 添加
+    'GiftInfo' ,               # 添加
+    'GiftVideo' ,             # 添加
     'LoginCookie',
     'user_api',
     'room_api',
     'live_api',
     'vip_api',
+    'gift_api',
     'bili_user_service'  ,
-    'vip_service'            # 添加
+    'bili_live_service'  ,
+    'vip_service',
+    'gift_service'           # 添加
 ]

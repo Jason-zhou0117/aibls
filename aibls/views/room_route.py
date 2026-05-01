@@ -2,17 +2,12 @@
 import logging
 
 from bilibili_api import Credential
-from flask import session, request, jsonify
+from flask import session, request, jsonify, current_app
 
 from aibls.decorators import check_session_2api_decorator
 from aibls.models import LoginCookie
 from aibls.services import room_service_file
 from aibls.views import room_api
-
-logger = logging.getLogger(__name__)
-
-
-
 
 def _get_login_credential() -> Credential:
     """获取当前登录用户的凭证"""
@@ -34,6 +29,8 @@ def _get_room_id_from_request() -> int | None:
 @check_session_2api_decorator
 def update_room():
     """更新房间信息"""
+
+    logger = current_app.logger
     try:
         room_id = _get_room_id_from_request()
         if room_id is None:
@@ -54,6 +51,8 @@ def update_room():
 @check_session_2api_decorator
 def search_room_list():
     """搜索房间列表"""
+
+    logger = current_app.logger
     try:
         login_user = session.get("login_user")
         filters = {"login_id": login_user["login_id"]}
@@ -81,6 +80,9 @@ def search_room_list():
 @check_session_2api_decorator
 def update_fav():
     """更新收藏状态"""
+
+    logger = current_app.logger
+
     try:
         room_id = request.form.get("room_id")
         is_fav = request.form.get("is_favorites")
@@ -98,3 +100,4 @@ def update_fav():
     except Exception as e:
         logger.error(f"更新收藏状态失败: {e}")
         return jsonify({"code": -210001, "message": str(e)})
+
