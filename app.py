@@ -6,6 +6,15 @@ BiliMon 弹幕监控系统 - 主入口
 
 import os
 import sys
+# ==================== 环境初始化 ====================
+
+# 将当前目录添加到 Python 路径
+current_dir = os.path.dirname(os.path.abspath(__file__))
+if current_dir not in sys.path:
+    sys.path.insert(0, current_dir)
+
+
+
 import logging
 import time
 from logging.handlers import RotatingFileHandler
@@ -17,12 +26,8 @@ from flask_session import Session
 from aibls.generator_manager import init_generator
 from aibls.services.message_consumer import MessageConsumer
 
-# ==================== 环境初始化 ====================
 
-# 将当前目录添加到 Python 路径
-current_dir = os.path.dirname(os.path.abspath(__file__))
-if current_dir not in sys.path:
-    sys.path.insert(0, current_dir)
+
 
 # 从 aibls 包导入
 from aibls import (

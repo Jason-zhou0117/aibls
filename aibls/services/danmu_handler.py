@@ -87,7 +87,7 @@ class AsyncMessageGenerator:
         self._room.add_event_listener("SUPER_CHAT_MESSAGE", self.on_super_chat)  # 醒目留言
         # self._room.add_event_listener("ENTRY_EFFECT", self.on_user_enter)  # 用户进入直播间
         self._room.add_event_listener("INTERACT_WORD_V2", self.on_user_enter_v2)  # 用户进入直播间
-        self._room.add_event_listener("VIDEO_CONNECTION_MSG", self.on_user_enter_v2)  # 用户进入直播间
+        self._room.add_event_listener("VIDEO_CONNECTION_MSG", self.on_user_video_link)  # 用户进入直播间
 
         try:
             # 连接并开始监听
