@@ -161,3 +161,63 @@ class RoomInfo(db.Model):
             'is_default': self.is_default,
             'created_at': self.created_at.isoformat() if self.created_at else None
         }
+
+
+class SendGiftDetail(db.Model):
+    """礼物特效视频表"""
+    __tablename__ = 'send_gift_detail'
+
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    room_id = db.Column(db.Integer, nullable=False)
+    send_month = db.Column(db.String(10), nullable=False)
+    send_date = db.Column(db.String(10), nullable=False)
+    sender_uid = db.Column(db.Integer, nullable=False)
+    sender_name = db.Column(db.String(50), nullable=False)
+    sender_face = db.Column(db.String(500), nullable=False)
+    receiver_uid = db.Column(db.Integer, nullable=False)
+    receiver_name = db.Column(db.String(50), nullable=False)
+    receiver_face = db.Column(db.String(500), nullable=False)
+    gift_id = db.Column(db.Integer, nullable=False)
+    gift_name = db.Column(db.String(50), nullable=False)
+    gift_num = db.Column(db.Integer, nullable=False)
+    gift_price_origin = db.Column(db.NUMERIC(10, 2), nullable=False)
+    gift_total_coin = db.Column(db.NUMERIC(10, 2), nullable=False)
+    gift_total_gold = db.Column(db.NUMERIC(10, 2), nullable=False)
+    gift_total_cny = db.Column(db.NUMERIC(10, 2), nullable=False)
+    blind_gift_id = db.Column(db.Integer, nullable=False)
+    blind_gift_name = db.Column(db.String(50), nullable=False)
+    blind_gift_price = db.Column(db.NUMERIC(10, 2), nullable=False)
+    blind_gift_total = db.Column(db.NUMERIC(10, 2), nullable=False)
+    total_scope = db.Column(db.NUMERIC(10, 2), nullable=False)
+    total_scope_gold = db.Column(db.NUMERIC(10, 2), nullable=False)
+    total_scope_cny = db.Column(db.NUMERIC(10, 2), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.now)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'room_id': self.room_id,
+            'send_month': self.send_month,
+            'send_date': self.send_date,
+            'sender_uid': self.sender_uid,
+            'sender_name': self.sender_name,
+            'sender_face': self.sender_face,
+            'receiver_uid': self.receiver_uid,
+            'receiver_name': self.receiver_name,
+            'receiver_face': self.receiver_face,
+            'gift_id': self.gift_id,
+            'gift_name': self.gift_name,
+            'gift_num': self.gift_num,
+            'gift_price_origin': self.gift_price_origin,
+            'gift_total_coin': self.gift_total_coin,
+            'gift_total_gold': self.gift_total_gold,
+            'gift_total_cny': self.gift_total_cny,
+            'blind_gift_id': self.blind_gift_id,
+            'blind_gift_name': self.blind_gift_name,
+            'blind_gift_price': self.blind_gift_price,
+            'blind_gift_total': self.blind_gift_total,
+            'total_scope': self.total_scope,
+            'total_scope_gold': self.total_scope_gold,
+            'total_scope_cny': self.total_scope_cny,
+            'created_at': self.created_at.isoformat() if self.created_at else None
+        }

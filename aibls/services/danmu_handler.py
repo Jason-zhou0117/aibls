@@ -85,7 +85,10 @@ class AsyncMessageGenerator:
         self._room.add_event_listener("SEND_GIFT", self.on_gift)  # 赠送礼物
         self._room.add_event_listener("GUARD_BUY", self.on_buy_guard)  # 购买舰长
         self._room.add_event_listener("SUPER_CHAT_MESSAGE", self.on_super_chat)  # 醒目留言
-        self._room.add_event_listener("ENTRY_EFFECT", self.on_user_enter)  # 用户进入直播间
+        # self._room.add_event_listener("ENTRY_EFFECT", self.on_user_enter)  # 用户进入直播间
+        self._room.add_event_listener("INTERACT_WORD_V2", self.on_user_enter_v2)  # 用户进入直播间
+        self._room.add_event_listener("VIDEO_CONNECTION_MSG", self.on_user_enter_v2)  # 用户进入直播间
+
         try:
             # 连接并开始监听
             sync(self._room.connect())
@@ -100,8 +103,7 @@ class AsyncMessageGenerator:
         """
         logger = self.app.logger
         try:
-
-            logger.info(f"文字弹幕，原始数据: {event}")
+            logger.debug(f"文字弹幕，原始数据: {event}")
             # 获取弹幕数据
             info = event['data']['info']
 
@@ -151,7 +153,6 @@ class AsyncMessageGenerator:
             self.message_queue.put(danmu_data)
         except Exception as e:
             logger.error(f"解析弹幕数据出错: {e}")
-            logger.info(f"文字弹幕，原始数据: {event}")
 
     async def _parse_datetime_str_(self,timestamp) -> str:
         if timestamp > 10 ** 10:  # 判断是否为毫秒（大于10位数）
@@ -165,7 +166,7 @@ class AsyncMessageGenerator:
         logger = self.app.logger
         try:
 
-            logger.info(f"************礼物弹幕，原始数据: {event}")
+            logger.debug(f"************礼物弹幕，原始数据: {event}")
 
             data = event["data"]["data"]
 
@@ -216,9 +217,13 @@ class AsyncMessageGenerator:
             info = {
                 "type": "gift",
                 "msg": f"弹幕-礼物: {sender_name} 投喂 {gift_name} x{gift_num}",  # 弹幕内容 (info[1])
-                "uname": sender_name,
-                "uid": sender_uid,
-                "user_face" : sender_face,
+                "room_id": room_id,
+                "sender_uid": sender_uid,
+                "sender_name": sender_name,
+                "sender_face" : sender_face,
+                "receiver_uid": receiver_uid,
+                "receiver_name": receiver_name,
+                "receiver_face": receiver_face,
                 "gift_id": gift_id,
                 "gift_name": gift_name,
                 "gift_num": gift_num,
@@ -246,7 +251,7 @@ class AsyncMessageGenerator:
                 with current_app.app_context():
                     gift_videos, error = gift_service.get_gift_videos(gift_id)
 
-            logger.info(f"查询到礼物 {gift_id}下的V视频数为{len(gift_videos)}")
+            logger.info(f"查询到礼物 {gift_id}下的视频数为:{len(gift_videos)}")
 
             if len(gift_videos) > 0:
                 video = random.choice(gift_videos)
@@ -267,6 +272,18 @@ class AsyncMessageGenerator:
                 # 放入消息队列，由消费者推送到前端
                 self.message_queue.put(video_command)
 
+            #准备记录礼物信息
+            logger.debug(f"准备添加投喂礼物到DB")
+            from aibls.services.send_gift_service import send_gift_service
+            if self.app:
+                with self.app.app_context():
+                    result, message = send_gift_service.add_send_gift(info)
+            else:
+                # 如果没传入 app，尝试使用 current_app
+                from flask import current_app
+                with current_app.app_context():
+                    result, message = send_gift_service.add_send_gift(info)
+
         except Exception as e:
             logger.error(f"解析礼物数据出错: {e}")
 
@@ -274,7 +291,7 @@ class AsyncMessageGenerator:
         """上舰事件回调"""
         logger = self.app.logger
         try:
-            logger.info(f"***********上舰: {event}")
+            logger.debug(f"***********上舰: {event}")
             data = event["data"]["data"]
             # 舰长等级对应: 3=舰长, 2=提督, 1=总督
             guard_level_names = {1: "总督", 2: "提督", 3: "舰长"}
@@ -296,13 +313,12 @@ class AsyncMessageGenerator:
 
         except Exception as e:
             logger.error(f"解析上舰数据出错: {e}")
-            logger.info(f"文字弹幕，原始数据: {event}")
 
     async def on_super_chat(self, event):
         """超级聊天（醒目留言）事件回调"""
         logger = self.app.logger
         try:
-            logger.info(f"+++++++++醒目留言: {event}")
+            logger.debug(f"+++++++++醒目留言: {event}")
             data = event["data"]["data"]
             info = {
                 "type": "super_chat",
@@ -318,13 +334,84 @@ class AsyncMessageGenerator:
             self.message_queue.put(info)
         except Exception as e:
             logger.error(f"解析醒目留言数据出错: {e}")
-            logger.info(f"文字弹幕，原始数据: {event}")
+
+
+    async def on_user_video_link(self, event):
+        """视频连线消息"""
+        logger = self.app.logger
+        try:
+            logger.debug(f"*************视频连线：{event}")
+            data = event["data"]["data"]
+        except Exception as e:
+            logger.error(f"解析醒目留言数据出错: {e}")
+
+    async def on_user_enter_v2(self, event):
+        """(新版)进入直播间事件回调"""
+        logger = self.app.logger
+        try:
+            logger.debug(f"***************进入直播间: {event}")
+            # 新协议的数据结构通常如下，你可以打印出来看看具体字段
+            data = event["data"].get('data', {})
+            pb_decoded = data.get("pb_decoded", None)
+            if pb_decoded is not None:
+                user_id = str(pb_decoded.get("uid", None))
+                user_name = str(pb_decoded.get("uname", None))
+                user_info = pb_decoded.get("user_info", None)
+                user_info_base = user_info.get("base", None)
+                user_face = user_info_base.get("face", None)
+
+                info = {
+                    "type": "welcome",
+                    "uname": user_name,
+                    "uid": user_id,
+                    "user_face": user_face,
+                    "msg": f" 欢迎 {user_name} ({user_id}) 进入直播间！"
+                }
+                logger.info(f"用户进入房间消息：{info}")
+
+                # 将弹幕放入消息队列
+                self.message_queue.put(info)
+
+                logger.info(f"准备查询VIP视频 {user_id}")
+                # 2. 检查是否为VIP用户，发送视频播放指令
+                # 在函数内部导入，避免循环导入
+                from aibls.services.vip_service import vip_service
+                if self.app:
+                    with self.app.app_context():
+                        vip_videos,error = vip_service.get_user_videos(user_id)
+                else:
+                    # 如果没传入 app，尝试使用 current_app
+                    from flask import current_app
+                    with current_app.app_context():
+                        vip_videos,error = vip_service.get_user_videos(user_id)
+                logger.info(f"查询到用户 {user_id}下的VIP视频数为:{len(vip_videos)}")
+
+                if len(vip_videos) > 0:
+                    video = random.choice(vip_videos)
+                    video_url = video.get("url", "")
+                    video_path = video.get("path", "")
+                    video_title = video.get("title", "")
+                    logger.info(f"VIP用户入场: {user_name} (UID: {user_id})，触发视频播放: {video.get('url', '')}")
+
+                    video_command = {
+                        "type": "video_command",  # 特殊类型，用于区分
+                        "action": "play_video",
+                        "video_url": video_url,  # 已经是Flask静态路径
+                        "uid": user_id,
+                        "video_path": video_path,
+                        "video_name": video_title,
+                        "timestamp": datetime.now().isoformat()
+                    }
+                    # 放入消息队列，由消费者推送到前端
+                    self.message_queue.put(video_command)
+        except Exception as e:
+            logger.error(f"解析进入事件数据出错: {e}")
 
     async def on_user_enter(self, event):
         """(新版)进入直播间事件回调"""
         logger = self.app.logger
         try:
-            logger.info(f"==========进入直播间: {event}")
+            logger.debug(f"$$$$$$$$$$$$$进入直播间: {event}")
             # 新协议的数据结构通常如下，你可以打印出来看看具体字段
             data = event["data"].get('data', {})
 
@@ -344,7 +431,7 @@ class AsyncMessageGenerator:
 
             #粉丝信息
             fans_info = data.get('medal', None)
-            logger.info(f"粉丝信息： {fans_info} ")
+            logger.debug(f"粉丝信息： {fans_info} ")
             if fans_info is not None:
                 #灯牌信息
                 fans_medal_name = fans_info.get('name', '')
@@ -408,27 +495,7 @@ class AsyncMessageGenerator:
 
         except Exception as e:
             logger.error(f"解析进入事件数据出错: {e}")
-            logger.info(f"文字弹幕，原始数据: {event}")
 
-    async def on_interaction(self, event):
-        """进入直播间事件回调"""
-        logger = self.app.logger
-        try:
-            logger.info(f"==========进入直播间: {event}")
-            data = event["data"]["data"]
-            info = {
-                "type": "welcome",
-                "uname": data["uname"],
-                "uid": data["uid"],
-                "msg": f"欢迎 {data['uname']} 进入直播间"
-            }
-            logger.info(f"进入: {data['uname']} 进入直播间")
-
-            # 将弹幕放入消息队列
-            self.message_queue.put(info)
-        except Exception as e:
-            logger.error(f"解析进入事件数据出错: {e}")
-            logger.info(f"文字弹幕，原始数据: {event}")
 
     async def load_user_info(self,user_id):
         user_obj = user.User(user_id,self.credential)

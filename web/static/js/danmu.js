@@ -93,7 +93,7 @@ danmuJs.addDanmaku = function(data) {
 danmuJs.addGift = function(data) {
     const container = document.getElementById('gift_messages');
     const div_time = '<div class="message-time">' + (data.time || new Date().toLocaleTimeString()) + '</div>';
-    const div_username = '<div><span class="message-user">' + danmuJs.escapeHtml(data.uname) +':</span></div>';
+    const div_username = '<div><span class="message-user">' + danmuJs.escapeHtml(data.sender_name) +':</span></div>';
     const div_msg = '<div class="message-content">送了' + data.gift_num+ '个 <span class="gift-name">' + danmuJs.escapeHtml(data.gift_name)+'</span></div>';
     const msgDiv = danmuJs.createMessageDiv('gift', div_time + div_username + div_msg);
     container.appendChild(msgDiv);
@@ -139,8 +139,8 @@ danmuJs.addWelcome = function(data) {
     const container = document.getElementById('welcome_messages');
 
     const div_time = '<div class="message-time">' + (data.time || new Date().toLocaleTimeString()) + '</div>';
-    const div_guard = '<div class="message-content">⭐ ' + danmuJs.escapeHtml(data.guard_name) + danmuJs.escapeHtml(data.uname) + '进入直播间</div>';
-    const div_normal = '<div class="message-content">👋 ' + danmuJs.escapeHtml(data.uname) +'进入直播间</div>';
+    const div_guard = '<div class="message-content">⭐ [' + danmuJs.escapeHtml(data.guard_name) + danmuJs.escapeHtml(data.uname) + '] 进入直播间</div>';
+    const div_normal = '<div class="message-content">👋 [' + danmuJs.escapeHtml(data.uname) +'] 进入直播间</div>';
 
     const msgDiv = danmuJs.createMessageDiv('welcome', div_time + (data.guard_name ? div_guard : div_normal));
 

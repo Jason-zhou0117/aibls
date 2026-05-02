@@ -112,3 +112,4 @@ class Snowflake:
             'sequence': sequence
         }
 
+snowflake = Snowflake(worker_id=1, data_center_id=1)

@@ -17,6 +17,7 @@ from .message_consumer import message_consumer
 from .vip_service import vip_service
 from .gift_service import gift_service
 from .room_service import room_service
+from .send_gift_service import send_gift_service
 
 
 __all__ = [
@@ -26,5 +27,6 @@ __all__ = [
     'vip_service',
     'gift_service',
     'room_service',
+    'send_gift_service',
     'message_consumer'
 ]

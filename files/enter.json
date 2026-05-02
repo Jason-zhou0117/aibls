@@ -1,0 +1,37 @@
+{
+  'room_display_id': 1713824932,
+  'room_real_id': 1713824932,
+  'type': 'INTERACT_WORD_V2',
+  'data': {
+    'cmd': 'INTERACT_WORD_V2',
+    'data': {
+      'dmscore': 3,
+      'pb': 'CNPt3GYSEOaxn+a5luWwj+iZvuexs0UiAQEoATCkyZuxBjinudbPBkCx3a+73jNiAHi7q5GW5o7r1RiaAQCyAWkI0+3cZhJeChDmsZ/muZblsI/omb7nsbNFEkpodHRwczovL2kwLmhkc2xiLmNvbS9iZnMvZmFjZS83NWRiZTdmODhhYjg3ZTNmNGNkZWJhOWVmMGEyMTMwODZhY2JmMDNkLmpwZyIAMgC6AQDCAQA=',
+      'pb_decoded': {
+        'uid': 215430867,
+        'uname': '江湖小虾米E',
+        'identities': [
+          1
+        ],
+        'msg_type': 1,
+        'room_id': 1713824932,
+        'timestamp': 1777704103,
+        'score': 1777704103601,
+        'contribution_info': {},
+        'trigger_time': 1777704102390945211,
+        'contribution_info_v2': {},
+        'user_info': {
+          'uid': 215430867,
+          'base': {
+            'name': '江湖小虾米E',
+            'face': 'https://i0.hdslb.com/bfs/face/75dbe7f88ab87e3f4cdeba9ef0a213086acbf03d.jpg'
+          },
+          'wealth': {},
+          'guard': {}
+        },
+        'user_anchor_relation': {}
+      },
+      'pb_decode_message': 'success'
+    }
+  }
+}

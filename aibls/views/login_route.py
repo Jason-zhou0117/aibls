@@ -8,7 +8,7 @@ from bilibili_api.login_v2 import QrCodeLogin, QrCodeLoginEvents
 from flask import jsonify, session, render_template, current_app
 
 from aibls.services import bili_user_service
-from aibls.utils import Snowflake
+from aibls.utils import snowflake
 from aibls.views import user_api
 from aibls.settings import STATIC_DIR, APP_ROOT
 
@@ -96,7 +96,7 @@ def refresh_qrcode():
     _clear_qrcode_file()
 
     # 生成新二维码
-    qrcode_key = Snowflake().next_id()
+    qrcode_key = snowflake.next_id()
     to_sync(qrcode_login.generate_qrcode())
     source_url = qrcode_login.get_qrcode_picture().url
 

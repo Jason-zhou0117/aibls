@@ -1,5 +1,6 @@
-from .database import db, VIPUser, UserVideo,GiftInfo,GiftVideo
+from .database import db, VIPUser, UserVideo,GiftInfo,GiftVideo,SendGiftDetail
 
 from .users import LoginCookie
 
-__all__ = ['db', 'VIPUser', 'UserVideo','GiftInfo','LoginCookie','GiftVideo']
+__all__ = ['db', 'VIPUser', 'UserVideo','GiftInfo','LoginCookie','GiftVideo'
+    ,'SendGiftDetail']

@@ -1,8 +1,8 @@
 
 from .vipconfig import VIPConfig
-from .snowflake import Snowflake
+from .snowflake import snowflake
 
 __all__ = [
     'VIPConfig',
-    'Snowflake'
+    'snowflake'
 ]
