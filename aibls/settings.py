@@ -18,14 +18,8 @@ def get_app_dir():
         return project_root
 
 # ==================== 路径配置 ====================
-
 # 项目根目录
 APP_ROOT = get_app_dir()
-
-# ==================== Session 配置 ====================
-SESSION_DIR = os.path.join(APP_ROOT, 'flask_sessions')
-# 确保目录存在
-os.makedirs(SESSION_DIR, exist_ok=True)
 
 # 嵌入式Python的路径（用于脚本）
 RUNTIME_DIR = os.path.join(APP_ROOT, 'runtime')
@@ -35,9 +29,7 @@ PYTHON_EXE = os.path.join(RUNTIME_DIR, 'python.exe') if os.path.exists(RUNTIME_D
 STATIC_DIR = os.path.join(APP_ROOT, 'web', 'static')
 TEMPLATE_DIR = os.path.join(APP_ROOT, 'web', 'templates')
 VIDEO_DIR = os.path.join(APP_ROOT, 'web', 'static', 'videos')
-CONFIG_DIR = os.path.join(APP_ROOT, 'config')
 LOG_DIR = os.path.join(APP_ROOT, 'logs')
-ROOM_DIR = os.path.join(APP_ROOT, 'rooms')
 
 # ==================== 运行环境判断 ====================
 # 是否为嵌入式运行
@@ -61,7 +53,7 @@ DEBUG_MODE = not IS_EMBEDDED
 
 def ensure_directories():
     """确保必要的目录存在"""
-    dirs = [SESSION_DIR, LOG_DIR, VIDEO_DIR, CONFIG_DIR,ROOM_DIR]
+    dirs = [LOG_DIR, VIDEO_DIR]
     for d in dirs:
         if not os.path.exists(d):
             os.makedirs(d, exist_ok=True)

@@ -6,9 +6,7 @@ from flask import session, render_template, jsonify
 
 from aibls.exceptions.BLSException import BLSException
 from aibls.models.users import LoginCookie
-from aibls.services.user_service_file import UserServiceFile
-
-user_service = UserServiceFile()
+from aibls.services import bili_user_service
 
 def check_session_go_login_decorator(func):
     """校验是否登录，如没有跳转到登录页面"""
@@ -21,7 +19,7 @@ def check_session_go_login_decorator(func):
             try:
                 #重新获取一次登录用户信息，以免登录态过期
                 user_credential:Credential = LoginCookie.dic_to_credential(login_user)
-                login_user_info = user_service.test_login_status(user_credential)
+                login_user_info = bili_user_service.test_login_status(user_credential)
                 if login_user_info:
                     session["login_user"] = login_user
                     return func(*args,**kwargs)

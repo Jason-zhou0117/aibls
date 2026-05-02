@@ -5,14 +5,12 @@ BiliMon 核心包
 
 from .settings import (
     APP_ROOT,
-    SESSION_DIR,
     IS_EMBEDDED,
     DEBUG_MODE,
     STATIC_DIR,
     TEMPLATE_DIR,
     LOG_DIR,
-    VIDEO_DIR,
-    CONFIG_DIR
+    VIDEO_DIR
 )
 
 from .config import get_app_config
@@ -24,14 +22,12 @@ from .services import bili_user_service,bili_live_service,vip_service,gift_servi
 
 __all__ = [
     'APP_ROOT',
-    'SESSION_DIR',
     'IS_EMBEDDED',
     'DEBUG_MODE',
     'STATIC_DIR',
     'TEMPLATE_DIR',
     'LOG_DIR',
     'VIDEO_DIR',
-    'CONFIG_DIR',
     'get_app_config',      # 改为导出函数，不是实例
     'socketio',
     'message_queue',

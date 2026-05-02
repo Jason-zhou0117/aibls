@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="referrer" content="no-referrer">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>B站弹幕监控</title>
+    <title>弹幕监听 - BiliMon</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}" type="text/css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/head.css') }}" type="text/css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/danmu2.css') }}" type="text/css">
-
+    <link rel="icon" href="{{ url_for('static', filename='images/bicon.png') }}">
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
     <script src="{{ url_for('static', filename='js/head.js') }}" ></script>
     <script src="{{ url_for('static', filename='js/danmu.js') }}" ></script>
@@ -47,7 +47,7 @@
             <div class="header-right">
                 <!-- 配置按钮 -->
                 <button class="header-btn" id="config_btn" onclick="headJs.openConfig()">
-                    <span class="btn-icon">👑️</span>
+                    <span class="btn-icon">⚙️️</span>
                     <span>配置</span>
                 </button>
                 <button class="header-btn" onclick="headJs.openPlayer()">

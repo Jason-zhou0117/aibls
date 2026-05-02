@@ -52,10 +52,12 @@ def create_app():
     app_config = get_app_config()
     app.config.from_object(app_config)
     app.debug = DEBUG_MODE
-
+    #先初始化数据
+    init_db(app)  # 初始化数据库（只会执行一次建表）
+    #然后将Session指向数据库
+    app.config['SESSION_SQLALCHEMY'] = db
     # 初始化扩展
     Session(app)
-    init_db(app)  # 初始化数据库（只会执行一次建表）
 
     # 注册蓝图和日志
     register_blueprint(app)

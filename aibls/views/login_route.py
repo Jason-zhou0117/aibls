@@ -7,7 +7,7 @@ from bilibili_api import Credential
 from bilibili_api.login_v2 import QrCodeLogin, QrCodeLoginEvents
 from flask import jsonify, session, render_template, current_app
 
-from aibls.services import user_service_file
+from aibls.services import bili_user_service
 from aibls.utils import Snowflake
 from aibls.views import user_api
 from aibls.settings import STATIC_DIR, APP_ROOT
@@ -132,7 +132,7 @@ def poll_status():
 
         if result["code"] == 0:
             credential :Credential = qrcode_login.get_credential()
-            login_user = user_service_file.save_login_user(credential)
+            login_user = asyncio.run(bili_user_service.test_login_status(credential))
             session["login_user"] = login_user
             _clear_qrcode_file(qrcode_key)
             return jsonify({"code": 0, "text": "成功"})
