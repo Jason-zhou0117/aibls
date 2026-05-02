@@ -14,7 +14,7 @@ from werkzeug.utils import secure_filename
 
 from aibls import LoginCookie
 from aibls.decorators import check_session_2api_decorator, check_session_go_login_decorator
-from aibls.services import gift_service, room_service_file, bili_live_service
+from aibls.services import gift_service, bili_live_service, room_service
 from aibls.settings import VIDEO_DIR
 from aibls.views import gift_api
 
@@ -36,9 +36,9 @@ def _get_login_credential() -> Credential:
 @gift_api.route('/api/gift/refresh')
 @check_session_2api_decorator
 def refresh_gift_route():
-    room_data = room_service_file.get_default_live_room()
+    room_data = room_service.get_default_room()
     logger.info(f'获取默认房间信息{room_data}')
-    room_id = room_data.get('room_id')
+    room_id = room_data.get('id')
     gif_common: dict = asyncio.run(bili_live_service.get_gif_config(room_id))
 
     gift_service.sync_from_bili(gif_common)

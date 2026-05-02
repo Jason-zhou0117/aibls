@@ -1,4 +1,5 @@
 # aibls/views/room_route.py
+import asyncio
 import logging
 
 from bilibili_api import Credential
@@ -6,7 +7,7 @@ from flask import session, request, jsonify, current_app
 
 from aibls.decorators import check_session_2api_decorator
 from aibls.models import LoginCookie
-from aibls.services import room_service_file
+from aibls.services import room_service
 from aibls.views import room_api
 
 def _get_login_credential() -> Credential:
@@ -29,7 +30,6 @@ def _get_room_id_from_request() -> int | None:
 @check_session_2api_decorator
 def update_room():
     """更新房间信息"""
-
     logger = current_app.logger
     try:
         room_id = _get_room_id_from_request()
@@ -37,11 +37,12 @@ def update_room():
             return jsonify({"code": 2102, "message": "请输入房间号"})
 
         credential = _get_login_credential()
-        resp = room_service_file.save_room(credential, str(room_id))
-        logger.info(f"保存房间数据结果: {resp}")
-
-        return jsonify(resp.to_dict())
-
+        result,message = asyncio.run(room_service.set_default_room(room_id,credential))
+        logger.info(f"保存房间数据结果:result={result},message={message}")
+        if result:
+            return jsonify({"code": 0, "message": "更新成功"})
+        else:
+            return jsonify({"code": -210001, "message": message})
     except Exception as e:
         logger.error(f"更新房间信息失败: {e}")
         return jsonify({"code": -210001, "message": str(e)})
@@ -51,53 +52,18 @@ def update_room():
 @check_session_2api_decorator
 def search_room_list():
     """搜索房间列表"""
-
     logger = current_app.logger
     try:
-        login_user = session.get("login_user")
-        filters = {"login_id": login_user["login_id"]}
-
-        # 添加筛选条件
-        room_id = request.args.get("room_id")
-        if room_id:
-            filters["room_id"] = room_id
-
-        result_data = room_service_file.load_rooms_by_filter(filters)
+        result_data = room_service.get_all_rooms()
 
         return jsonify({
             "code": 0,
             "message": "查询成功",
-            "rooms": result_data["items"],
-            "count": result_data["count"]
+            "rooms": result_data,
+            "count": len(result_data)
         })
-
     except Exception as e:
         logger.error(f"搜索房间列表失败: {e}")
         return jsonify({"code": -210002, "message": str(e)})
 
-
-@room_api.route('/api/updatefav', methods=['GET', 'POST'])
-@check_session_2api_decorator
-def update_fav():
-    """更新收藏状态"""
-
-    logger = current_app.logger
-
-    try:
-        room_id = request.form.get("room_id")
-        is_fav = request.form.get("is_favorites")
-
-        if not room_id:
-            return jsonify({"code": 2102, "message": "请输入房间号"})
-        if is_fav is None:
-            return jsonify({"code": 2103, "message": "请输入收藏信息"})
-
-        login_user = session.get("login_user")
-        resp = room_service_file.set_favorites(room_id, login_user["login_id"], is_fav)
-
-        return jsonify(resp.to_dict())
-
-    except Exception as e:
-        logger.error(f"更新收藏状态失败: {e}")
-        return jsonify({"code": -210001, "message": str(e)})
 

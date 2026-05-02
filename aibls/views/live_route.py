@@ -1,5 +1,6 @@
 # aibls/views/live_route.py
 """弹幕API的蓝图定义"""
+import asyncio
 import logging
 import random
 import threading
@@ -12,7 +13,7 @@ from flask_socketio import emit
 
 from aibls.decorators import check_session_2api_decorator, check_session_go_login_decorator
 from aibls.models import LoginCookie
-from aibls.services import message_consumer,room_service_file
+from aibls.services import room_service
 from aibls.views import live_api
 from aibls.stock_io import socketio, message_queue
 
@@ -43,13 +44,13 @@ def danmu_page():
     login_user = session.get("login_user")
     user_credential:Credential = LoginCookie.dic_to_credential(login_user)
 
-    room_data = room_service_file.get_default_live_room()
+    room_data = room_service.get_default_room()
     room_id = "000000"
     room_owner = "未设置房间"
 
     if room_data:
-        room_id = room_data["room_id"]
-        room_owner = room_data["room_user_name"]
+        room_id = room_data["id"]
+        room_owner = room_data["owner_name"]
         generator.connect(user_credential, room_id)
         generator.start()
         print(f"✅ 生成器已启动，房间: {room_id}")

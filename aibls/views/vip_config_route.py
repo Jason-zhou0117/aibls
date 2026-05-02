@@ -1,4 +1,5 @@
 # aibls/views/vip_config_route.py
+import asyncio
 import os
 import uuid
 import logging
@@ -59,7 +60,7 @@ def add_vip_user():
         login_user: dict[str, Any] = session.get("login_user")
         user_credential: Credential = LoginCookie.dic_to_credential(login_user)
         # 获取Bili用户信息
-        bili_user = bili_user_service.get_user_info(uid,user_credential)
+        bili_user = asyncio.run(bili_user_service.get_user_info(uid,user_credential))
 
         if bili_user is None:
             return jsonify({'code': -2, 'message': 'B站查询该用户信息失败，请确认UID是否正确'})
@@ -264,7 +265,7 @@ def test_play_video():
 @check_session_2api_decorator
 def refresh_vip_config():
     login_credential = _get_login_credential()
-    vip_service.sync_from_bili(login_credential)
+    asyncio.run(vip_service.sync_from_bili(login_credential))
     return jsonify({
         "code": 0,
         "message": "同步VIP用户信息成功"

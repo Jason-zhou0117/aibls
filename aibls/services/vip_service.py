@@ -1,4 +1,5 @@
 # aibls/services/vip_service.py
+import asyncio
 import os
 import uuid
 import logging
@@ -141,7 +142,7 @@ class VIPService:
         return UserVideo.query.get(video_id)
 
     @staticmethod
-    def sync_from_bili(loginCredential:Credential):
+    async def sync_from_bili(loginCredential:Credential):
         """从B站同步礼物数据（批量）"""
         logger = current_app.logger
 
@@ -149,7 +150,7 @@ class VIPService:
             user_list = VIPUser.query.all()
             logger.info(f'同步的VIP用户數量：{len(user_list)}')
             for u in user_list:
-                bili_user = bili_user_service.get_user_info(u.userid,loginCredential)
+                bili_user = await bili_user_service.get_user_info(u.userid,loginCredential)
                 u.name = bili_user.get("name")
                 u.nickname =  bili_user.get("name")
                 u.face =  bili_user.get("face")

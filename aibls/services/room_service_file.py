@@ -8,7 +8,6 @@ from bilibili_api import Credential, live, user
 from flask import current_app
 
 from aibls.exceptions.BLSException import BLSException
-from aibls.services.response import ResponseResult
 from aibls.settings import ROOM_DIR
 
 
@@ -78,7 +77,7 @@ class RoomServiceFile:
             logger.error(f"获取默认房间信息时出错：{e}")
             raise BLSException(-20001, "获取默认房间信息时出错")
 
-    def save_room(self, login_user_credential: Credential, room_id: str) -> ResponseResult:
+    def save_room(self, login_user_credential: Credential, room_id: str) :
         """
         保存房间（含房主）的信息
         :param login_user_credential: 当前登录用户的凭据
@@ -108,16 +107,16 @@ class RoomServiceFile:
                     with open(file_path, 'w', encoding='utf-8') as f:
                         json.dump(room_data, f, ensure_ascii=False, indent=2)  # indent使格式更美观
 
-                    return ResponseResult(code=0, message="保存房间信息成功！")
+                    return 0, "保存房间信息成功！"
                 except Exception as e:
                     logger.info(e)
-                    return ResponseResult(code=-20003, message="保存房间信息时出错！")
+                    return -20003, "保存房间信息时出错！"
             except Exception as e:
                 logger.info(e)
-                return ResponseResult(code=-20002, message="获取房主信息时出错！")
+                return -20002, "获取房主信息时出错！"
         except Exception as e:
             logger.info(e)
-            return ResponseResult(code=-20001, message="获取房间信息时出错！")
+            return -20001, "获取房间信息时出错！"
 
     def __from_dict_to_db(self,room_info: dict[str, Any], room_owner: dict[str, Any],
                           login_id: str,room_key:str) -> dict[str, Any]:
@@ -138,8 +137,8 @@ class RoomServiceFile:
             "login_id": login_id
         }
 
-    def set_favorites(self, room_id: str, login_id: str, is_favorites: str) -> ResponseResult:
-        return ResponseResult(code=0, message="成功")
+    def set_favorites(self, room_id: str, login_id: str, is_favorites: str) :
+        return 0, "成功"
 
     def load_rooms_by_filter(self, filters: dict) -> dict:
         """

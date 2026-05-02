@@ -135,3 +135,29 @@ class GiftVideo(db.Model):
             'path': self.path,
             'created_at': self.created_at.isoformat() if self.created_at else None
         }
+
+
+class RoomInfo(db.Model):
+    """房间信息表"""
+    __tablename__ = 'room_info'
+
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    title = db.Column(db.String(200), nullable=False)
+    cover_url = db.Column(db.String(500), nullable=False)
+    owner_id = db.Column(db.Integer, nullable=False)
+    owner_name = db.Column(db.String(100), nullable=False)
+    owner_face = db.Column(db.String(500), nullable=False)
+    is_default = db.Column(db.String(1), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.now)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'cover_url': self.cover_url,
+            'owner_id': self.owner_id,
+            'owner_name': self.owner_name,
+            'owner_face': self.owner_face,
+            'is_default': self.is_default,
+            'created_at': self.created_at.isoformat() if self.created_at else None
+        }
