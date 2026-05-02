@@ -19,13 +19,14 @@ def check_session_go_login_decorator(func):
             try:
                 #重新获取一次登录用户信息，以免登录态过期
                 user_credential:Credential = LoginCookie.dic_to_credential(login_user)
-                login_user_info = bili_user_service.test_login_status(user_credential)
+                login_user_info = asyncio.run(bili_user_service.test_login_status(user_credential))
                 if login_user_info:
                     session["login_user"] = login_user
                     return func(*args,**kwargs)
                 else:
                     return render_template('login.html')
             except BLSException as e:
+                print(e)
                 return render_template('login.html')
     return inner
 

@@ -2,7 +2,6 @@
 import asyncio
 import os
 import uuid
-import logging
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -13,7 +12,6 @@ from werkzeug.utils import secure_filename
 
 from aibls import LoginCookie
 from aibls.decorators import check_session_2api_decorator, check_session_go_login_decorator
-from aibls.models import db
 from aibls.services import vip_service,bili_user_service
 from aibls.utils import VIPConfig
 from aibls.views import  vip_api
@@ -52,9 +50,6 @@ def add_vip_user():
     uid = str(data.get('uid'))
     if not uid:
         return jsonify({'code': -1, 'message': 'UID不能为空'})
-
-
-
     try:
         # 准备当前登录用户
         login_user: dict[str, Any] = session.get("login_user")
@@ -75,7 +70,7 @@ def add_vip_user():
 
         return jsonify({'code': 0, 'data': user, 'message': '添加成功'})
     except Exception as e:
-        return jsonify({'code': -2, 'message': '保存用户信息失败'})
+        return jsonify({'code': -2, 'message': f'保存用户信息失败:{e}'})
 
 
 @vip_api.route('/api/vip/users/<uid>', methods=['PUT'])

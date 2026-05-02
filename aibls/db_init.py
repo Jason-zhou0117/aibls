@@ -1,6 +1,5 @@
 # aibls/db_init.py
 from aibls.models.database import db
-from aibls.utils.migrate_json_to_db import migrate_json_to_db
 
 # 添加全局标志，避免重复创建表
 _tables_created = False

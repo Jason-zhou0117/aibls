@@ -1,8 +1,6 @@
 # aibls/services/vip_service.py
-import asyncio
 import os
 import uuid
-import logging
 from datetime import datetime
 
 from bilibili_api import Credential
@@ -99,9 +97,8 @@ class VIPService:
         if not user:
             return None, "用户不存在"
         try:
-            id = f'{str(uuid.uuid4())[:8]}-{str(uid)}'
             video = UserVideo(
-                id = id,
+                id = f'{str(uuid.uuid4())[:8]}-{str(uid)}',
                 video_id=video_id,
                 userid=str(uid),
                 title=title,
@@ -142,7 +139,7 @@ class VIPService:
         return UserVideo.query.get(video_id)
 
     @staticmethod
-    async def sync_from_bili(loginCredential:Credential):
+    async def sync_from_bili(login_credential:Credential):
         """从B站同步礼物数据（批量）"""
         logger = current_app.logger
 
@@ -150,7 +147,7 @@ class VIPService:
             user_list = VIPUser.query.all()
             logger.info(f'同步的VIP用户數量：{len(user_list)}')
             for u in user_list:
-                bili_user = await bili_user_service.get_user_info(u.userid,loginCredential)
+                bili_user = await bili_user_service.get_user_info(u.userid,login_credential)
                 u.name = bili_user.get("name")
                 u.nickname =  bili_user.get("name")
                 u.face =  bili_user.get("face")

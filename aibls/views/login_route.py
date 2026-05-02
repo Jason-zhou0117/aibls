@@ -1,6 +1,5 @@
 # aibls/views/login_route.py
 import asyncio
-import logging
 import os
 
 from bilibili_api import Credential
@@ -10,7 +9,7 @@ from flask import jsonify, session, render_template, current_app
 from aibls.services import bili_user_service
 from aibls.utils import snowflake
 from aibls.views import user_api
-from aibls.settings import STATIC_DIR, APP_ROOT
+from aibls.settings import STATIC_DIR
 
 
 qrcode_login = QrCodeLogin()

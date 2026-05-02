@@ -19,14 +19,11 @@ import logging
 import time
 from logging.handlers import RotatingFileHandler
 
-import requests
-from flask import Flask, request, Response, jsonify
+from flask import Flask, jsonify
 from flask_session import Session
 
-from aibls.generator_manager import init_generator
+from aibls.generator_manager import init_generator, stop_generator
 from aibls.services.message_consumer import MessageConsumer
-
-
 
 
 # 从 aibls 包导入
@@ -37,9 +34,8 @@ from aibls import (
     message_queue,
     db
 )
-from aibls.settings import APP_ROOT, IS_EMBEDDED, DEBUG_MODE, LOG_DIR, STATIC_DIR, TEMPLATE_DIR
+from aibls.settings import APP_ROOT, IS_EMBEDDED, DEBUG_MODE, STATIC_DIR, TEMPLATE_DIR
 from aibls.views import user_api, room_api, live_api, vip_api,gift_api
-from aibls.views.live_route import generator
 
 # 切换到项目根目录
 os.chdir(APP_ROOT)
@@ -218,5 +214,5 @@ if __name__ == "__main__":
 
     except KeyboardInterrupt:
         print("\n👋 正在关闭服务器...")
-        generator.stop()
+        stop_generator()
         print("服务器已关闭")

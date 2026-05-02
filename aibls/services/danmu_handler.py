@@ -1,10 +1,8 @@
 import asyncio
 
-import logging
 import random
 import threading
 from datetime import datetime
-from typing import Any
 
 from bilibili_api import Credential, live, sync, user
 
@@ -12,6 +10,10 @@ from bilibili_api import Credential, live, sync, user
 
 class AsyncMessageGenerator:
     """异步消息生成器 - 在单个线程中使用 asyncio.new_event_loop"""
+
+    credential = None
+    room_id = None
+    app = None
 
     def __init__(self, message_queue,app = None):
         self.message_queue = message_queue
@@ -283,7 +285,7 @@ class AsyncMessageGenerator:
                 from flask import current_app
                 with current_app.app_context():
                     result, message = send_gift_service.add_send_gift(info)
-
+            logger.debug(f"添加投喂记录结果：{result},{message}")
         except Exception as e:
             logger.error(f"解析礼物数据出错: {e}")
 
@@ -341,7 +343,7 @@ class AsyncMessageGenerator:
         logger = self.app.logger
         try:
             logger.debug(f"*************视频连线：{event}")
-            data = event["data"]["data"]
+            
         except Exception as e:
             logger.error(f"解析醒目留言数据出错: {e}")
 

@@ -1,5 +1,4 @@
-import asyncio
-import logging
+
 from typing import Any
 
 from bilibili_api import Credential, user
@@ -11,8 +10,8 @@ from aibls.exceptions import BLSException
 
 class BiliUserService:
 
-
-    async def test_login_status(self, credential: Credential) -> dict[str, Any]:
+    @staticmethod
+    async def test_login_status(credential: Credential) -> dict[str, Any]:
         """
         验证Session中的凭据是否能登录到Bili
         :param credential: 扫二维码后的登录凭证
@@ -43,7 +42,8 @@ class BiliUserService:
             logger.error(e)
             raise BLSException(-10001, "实时获取用户信息时出错")
 
-    async def get_user_info(self,target_uid:str,login_user_credential:Credential) -> dict[str, Any] | None:
+    @staticmethod
+    async def get_user_info(target_uid:str,login_user_credential:Credential) -> dict[str, Any] | None:
         logger = current_app.logger
         try:
             # 根据房间号，获取房主的用户信息

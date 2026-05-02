@@ -33,3 +33,11 @@ def reset_generator():
     # 创建新的
     _generator = AsyncMessageGenerator(message_queue, app=_app)
     return _generator
+
+def stop_generator():
+    """重置生成器（销毁旧的，创建新的）"""
+    global _generator, _app
+
+    # 停止旧的
+    if _generator:
+        _generator.stop()

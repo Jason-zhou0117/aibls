@@ -1,10 +1,7 @@
 # aibls/views/live_route.py
 """弹幕API的蓝图定义"""
-import asyncio
-import logging
+
 import random
-import threading
-import time
 from datetime import datetime
 
 from bilibili_api import Credential
@@ -110,11 +107,19 @@ def stop_generator(room_id: int):
 @live_api.route('/api/status')
 def get_status():
     """获取系统状态"""
+    """获取系统状态"""
+    # 延迟导入，避免循环导入
+    from aibls.services.message_consumer import message_consumer
+
+    consumer_running = False
+    if message_consumer:
+        consumer_running = message_consumer.running
+
     return {
-        'generator_running': generator.running,
-        'consumer_running': consumer_thread.is_alive(),
+        'generator_running': generator.running if generator else False,
+        'consumer_running': consumer_running,
         'queue_size': message_queue.qsize(),
-        'generator_id': generator.generator_id,
+        'generator_id': generator.generator_id if generator else None,
         'timestamp': datetime.now().isoformat()
     }
 

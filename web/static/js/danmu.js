@@ -327,7 +327,7 @@ danmuJs.changeRoom = function (){
     }
     formData = new FormData();
     formData.append('room_id', room_id);
-    fetch('/api/updateroom',{
+    fetch('/api/update_room',{
         method:"post",
         body:formData,
         headers:{}

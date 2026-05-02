@@ -1,8 +1,7 @@
 # aibls/services/gift_service.py
 import os
 import uuid
-import logging
-from datetime import datetime
+
 
 from flask import current_app
 
@@ -232,7 +231,6 @@ class GiftService:
         Returns:
             tuple: (是否废弃, 废弃原因)
         """
-        logger = current_app.logger
         # 1. 最高置信度：名字直接为"废弃"
         if gift.get('name') == '废弃' or '废弃' in gift.get('name') :
             return True, "礼物名为'废弃'"
@@ -242,9 +240,13 @@ class GiftService:
         price = gift.get('price', 0)
         coin_type = gift.get('coin_type', '')
         gift_type = gift.get('gift_type', 0)
-        bind_roomid = gift.get('bind_roomid', 0)
+        bind_room_id = gift.get('bind_roomid', 0)
 
         reasons = []
+
+        # 礼物名称含作废字样
+        if '作废' in name:
+            reasons.append("礼物名称含作废字样")
 
         # 价格异常低（但排除正常的低价礼物如辣条100银瓜子）
         if price == 0 :
@@ -259,8 +261,8 @@ class GiftService:
             reasons.append("活动类型且价格为0")
 
         # 绑定特定房间（通常是活动直播间）
-        if bind_roomid != 0:
-            reasons.append(f"绑定特定房间 {bind_roomid}")
+        if bind_room_id != 0:
+            reasons.append(f"绑定特定房间 {bind_room_id}")
 
         # 描述中可能出现"已结束"等关键词（可扩展）
         desc = gift.get('desc', '')

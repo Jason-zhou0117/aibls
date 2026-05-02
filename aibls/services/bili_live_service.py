@@ -1,4 +1,3 @@
-import logging
 from typing import Any
 
 from bilibili_api import Credential, live
@@ -8,7 +7,8 @@ from flask import current_app
 
 class BiliLiveService:
 
-    async def get_live_info(self, room_id: str, login_user_credential: Credential) -> dict[str, Any] | None:
+    @staticmethod
+    async def get_live_info( room_id: str, login_user_credential: Credential) -> dict[str, Any] | None:
         logger = current_app.logger
         try:
             # 根据房间号，获取房主的用户信息
@@ -23,8 +23,8 @@ class BiliLiveService:
             logger.info(e)
             return None
 
-
-    async def get_gif_config(self, room_id: str) -> dict[str, Any] | None:
+    @staticmethod
+    async def get_gif_config( room_id: str) -> dict[str, Any] | None:
         logger = current_app.logger
         try:
             # 根据房间号，获取房主的用户信息
@@ -39,7 +39,8 @@ class BiliLiveService:
             logger.info(e)
             return None
 
-    async def get_gif_common(self, room_id: str,login_user_credential: Credential) -> dict[str, Any] | None:
+    @staticmethod
+    async def get_gif_common( room_id: str,login_user_credential: Credential) -> dict[str, Any] | None:
         logger = current_app.logger
         try:
             # 根据房间号，获取房主的用户信息

@@ -1,6 +1,5 @@
 # aibls/views/room_route.py
 import asyncio
-import logging
 
 from bilibili_api import Credential
 from flask import session, request, jsonify, current_app
@@ -26,7 +25,7 @@ def _get_room_id_from_request() -> int | None:
 
 # ==================== 路由 ====================
 
-@room_api.route('/api/updateroom', methods=['GET', 'POST'])
+@room_api.route('/api/update_room', methods=['GET', 'POST'])
 @check_session_2api_decorator
 def update_room():
     """更新房间信息"""
