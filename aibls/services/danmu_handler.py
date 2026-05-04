@@ -90,8 +90,8 @@ class AsyncMessageGenerator:
         self._room.add_event_listener("SEND_GIFT", self.on_gift)  # 赠送礼物
         self._room.add_event_listener("GUARD_BUY", self.on_buy_guard)  # 购买舰长
         self._room.add_event_listener("SUPER_CHAT_MESSAGE", self.on_super_chat)  # 醒目留言
-        # self._room.add_event_listener("ENTRY_EFFECT", self.on_user_enter)  # 用户进入直播间
-        self._room.add_event_listener("INTERACT_WORD_V2", self.on_user_enter_v2)  # 用户进入直播间
+        self._room.add_event_listener("ENTRY_EFFECT", self.on_user_enter)  # 用户进入直播间
+        # self._room.add_event_listener("INTERACT_WORD_V2", self.on_user_enter_v2)  # 用户进入直播间
         self._room.add_event_listener("VIDEO_CONNECTION_MSG", self.on_user_video_link)  # 用户进入直播间
 
         try:
@@ -568,6 +568,7 @@ class AsyncMessageGenerator:
             if user_info is not None and user_id != 0:
                 user_info_base = user_info.get('base', None)
                 user_name = user_info_base.get('name', '未知用户')
+                user_face = user_info_base.get("face", None)
 
             fans_medal_name = ""
             fans_level = 0
@@ -592,6 +593,7 @@ class AsyncMessageGenerator:
                 "type": "welcome",
                 "uname": user_name,
                 "uid": user_id,
+                "user_face": user_face,
                 "guard_name":guard_name,
                 "fans_level":fans_level,
                 "guard_level":guard_level,
