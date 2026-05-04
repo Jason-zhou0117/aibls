@@ -154,61 +154,109 @@ class GiftStatManager {
     }
 
     renderSummary(data) {
-        // 区域1：礼物总数和总价值
-        document.getElementById('giftTotalNum').textContent = data.gift_total_num || 0;
-        document.getElementById('giftTotalCny').textContent = `¥${this.formatPrice(data.gift_total_cny)}`;
+        // 顶部总金额
+        const totalAmountEl = document.getElementById('totalAmount');
+        if (totalAmountEl) {
+            totalAmountEl.innerHTML = `总金额：¥${this.formatPrice(data.gift_total_cny)}`;
+        }
 
-        // 区域2：盲盒统计
-        document.getElementById('blindGiftNum').textContent = data.blind_gift_num || 0;
-        document.getElementById('blindGiftTotal').textContent = `¥${this.formatPrice(data.blind_gift_total_cny)}`;
+        // 1. 普通礼物统计
+        const normalGiftNumEl = document.getElementById('normalGiftNum');
+        const normalGiftValueEl = document.getElementById('normalGiftValue');
+        if (normalGiftNumEl) normalGiftNumEl.textContent = data.gift_total_num || 0;
+        if (normalGiftValueEl) normalGiftValueEl.textContent = `¥${this.formatPrice(data.gift_total_cny)}`;
 
-        const scopeElement = document.getElementById('blindGiftScope');
+        // 2. 盲盒统计
+        const blindGiftNumEl = document.getElementById('blindGiftNum');
+        const blindGiftTotalEl = document.getElementById('blindGiftTotal');
+        const blindGiftScopeEl = document.getElementById('blindGiftScope');
+
+        if (blindGiftNumEl) blindGiftNumEl.textContent = data.blind_gift_num || 0;
+        if (blindGiftTotalEl) blindGiftTotalEl.textContent = `¥${this.formatPrice(data.blind_gift_total_cny)}`;
+
         const scopeValue = data.blind_gift_scope_cny || 0;
-        scopeElement.textContent = `¥${this.formatPrice(Math.abs(scopeValue))}`;
-        scopeElement.className = scopeValue >= 0 ? 'stat-card-value positive' : 'stat-card-value negative';
-
-        // 区域3：投喂榜首
-        const firstUser = data.first_user;
-        const firstUserContainer = document.getElementById('firstUserInfo');
-        if (firstUser && firstUser.uid) {
-            firstUserContainer.innerHTML = `
-                <div class="user-card">
-                    <div class="user-avatar-large">
-                        ${firstUser.face ? `<img src="${firstUser.face}" alt="头像" onerror="this.parentElement.innerHTML='👤'">` : '👤'}
-                    </div>
-                    <div class="user-info-large">
-                        <div class="user-name-large">${this.escapeHtml(firstUser.name)}</div>
-                        <div class="user-uid-large">UID: ${firstUser.uid}</div>
-                    </div>
-                    <div class="user-value-large">¥${this.formatPrice(firstUser.total_cny)}</div>
-                </div>
-            `;
-        } else {
-            firstUserContainer.innerHTML = '<div class="no-user-tip">暂无数据</div>';
+        if (blindGiftScopeEl) {
+            blindGiftScopeEl.textContent = `¥${this.formatPrice(scopeValue)}`;
+            blindGiftScopeEl.className = `stat-number ${scopeValue >= 0 ? 'positive' : 'negative'}`;
         }
 
-        // 区域4：盲盒盈亏榜首
-        const blindFirstUser = data.blind_first_user;
-        const blindFirstContainer = document.getElementById('blindFirstUserInfo');
-        if (blindFirstUser && blindFirstUser.uid) {
-            blindFirstContainer.innerHTML = `
-                <div class="user-card">
-                    <div class="user-avatar-large">
-                        ${blindFirstUser.face ? `<img src="${blindFirstUser.face}" alt="头像" onerror="this.parentElement.innerHTML='👤'">` : '👤'}
-                    </div>
-                    <div class="user-info-large">
-                        <div class="user-name-large">${this.escapeHtml(blindFirstUser.name)}</div>
-                        <div class="user-uid-large">UID: ${blindFirstUser.uid}</div>
-                    </div>
-                    <div class="user-value-large ${blindFirstUser.scope_cny >= 0 ? 'positive' : 'negative'}">
-                        ¥${this.formatPrice(Math.abs(blindFirstUser.scope_cny))}
-                    </div>
-                </div>
-            `;
-        } else {
-            blindFirstContainer.innerHTML = '<div class="no-user-tip">暂无数据</div>';
-        }
+        // 3. 上舰统计
+        this.renderGuardStats(data);
+
+        // 4. 榜首
+        this.renderTopUsers(data);
     }
+
+    renderGuardStats(data) {
+        const guardStats = data.guard_stats || {
+            governor: { count: 0, amount: 0 },
+            lieutenant: { count: 0, amount: 0 },
+            captain: { count: 0, amount: 0 }
+        };
+
+        const governorCountEl = document.getElementById('governorCount');
+        const governorAmountEl = document.getElementById('governorAmount');
+        const lieutenantCountEl = document.getElementById('lieutenantCount');
+        const lieutenantAmountEl = document.getElementById('lieutenantAmount');
+        const captainCountEl = document.getElementById('captainCount');
+        const captainAmountEl = document.getElementById('captainAmount');
+
+        if (governorCountEl) governorCountEl.textContent = guardStats.governor.count;
+        if (governorAmountEl) governorAmountEl.textContent = `¥${this.formatPrice(guardStats.governor.amount)}`;
+        if (lieutenantCountEl) lieutenantCountEl.textContent = guardStats.lieutenant.count;
+        if (lieutenantAmountEl) lieutenantAmountEl.textContent = `¥${this.formatPrice(guardStats.lieutenant.amount)}`;
+        if (captainCountEl) captainCountEl.textContent = guardStats.captain.count;
+        if (captainAmountEl) captainAmountEl.textContent = `¥${this.formatPrice(guardStats.captain.amount)}`;
+    }
+
+    renderTopUsers(data) {
+    // 礼物投喂榜首
+    const firstUser = data.first_user;
+    const firstUserContainer = document.getElementById('firstUserInfo');
+    if (firstUser && firstUser.uid) {
+        firstUserContainer.innerHTML = `
+            <div class="rank-item">
+                <div class="rank-avatar">
+                    ${firstUser.face ? `<img src="${firstUser.face}" alt="头像" onerror="this.parentElement.innerHTML='<span>👤</span>'">` : '<span>👤</span>'}
+                </div>
+                <div class="rank-info">
+                    <div class="rank-name">
+                        <span class="rank-name-text">${this.escapeHtml(firstUser.name)}</span>
+                        <span class="rank-value positive">¥${this.formatPrice(firstUser.total_cny)}</span>
+                    </div>
+                    <div class="rank-uid">UID: ${firstUser.uid}</div>
+                    <div class="rank-type">🏆 礼物投喂榜首</div>
+                </div>
+            </div>
+        `;
+    } else {
+        firstUserContainer.innerHTML = '<div class="empty-tip">暂无数据</div>';
+    }
+
+    // 盲盒盈亏榜首
+    const blindFirstUser = data.blind_first_user;
+    const blindFirstContainer = document.getElementById('blindFirstUserInfo');
+    if (blindFirstUser && blindFirstUser.uid) {
+        const isPositive = blindFirstUser.scope_cny >= 0;
+        blindFirstContainer.innerHTML = `
+            <div class="rank-item">
+                <div class="rank-avatar">
+                    ${blindFirstUser.face ? `<img src="${blindFirstUser.face}" alt="头像" onerror="this.parentElement.innerHTML='<span>👤</span>'">` : '<span>👤</span>'}
+                </div>
+                <div class="rank-info">
+                    <div class="rank-name">
+                        <span class="rank-name-text">${this.escapeHtml(blindFirstUser.name)}</span>
+                        <span class="rank-value ${isPositive ? 'positive' : 'negative'}">¥${this.formatPrice(blindFirstUser.scope_cny)}</span>
+                    </div>
+                    <div class="rank-uid">UID: ${blindFirstUser.uid}</div>
+                    <div class="rank-type">🎲 盲盒盈亏榜首</div>
+                </div>
+            </div>
+        `;
+    } else {
+        blindFirstContainer.innerHTML = '<div class="empty-tip">暂无数据</div>';
+    }
+}
 
     renderBlindBoxList() {
         const container = document.getElementById('blindBoxList');
@@ -223,13 +271,13 @@ class GiftStatManager {
             <div class="blind-item ${this.currentBlindBox === box.blind_gift_id ? 'active' : ''}"
                  data-id="${box.blind_gift_id}"
                  onclick="giftStatManager.selectBlindBox(${box.blind_gift_id})">
-                <div class="blind-name">${this.escapeHtml(box.blind_gift_name || '未知盲盒')}</div>
+                <div class="blind-name">📦 ${this.escapeHtml(box.blind_gift_name || '未知盲盒')}</div>
                 <div class="blind-id">ID: ${box.blind_gift_id}</div>
                 <div class="blind-stats">
                     <span>数量: ${box.total_num}</span>
                     <span>投入: ¥${this.formatPrice(box.total_input_cny)}</span>
                     <span>产出: ¥${this.formatPrice(box.total_output_cny)}</span>
-                    <span>盈亏: <span class="scope-value ${box.scope_cny >= 0 ? 'positive' : 'negative'}">¥${this.formatPrice(Math.abs(box.scope_cny))}</span></span>
+                    <span>盈亏: <span class="scope-value ${box.scope_cny >= 0 ? 'positive' : 'negative'}">¥${this.formatPrice(box.scope_cny)}</span></span>
                 </div>
             </div>
         `).join('');
@@ -252,21 +300,21 @@ class GiftStatManager {
             else if (rank === 3) rankClass = 'top3';
 
             return `
-                <div class="rank-item">
-                    <div class="rank-number ${rankClass}">${rank}</div>
-                    <div class="rank-avatar">
+                <div class="user-rank-item">
+                    <div class="user-rank-number ${rankClass}">${rank}</div>
+                    <div class="user-rank-avatar">
                         ${user.face ? `<img src="${user.face}" alt="头像" onerror="this.parentElement.innerHTML='👤'">` : '👤'}
                     </div>
-                    <div class="rank-info">
-                        <div class="rank-name">${this.escapeHtml(user.name)}</div>
-                        <div class="rank-uid">UID: ${user.uid}</div>
+                    <div class="user-rank-info">
+                        <div class="user-rank-name">${this.escapeHtml(user.name)}</div>
+                        <div class="user-rank-uid">UID: ${user.uid}</div>
                     </div>
-                    <div class="rank-stats">
-                        <div class="rank-num">数量: ${user.gift_num}</div>
-                        <div class="rank-value">投入: ¥${this.formatPrice(user.total_input_cny)}</div>
-                        <div class="rank-value">产出: ¥${this.formatPrice(user.total_output_cny)}</div>
-                        <div class="rank-value ${user.scope_cny >= 0 ? 'positive' : 'negative'}">
-                            盈亏: ¥${this.formatPrice(Math.abs(user.scope_cny))}
+                    <div class="user-rank-stats">
+                        <div class="user-rank-num">数量: ${user.gift_num}</div>
+                        <div class="user-rank-value">投入: ¥${this.formatPrice(user.total_input_cny)}</div>
+                        <div class="user-rank-value">产出: ¥${this.formatPrice(user.total_output_cny)}</div>
+                        <div class="user-rank-value ${user.scope_cny >= 0 ? 'positive' : 'negative'}">
+                            盈亏: ¥${this.formatPrice(user.scope_cny)}
                         </div>
                     </div>
                 </div>
@@ -304,13 +352,11 @@ class GiftStatManager {
 
     // ========== 事件绑定 ==========
     bindEvents() {
-        // 月份选择器变化
         const monthSelect = document.getElementById('monthSelect');
         if (monthSelect) {
             monthSelect.onchange = () => this.onMonthChange();
         }
 
-        // 刷新按钮
         const refreshBtn = document.getElementById('refreshBtn');
         if (refreshBtn) {
             refreshBtn.onclick = () => this.refresh();
@@ -320,11 +366,9 @@ class GiftStatManager {
     // ========== 初始化 ==========
     async init() {
         await this.loadMonths();
-        // 如果没有数据，显示空状态
     }
 }
 
-// 全局实例
 let giftStatManager = null;
 
 document.addEventListener('DOMContentLoaded', () => {

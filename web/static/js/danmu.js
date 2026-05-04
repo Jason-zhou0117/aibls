@@ -107,8 +107,8 @@ danmuJs.addGift = function(data) {
 danmuJs.addGuard = function(data) {
     const container = document.getElementById('gift_messages');
     const div_time = '<div class="message-time">' + (data.time || new Date().toLocaleTimeString()) + '</div>';
-    const div_username = '<div><span class="message-user">' + danmuJs.escapeHtml(data.uname) +':</span></div>';
-    const div_msg = '<div class="message-content">🏆 购买了 ' + danmuJs.escapeHtml(data.guard_level) + '舰长</div>';
+    const div_username = '<div><span class="message-user">' + danmuJs.escapeHtml(data.sender_name) +':</span></div>';
+    const div_msg = '<div class="message-content">🏆 购买了 '+ danmuJs.escapeHtml(data.gift_num) + '个月  <span class="gift-name">' + danmuJs.escapeHtml(data.guard_name) + '</span></div>';
     const msgDiv = danmuJs.createMessageDiv('guard', div_time + div_username + div_msg);
     container.appendChild(msgDiv);
     danmuJs.scrollToBottom(container);

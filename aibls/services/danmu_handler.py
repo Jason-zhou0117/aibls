@@ -199,7 +199,7 @@ class AsyncMessageGenerator:
             gift_type = data.get("giftType")
             gift_num = data.get("num")
             gift_price = data.get("price")
-            gift_total_coin = data.get("total_coin")
+            gift_total_coin = gift_num  * gift_price
             logger.info(f"************礼物弹幕，礼物信息:礼物={gift_name}（{gift_id}）,类型= {gift_type},数量={gift_num},单价={gift_price},总数={gift_total_coin}")
 
             #盲盒相关信息
@@ -300,22 +300,109 @@ class AsyncMessageGenerator:
             logger.debug(f"***********上舰: {event}")
             data = event["data"]["data"]
             # 舰长等级对应: 3=舰长, 2=提督, 1=总督
+            guard_level = data["guard_level"]
             guard_level_names = {1: "总督", 2: "提督", 3: "舰长"}
-            guard_name = guard_level_names.get(data["guard_level"], "未知")
+            guard_name = guard_level_names.get(guard_level, "未知")
+
+            video_gift_ids = {1:33909, 2: 33908, 3: 33972}
+            video_gift_id = video_gift_ids.get(guard_level,None)
+
+            #礼物
+            gift_id = 10000 + data["guard_level"]
+            gift_name = guard_name
+            gift_num = data["num"]
+            gift_type = 100
+            gift_price = data["price"]
+
+            # 房间信息
+            room_id = self.room_id
+            owner_uid = self.room_info.get("owner_id")
+            owner_name = self.room_info.get("owner_name")
+            owner_face = self.room_info.get("owner_face")
+
+            #投喂人
+            sender_uid = data.get("uid")
+            sender_name = data.get("username")
+            user_detail = await self.load_user_info(sender_uid)
+            sender_face = user_detail["face"] if user_detail is not None else ""
 
             info = {
                 "type": "guard",
-                "msg": f"{data['username']} 开通 {guard_name} x {data['num']} 个月",
-                "sender_name": data["username"],
-                "sender_uid": data["uid"],
+                "room_id": room_id,
+                "sender_uid": sender_uid,
+                "sender_name": sender_name,
+                "sender_face": sender_face,
+                "receiver_uid": owner_uid,
+                "receiver_name": owner_name,
+                "receiver_face": owner_face,
+                "gift_id": gift_id,
+                "gift_type": gift_type,
+                "gift_name": gift_name,
+                "gift_num": gift_num,
+                "price": gift_price,
+                "total_coin": (gift_num * gift_price),
+                "blind_gift_id": 0,
+                "blind_gift_name": "",
+                "blind_gift_price": 0,
+                "blind_gift_total": 0,
+                "total_scope": (gift_num * gift_price),
+                "msg": f"{sender_name} 开通 {guard_name} x {gift_num} 个月",
                 "guard_level": data["guard_level"],
                 "guard_name": guard_name,
-                "num": data["num"]
+                "num": gift_num
             }
-            logger.info(f"上舰: {data['username']} 开通{guard_name}")
+            logger.info(f"上舰: {gift_name} 开通{guard_name}")
 
             #将弹幕放入消息队列
             self.message_queue.put(info)
+
+            if video_gift_id is not None:
+                logger.info(f"准备查询上舰的视频，礼物编号={video_gift_id}")
+                # 2. 检查是否为VIP用户，发送视频播放指令
+                # 在函数内部导入，避免循环导入
+                from aibls.services.gift_service import gift_service
+                if self.app:
+                    with self.app.app_context():
+                        gift_videos, error = gift_service.get_gift_videos(video_gift_id)
+                else:
+                    # 如果没传入 app，尝试使用 current_app
+                    from flask import current_app
+                    with current_app.app_context():
+                        gift_videos, error = gift_service.get_gift_videos(video_gift_id)
+
+                logger.info(f"查询到礼物 {video_gift_id}下的视频数为:{len(gift_videos)}")
+
+                if len(gift_videos) > 0:
+                    video = random.choice(gift_videos)
+                    video_url = video.get("url", "")
+                    video_path = video.get("path", "")
+                    video_title = video.get("title", "")
+                    logger.info(f"礼物特效: {gift_name} (UID: {video_gift_id})，触发视频播放: {video.get('url', '')}")
+
+                    video_command = {
+                        "type": "video_command",  # 特殊类型，用于区分
+                        "action": "play_video",
+                        "video_url": video_url,  # 已经是Flask静态路径
+                        "uid": video_gift_id,
+                        "video_path": video_path,
+                        "video_name": video_title,
+                        "timestamp": datetime.now().isoformat()
+                    }
+                    # 放入消息队列，由消费者推送到前端
+                    self.message_queue.put(video_command)
+
+            #记录到DB
+            logger.debug(f"准备添加大航海到DB")
+            from aibls.services.send_gift_service import send_gift_service
+            if self.app:
+                with self.app.app_context():
+                    result, message = send_gift_service.add_send_gift(info)
+            else:
+                # 如果没传入 app，尝试使用 current_app
+                from flask import current_app
+                with current_app.app_context():
+                    result, message = send_gift_service.add_send_gift(info)
+            logger.debug(f"添加加大航海记录结果：{result},{message}")
 
         except Exception as e:
             logger.error(f"解析上舰数据出错: {e}")

@@ -1,0 +1,19 @@
+{
+  'room_display_id': 998197,
+  'room_real_id': 998197,
+  'type': 'GUARD_BUY',
+  'data': {
+    'cmd': 'GUARD_BUY',
+    'data': {
+      'uid': 89726427,
+      'username': '枫雪小无赖',
+      'guard_level': 3,
+      'num': 1,
+      'price': 198000,
+      'gift_id': 10003,
+      'gift_name': '舰长',
+      'start_time': 1777898918,
+      'end_time': 1777898918
+    }
+  }
+}

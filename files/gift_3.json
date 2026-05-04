@@ -1,57 +1,73 @@
 {
-  'room_display_id': 1871516717,
-  'room_real_id': 1871516717,
+  'room_display_id': 998197,
+  'room_real_id': 998197,
   'type': 'SEND_GIFT',
   'data': {
     'cmd': 'SEND_GIFT',
     'danmu': {
-      'area': 1
+      'area': 0
     },
     'data': {
       'action': '投喂',
       'bag_gift': None,
-      'batch_combo_id': 'batch:gift:combo_id:3706937470356245:3546925886343600:31036:1772524676.4759',
+      'batch_combo_id': '6f0af50a-d262-4d2c-b40f-867e2e9afd7e',
       'batch_combo_send': {
         'action': '投喂',
-        'batch_combo_id': 'batch:gift:combo_id:3706937470356245:3546925886343600:31036:1772524676.4759',
+        'batch_combo_id': '6f0af50a-d262-4d2c-b40f-867e2e9afd7e',
         'batch_combo_num': 1,
-        'blind_gift': None,
-        'gift_id': 31036,
-        'gift_name': '小花花',
+        'blind_gift': {
+          'blind_gift_config_id': 139,
+          'from': 0,
+          'gift_action': '爆出',
+          'gift_tip_price': 9000,
+          'original_gift_id': 32251,
+          'original_gift_name': '心动盲盒',
+          'original_gift_price': 15000
+        },
+        'gift_id': 32126,
+        'gift_name': '棉花糖',
         'gift_num': 1,
         'send_master': None,
-        'uid': 3706937470356245,
-        'uname': '安XI教练'
+        'uid': 21776622,
+        'uname': '丘生万'
       },
-      'beatId': '',
+      'beatId': '0',
       'benefits': None,
-      'biz_source': 'live',
-      'blind_gift': None,
+      'biz_source': 'Live',
+      'blind_gift': {
+        'blind_gift_config_id': 139,
+        'from': 0,
+        'gift_action': '爆出',
+        'gift_tip_price': 9000,
+        'original_gift_id': 32251,
+        'original_gift_name': '心动盲盒',
+        'original_gift_price': 15000
+      },
       'broadcast_id': 0,
       'coin_type': 'gold',
       'combo_resources_id': 1,
       'combo_send': {
         'action': '投喂',
-        'combo_id': 'gift:combo_id:3706937470356245:3546925886343600:31036:1772524676.4746',
+        'combo_id': '7da72199-3dd0-454a-a188-7bebea638e34',
         'combo_num': 1,
-        'gift_id': 31036,
-        'gift_name': '小花花',
+        'gift_id': 32126,
+        'gift_name': '棉花糖',
         'gift_num': 1,
         'send_master': None,
-        'uid': 3706937470356245,
-        'uname': '安XI教练'
+        'uid': 21776622,
+        'uname': '丘生万'
       },
       'combo_stay_time': 5,
-      'combo_total_coin': 100,
+      'combo_total_coin': 9000,
       'crit_prob': 0,
-      'demarcation': 1,
-      'discount_price': 100,
-      'dmscore': 42,
+      'demarcation': 2,
+      'discount_price': 9000,
+      'dmscore': 1190,
       'draw': 0,
       'effect': 0,
       'effect_block': 0,
       'effect_config': None,
-      'face': 'https://i2.hdslb.com/bfs/face/afe36d3cc257a1dab8718d6ffa97614354b5f66f.jpg',
+      'face': 'https://i0.hdslb.com/bfs/face/673bb2fb9b3ed23add668c4ea26c7f1be4742877.jpg',
       'face_effect': {},
       'face_effect_id': 0,
       'face_effect_type': 0,
@@ -60,20 +76,20 @@
         'type': 0
       },
       'float_sc_resource_id': 0,
-      'giftId': 31036,
-      'giftName': '小花花',
+      'giftId': 32126,
+      'giftName': '棉花糖',
       'giftType': 0,
       'gift_info': {
         'effect_id': 0,
-        'gif': 'https://i0.hdslb.com/bfs/live/c806ee29394aab4877fa3d535daca5c66c631306.gif',
+        'gif': 'https://i0.hdslb.com/bfs/live/97652a724c610b3e7df2f49a4fc82769a4b0c062.gif',
         'has_imaged_gift': 0,
-        'img_basic': 'https://s1.hdslb.com/bfs/live/5126973892625f3a43a8290be6b625b5e54261a5.png',
-        'webp': 'https://i0.hdslb.com/bfs/live/28357ba4cd566418730ca29da2c552efa7e4a390.webp'
+        'img_basic': 'https://s1.hdslb.com/bfs/live/b555682af41551c28f8ad19dc5c4ed87943c84f4.png',
+        'webp': 'https://i0.hdslb.com/bfs/live/3dfb753065c967653dc35be1df85322188a88625.webp'
       },
       'gift_tag': [],
       'gold': 0,
       'group_medal': None,
-      'guard_level': 0,
+      'guard_level': 3,
       'is_first': True,
       'is_join_receiver': False,
       'is_naming': False,
@@ -82,43 +98,43 @@
       'medal_info': {
         'anchor_roomid': 0,
         'anchor_uname': '',
-        'guard_level': 0,
+        'guard_level': 3,
         'icon_id': 0,
-        'is_lighted': 0,
-        'medal_color': 6067854,
-        'medal_color_border': 12632256,
-        'medal_color_end': 12632256,
-        'medal_color_start': 12632256,
-        'medal_level': 2,
-        'medal_name': '可期y',
+        'is_lighted': 1,
+        'medal_color': 16736523,
+        'medal_color_border': 6809855,
+        'medal_color_end': 16765060,
+        'medal_color_start': 16736523,
+        'medal_level': 44,
+        'medal_name': '凰涩',
         'special': '',
-        'target_id': 1556934389
+        'target_id': 2156921
       },
-      'name_color': '',
+      'name_color': '#00D1F1',
       'num': 1,
       'original_gift_name': '',
-      'price': 100,
-      'rcost': 11070040,
+      'price': 9000,
+      'rcost': 145534800,
       'receive_user_info': {
-        'uid': 3546925886343600,
-        'uname': '不辣煲煲'
+        'uid': 2156921,
+        'uname': '狱凰阿巴阿巴'
       },
       'receiver_uinfo': {
         'base': {
-          'face': 'https://i0.hdslb.com/bfs/face/9db99ea408d47b5845bc1f834bf02209fbc9df31.jpg',
+          'face': 'https://i2.hdslb.com/bfs/face/ea73631d8092f1f4b8577a9f4c0f2ff7a285a3f9.jpg',
           'is_mystery': False,
-          'name': '不辣煲煲',
+          'name': '狱凰阿巴阿巴',
           'name_color': 0,
           'name_color_str': '',
           'official_info': {
             'desc': '',
-            'role': 0,
-            'title': '',
-            'type': -1
+            'role': 7,
+            'title': 'bilibili独家高能主播',
+            'type': 0
           },
           'origin_info': {
-            'face': 'https://i0.hdslb.com/bfs/face/9db99ea408d47b5845bc1f834bf02209fbc9df31.jpg',
-            'name': '不辣煲煲'
+            'face': 'https://i2.hdslb.com/bfs/face/ea73631d8092f1f4b8577a9f4c0f2ff7a285a3f9.jpg',
+            'name': '狱凰阿巴阿巴'
           },
           'risk_ctrl_info': None
         },
@@ -127,17 +143,17 @@
         'medal': None,
         'title': None,
         'uhead_frame': None,
-        'uid': 3546925886343600,
+        'uid': 2156921,
         'wealth': None
       },
       'remain': 0,
-      'rnd': '4746191549749147648',
+      'rnd': '4768727007775349248',
       'send_master': None,
       'sender_uinfo': {
         'base': {
-          'face': 'https://i2.hdslb.com/bfs/face/afe36d3cc257a1dab8718d6ffa97614354b5f66f.jpg',
+          'face': 'https://i0.hdslb.com/bfs/face/673bb2fb9b3ed23add668c4ea26c7f1be4742877.jpg',
           'is_mystery': False,
-          'name': '安XI教练',
+          'name': '丘生万',
           'name_color': 0,
           'name_color_str': '',
           'official_info': {
@@ -147,17 +163,38 @@
             'type': -1
           },
           'origin_info': {
-            'face': 'https://i2.hdslb.com/bfs/face/afe36d3cc257a1dab8718d6ffa97614354b5f66f.jpg',
-            'name': '安XI教练'
+            'face': 'https://i0.hdslb.com/bfs/face/673bb2fb9b3ed23add668c4ea26c7f1be4742877.jpg',
+            'name': '丘生万'
           },
           'risk_ctrl_info': None
         },
         'guard': None,
         'guard_leader': None,
-        'medal': None,
+        'medal': {
+          'color': 16736523,
+          'color_border': 6809855,
+          'color_end': 16765060,
+          'color_start': 16736523,
+          'guard_icon': 'https://i0.hdslb.com/bfs/live/48360c8f3b7de8031e86ff1ef4a2dfc0ec2a61c2.png',
+          'guard_level': 3,
+          'honor_icon': '',
+          'id': 0,
+          'is_light': 1,
+          'level': 44,
+          'name': '凰涩',
+          'ruid': 2156921,
+          'score': 909594,
+          'typ': 0,
+          'user_receive_count': 0,
+          'v2_medal_color_border': '#D47AFF',
+          'v2_medal_color_end': '#A773F199',
+          'v2_medal_color_level': '#A773F1E6',
+          'v2_medal_color_start': '#A773F199',
+          'v2_medal_color_text': '#FFFFFF'
+        },
         'title': None,
         'uhead_frame': None,
-        'uid': 3706937470356245,
+        'uid': 21776622,
         'wealth': None
       },
       'silver': 0,
@@ -167,13 +204,17 @@
       'svga_block': 0,
       'switch': True,
       'tag_image': '',
-      'tid': '4746191549749147648',
-      'timestamp': 1772524676,
+      'tid': '4768727007775349248',
+      'timestamp': 1777897548,
       'top_list': None,
-      'total_coin': 100,
-      'uid': 3706937470356245,
-      'uname': '安XI教练',
-      'wealth_level': 1
-    }
+      'total_coin': 15000,
+      'uid': 21776622,
+      'uname': '丘生万',
+      'wealth_level': 46
+    },
+    'msg_id': '93683626450904064:1000:1000',
+    'p_is_ack': True,
+    'p_msg_type': 1,
+    'send_time': 1777897548414
   }
 }

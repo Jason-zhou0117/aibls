@@ -76,7 +76,7 @@ class GiftStatService:
             else:
                 # 新增记录
                 new_record = RoomReceiveGifts(
-                    id = snowflake.next_id(),
+                    id=snowflake.next_id(),
                     room_id=room_id,
                     send_month=month,
                     gift_total_num=stats['gift_total_num'],
@@ -115,21 +115,39 @@ class GiftStatService:
         if not records:
             return None
 
-        # 统计所有礼物
-        gift_total_num = sum(r.gift_num for r in records)
-        gift_total_coin = sum(r.gift_total_coin for r in records)
+        # 统计所有礼物（普通礼物：gift_type < 100，非盲盒爆出）
+        normal_records = [r for r in records if r.gift_type < 100 and r.blind_gift_id == 0]
+        gift_total_num = sum(r.gift_num for r in normal_records)
+        gift_total_coin = sum(r.gift_total_coin for r in normal_records)
 
         # 统计盲盒相关（只统计 blind_gift_id > 0 的记录，即从盲盒爆出的礼物）
         blind_records = [r for r in records if r.blind_gift_id > 0]
-        blind_gift_num = sum(
-            r.gift_num for r in blind_records if r.gift_num)
+        blind_gift_num = sum(r.gift_num for r in blind_records if r.gift_num)
 
         # 盲盒总投入：统计所有购买的盲盒（gift_id 是盲盒ID，且 blind_gift_id > 0）
-        blind_gift_total = sum(
-            r.blind_gift_total for r in blind_records if r.blind_gift_total)
+        blind_gift_total = sum(r.blind_gift_total for r in blind_records if r.blind_gift_total)
 
         # 盲盒总盈亏：只统计 blind_gift_id > 0 的记录（即从盲盒爆出的礼物）
         blind_gift_scope = sum(r.total_scope for r in blind_records if r.total_scope)
+
+        # 统计上舰（gift_type = 100）
+        guard_records = [r for r in records if r.gift_type == 100]
+        guard_stats = {
+            'governor': {'count': 0, 'amount': 0},  # 总督 gift_id=10001
+            'lieutenant': {'count': 0, 'amount': 0},  # 提督 gift_id=10002
+            'captain': {'count': 0, 'amount': 0}  # 舰长 gift_id=10003
+        }
+
+        for r in guard_records:
+            if r.gift_id == 10001:  # 总督
+                guard_stats['governor']['count'] += r.gift_num
+                guard_stats['governor']['amount'] += r.gift_total_coin
+            elif r.gift_id == 10002:  # 提督
+                guard_stats['lieutenant']['count'] += r.gift_num
+                guard_stats['lieutenant']['amount'] += r.gift_total_coin
+            elif r.gift_id == 10003:  # 舰长
+                guard_stats['captain']['count'] += r.gift_num
+                guard_stats['captain']['amount'] += r.gift_total_coin
 
         # 找出投喂礼物价值最高的用户
         user_gift_total = {}
@@ -181,7 +199,8 @@ class GiftStatService:
             'blind_first_uid': blind_first_uid,
             'blind_first_name': blind_first_name,
             'blind_first_face': blind_first_face,
-            'blind_first_scope': blind_first_scope
+            'blind_first_scope': blind_first_scope,
+            'guard_stats': guard_stats
         }
 
     @staticmethod
@@ -202,6 +221,23 @@ class GiftStatService:
         if not record:
             return None
 
+        # 转换上舰统计金额为人民币
+        guard_stats = stats.get('guard_stats', {})
+        guard_stats_cny = {
+            'governor': {
+                'count': guard_stats.get('governor', {}).get('count', 0),
+                'amount': GiftStatService.to_cny(guard_stats.get('governor', {}).get('amount', 0))
+            },
+            'lieutenant': {
+                'count': guard_stats.get('lieutenant', {}).get('count', 0),
+                'amount': GiftStatService.to_cny(guard_stats.get('lieutenant', {}).get('amount', 0))
+            },
+            'captain': {
+                'count': guard_stats.get('captain', {}).get('count', 0),
+                'amount': GiftStatService.to_cny(guard_stats.get('captain', {}).get('amount', 0))
+            }
+        }
+
         return {
             'month': month,
             'room_id': room_id,
@@ -210,6 +246,7 @@ class GiftStatService:
             'blind_gift_num': stats['blind_gift_num'],
             'blind_gift_total_cny': GiftStatService.to_cny(stats['blind_gift_total']),
             'blind_gift_scope_cny': GiftStatService.to_cny(stats['blind_gift_scope']),
+            'guard_stats': guard_stats_cny,
             'first_user': {
                 'uid': record.first_uid,
                 'name': record.first_name,
@@ -244,9 +281,10 @@ class GiftStatService:
         # 按 blind_gift_id 分组统计
         blind_groups = {}
         for blind_id in blind_box_ids:
-            #总梳理
+            # 总数量
             blind_total_num = sum(r.gift_num for r in records if r.gift_num and r.blind_gift_id == blind_id)
-            blind_total_input_coin = sum(r.blind_gift_total for r in records if r.blind_gift_total and r.blind_gift_id == blind_id)
+            blind_total_input_coin = sum(
+                r.blind_gift_total for r in records if r.blind_gift_total and r.blind_gift_id == blind_id)
             blind_total_output_coin = sum(
                 r.gift_total_coin for r in records if r.gift_total_coin and r.blind_gift_id == blind_id)
 
@@ -254,12 +292,10 @@ class GiftStatService:
                 'blind_gift_id': blind_id,
                 'blind_gift_name': '',
                 'total_num': blind_total_num,
-                'total_input_coin': blind_total_input_coin,  # 用户购买盲盒的总投入（金瓜子）
-                'total_output_coin': blind_total_output_coin,  # 爆出礼物总价值（金瓜子）
-                'scope_coin': (blind_total_output_coin -blind_total_input_coin)
+                'total_input_coin': blind_total_input_coin,
+                'total_output_coin': blind_total_output_coin,
+                'scope_coin': (blind_total_output_coin - blind_total_input_coin)
             }
-
-
 
         # 统计盲盒名称（从 blind_gift_id > 0 的记录中取）
         for r in records:

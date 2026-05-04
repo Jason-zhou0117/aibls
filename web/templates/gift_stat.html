@@ -6,6 +6,7 @@
     <title>礼物统计 - BiliMon</title>
     <meta name="referrer" content="no-referrer">
     <link rel="stylesheet" href="/static/css/gift_stat.css">
+    <link rel="icon" href="/static/images/bicon.png">
 </head>
 <body>
     <div class="header">
@@ -18,7 +19,7 @@
                 <a href="/vip_config" class="header-btn">
                     <span>👑</span> VIP入场
                 </a>
-                <div class="user-info" id="userInfo"  onclick="headJs.openLogin()">
+                <div class="user-info" id="userInfo" onclick="location.href='/login/page'">
                     <div class="user-avatar" id="userAvatar"><img src="{{user_face|default('👤')}}" alt="头像"/></div>
                     <span class="user-name" id="userName">{{ nick_name|default('未登录') }}</span>
                 </div>
@@ -27,59 +28,94 @@
     </div>
 
     <div class="main-container">
-        <!-- 月份选择栏 -->
-        <div class="month-bar">
+        <!-- 顶部栏：一行三列 -->
+        <div class="top-bar">
             <div class="month-selector">
                 <span class="month-label">选择月份：</span>
                 <select class="month-select" id="monthSelect">
                     <option value="">加载中...</option>
                 </select>
             </div>
+            <div class="total-amount" id="totalAmount">本月礼物总金额：¥0.00</div>
             <button class="refresh-btn" id="refreshBtn">🔄 刷新数据</button>
         </div>
 
-        <!-- 顶部4个卡片区域 -->
-        <div class="stats-cards">
-            <!-- 区域1：礼物统计 -->
+        <!-- 4个统计卡片 -->
+        <div class="stats-grid">
+            <!-- 卡片1：普通礼物统计 -->
             <div class="stat-card">
-                <div class="stat-card-title">🎁 礼物统计</div>
-                <div class="stat-card-value" id="giftTotalNum">0</div>
-                <div class="stat-card-unit">总数量</div>
-                <div class="stat-card-value" id="giftTotalCny">¥0.00</div>
-                <div class="stat-card-unit">总价值</div>
-            </div>
-
-            <!-- 区域2：盲盒统计 -->
-            <div class="stat-card">
-                <div class="stat-card-title">🎲 盲盒统计</div>
-                <div class="stat-card-value" id="blindGiftNum">0</div>
-                <div class="stat-card-unit">总数量</div>
-                <div class="stat-card-value" id="blindGiftTotal">¥0.00</div>
-                <div class="stat-card-unit">总投入</div>
-                <div class="stat-card-value" id="blindGiftScope">¥0.00</div>
-                <div class="stat-card-unit">总盈亏</div>
-            </div>
-
-            <!-- 区域3：投喂榜首 -->
-            <div class="stat-card">
-                <div class="stat-card-title">🏆 投喂榜首</div>
-                <div id="firstUserInfo">
-                    <div class="no-user-tip">暂无数据</div>
+                <div class="stat-card-title">🎁 普通礼物统计</div>
+                <div class="stat-item">
+                    <div class="stat-label">总数量</div>
+                    <div class="stat-number" id="normalGiftNum">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">总价值</div>
+                    <div class="stat-number" id="normalGiftValue">¥0.00</div>
                 </div>
             </div>
 
-            <!-- 区域4：盲盒盈亏榜首 -->
+            <!-- 卡片2：盲盒统计 -->
             <div class="stat-card">
-                <div class="stat-card-title">🎯 盲盒盈亏榜首</div>
-                <div id="blindFirstUserInfo">
-                    <div class="no-user-tip">暂无数据</div>
+                <div class="stat-card-title">🎲 盲盒统计</div>
+                <div class="stat-item">
+                    <div class="stat-label">总数量</div>
+                    <div class="stat-number" id="blindGiftNum">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">总投入</div>
+                    <div class="stat-number" id="blindGiftTotal">¥0.00</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">总盈亏</div>
+                    <div class="stat-number" id="blindGiftScope">¥0.00</div>
+                </div>
+            </div>
+
+            <!-- 卡片3：上舰统计 -->
+            <div class="stat-card">
+                <div class="stat-card-title">⚓ 上舰统计</div>
+                <div class="guard-stats">
+                    <div class="guard-item">
+                        <div class="guard-title red">🔴 总督</div>
+                        <div class="guard-detail">
+                            <span>数量: <span id="governorCount">0</span></span>
+                            <span>金额: <span id="governorAmount">¥0.00</span></span>
+                        </div>
+                    </div>
+                    <div class="guard-item">
+                        <div class="guard-title purple">🟪 提督</div>
+                        <div class="guard-detail">
+                            <span>数量: <span id="lieutenantCount">0</span></span>
+                            <span>金额: <span id="lieutenantAmount">¥0.00</span></span>
+                        </div>
+                    </div>
+                    <div class="guard-item">
+                        <div class="guard-title blue">🟦 舰长</div>
+                        <div class="guard-detail">
+                            <span>数量: <span id="captainCount">0</span></span>
+                            <span>金额: <span id="captainAmount">¥0.00</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 卡片4：榜首 -->
+            <div class="stat-card">
+                <div class="stat-card-title">🏆 榜首</div>
+                <div class="rank-list">
+                    <div id="firstUserInfo">
+                        <div class="empty-tip">暂无数据</div>
+                    </div>
+                    <div id="blindFirstUserInfo">
+                        <div class="empty-tip">暂无数据</div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- 下部双列表：盲盒列表 + 用户排名 -->
+        <!-- 底部双列表 -->
         <div class="bottom-section">
-            <!-- 左侧：盲盒分组列表 -->
             <div class="blind-list-panel">
                 <div class="panel-header">
                     <span class="panel-title">📦 盲盒分组 <span class="count" id="blindCount"></span></span>
@@ -89,12 +125,11 @@
                 </div>
             </div>
 
-            <!-- 右侧：用户投喂排名 -->
             <div class="rank-list-panel">
                 <div class="panel-header">
                     <span class="panel-title">👥 用户投喂排名 <span class="count" id="rankCount"></span></span>
                 </div>
-                <div class="rank-list" id="userRankList">
+                <div class="user-rank-list" id="userRankList">
                     <div class="empty-tip">请先选择盲盒</div>
                 </div>
             </div>
