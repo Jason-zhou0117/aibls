@@ -6,6 +6,7 @@ from datetime import datetime
 
 from bilibili_api import Credential, live, sync, user
 
+from aibls.services.room_service import room_service
 
 
 class AsyncMessageGenerator:
@@ -14,6 +15,7 @@ class AsyncMessageGenerator:
     credential = None
     room_id = None
     app = None
+    room_info = None
 
     def __init__(self, message_queue,app = None):
         self.message_queue = message_queue
@@ -27,6 +29,7 @@ class AsyncMessageGenerator:
     def connect(self, user_credential: Credential, room_id: int):
         self.credential = user_credential
         self.room_id = room_id
+        self.room_info = room_service.get_room_data(room_id)
         self._room = live.LiveDanmaku(room_id, False, self.credential)
 
     def start(self):
@@ -116,10 +119,10 @@ class AsyncMessageGenerator:
             msg = info[1]
 
             # 解析用户ID和昵称
-            uid = user_info[0]
-            uname = user_info[1]
+            sender_uid = user_info[0]
+            sender_name = user_info[1]
             #获取用户详情
-            user_detail = await self.load_user_info(uid)
+            user_detail = await self.load_user_info(sender_uid)
 
             # 解析粉丝牌信息 (如果有)
             medal_info = info[3] if len(info) > 3 else []
@@ -137,20 +140,20 @@ class AsyncMessageGenerator:
             # 构建标准化弹幕数据
             danmu_data = {
                 "type": "danmaku",
-                "msg": msg,  # 弹幕内容 (info[1])
-                "uname": uname,  # 用户昵称
-                "uid": uid,  # 用户ID
-                "user_face" : user_detail["face"] if user_detail is not None else "",
+                "message": msg,  # 弹幕内容 (info[1])
+                "room_id":self.room_id,
+                "sender_uid": sender_uid,  # 用户昵称
+                "sender_name": sender_name,  # 用户ID
+                "sender_face" : user_detail["face"] if user_detail is not None else "",
                 "timestamp": timestamp,  # 时间戳
                 "send_time":dt_str,
                 "medal_name": medal_name,  # 粉丝牌名称
                 "medal_level":medal_level,  # 粉丝牌等级
-                "honor_level":honor_level,
-                "raw_info": info  # 保留原始数据（可选）
+                "honor_level":honor_level
             }
 
             # 调试输出
-            logger.info(f"弹幕-文字: {uname}: {msg} [粉丝牌: {medal_name} Lv.{medal_level}]")
+            logger.info(f"弹幕-文字: {sender_name}: {msg} [粉丝牌: {medal_name} Lv.{medal_level}]")
 
             self.message_queue.put(danmu_data)
         except Exception as e:
@@ -227,6 +230,7 @@ class AsyncMessageGenerator:
                 "receiver_name": receiver_name,
                 "receiver_face": receiver_face,
                 "gift_id": gift_id,
+                "gift_type": gift_type,
                 "gift_name": gift_name,
                 "gift_num": gift_num,
                 "price": gift_price,  # 单价 (金瓜子)
@@ -302,8 +306,8 @@ class AsyncMessageGenerator:
             info = {
                 "type": "guard",
                 "msg": f"{data['username']} 开通 {guard_name} x {data['num']} 个月",
-                "uname": data["username"],
-                "uid": data["uid"],
+                "sender_name": data["username"],
+                "sender_uid": data["uid"],
                 "guard_level": data["guard_level"],
                 "guard_name": guard_name,
                 "num": data["num"]
@@ -322,18 +326,70 @@ class AsyncMessageGenerator:
         try:
             logger.debug(f"+++++++++醒目留言: {event}")
             data = event["data"]["data"]
+
+            #房间信息
+            room_id = self.room_id
+            owner_uid = self.room_info.get("owner_id")
+            owner_name = self.room_info.get("owner_name")
+            owner_face = self.room_info.get("owner_face")
+
+            #发送者
+            sender_uid = data.get("uid")
+            user_info = data.get("user_info")
+            sender_name = user_info.get("uname")
+            sender_face = user_info.get("face")
+
+            #醒目弹幕
+            gift_info = data.get("gift")
+            gift_type = 200
+            gift_id = gift_info.get("gift_id")
+            gift_name = gift_info.get("gift_name")
+            gift_num = gift_info.get("num")
+            gift_price = data.get("price") * data.get("rate")
+
+            #message
+            message = data.get("message")
+            message_time = data.get("time")
+
             info = {
                 "type": "super_chat",
-                "msg": data["message"],
-                "uname": data["user_info"]["uname"],
-                "uid": data["uid"],
-                "price": data["price"],  # 金额(元)
-                "time": data["time"]  # 持续时间(秒)
+                "room_id": room_id,
+                "sender_uid" : sender_uid,
+                "sender_name": sender_name,
+                "sender_face": sender_face,
+                "receiver_uid": owner_uid,
+                "receiver_name": owner_name,
+                "receiver_face": owner_face,
+                "gift_id": gift_id,
+                "gift_type": gift_type,
+                "gift_name": gift_name,
+                "gift_num": gift_num,
+                "price": gift_price,
+                "total_coin": (gift_num * gift_price),
+                "blind_gift_id": 0,
+                "blind_gift_name": "",
+                "blind_gift_price": 0,
+                "blind_gift_total": 0,
+                "total_scope": (gift_num * gift_price),
+                "message": message,
+                "message_time":message_time  # 持续时间(秒)
             }
             logger.info(f"醒目留言: {data['user_info']['uname']} 留言: {data['message']} ￥{data['price']}")
-
             # 将弹幕放入消息队列
             self.message_queue.put(info)
+
+            logger.debug(f"准备添加醒目留言到DB")
+            from aibls.services.send_gift_service import send_gift_service
+            if self.app:
+                with self.app.app_context():
+                    result, message = send_gift_service.add_send_gift(info)
+            else:
+                # 如果没传入 app，尝试使用 current_app
+                from flask import current_app
+                with current_app.app_context():
+                    result, message = send_gift_service.add_send_gift(info)
+            logger.debug(f"添加醒目留言记录结果：{result},{message}")
+
         except Exception as e:
             logger.error(f"解析醒目留言数据出错: {e}")
 

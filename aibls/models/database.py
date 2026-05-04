@@ -164,33 +164,30 @@ class RoomInfo(db.Model):
 
 
 class SendGiftDetail(db.Model):
-    """礼物特效视频表"""
+    """礼物投喂明细表"""
     __tablename__ = 'send_gift_detail'
 
-    id = db.Column(db.Integer, primary_key=True, nullable=False)
-    room_id = db.Column(db.Integer, nullable=False)
-    send_month = db.Column(db.String(10), nullable=False)
-    send_date = db.Column(db.String(10), nullable=False)
-    sender_uid = db.Column(db.Integer, nullable=False)
-    sender_name = db.Column(db.String(50), nullable=False)
-    sender_face = db.Column(db.String(500), nullable=False)
-    receiver_uid = db.Column(db.Integer, nullable=False)
-    receiver_name = db.Column(db.String(50), nullable=False)
-    receiver_face = db.Column(db.String(500), nullable=False)
-    gift_id = db.Column(db.Integer, nullable=False)
-    gift_name = db.Column(db.String(50), nullable=False)
-    gift_num = db.Column(db.Integer, nullable=False)
-    gift_price_origin = db.Column(db.NUMERIC(10, 2), nullable=False)
-    gift_total_coin = db.Column(db.NUMERIC(10, 2), nullable=False)
-    gift_total_gold = db.Column(db.NUMERIC(10, 2), nullable=False)
-    gift_total_cny = db.Column(db.NUMERIC(10, 2), nullable=False)
-    blind_gift_id = db.Column(db.Integer, nullable=False)
-    blind_gift_name = db.Column(db.String(50), nullable=False)
-    blind_gift_price = db.Column(db.NUMERIC(10, 2), nullable=False)
-    blind_gift_total = db.Column(db.NUMERIC(10, 2), nullable=False)
-    total_scope = db.Column(db.NUMERIC(10, 2), nullable=False)
-    total_scope_gold = db.Column(db.NUMERIC(10, 2), nullable=False)
-    total_scope_cny = db.Column(db.NUMERIC(10, 2), nullable=False)
+    id = db.Column(db.Integer, primary_key=True, nullable=False) #投喂礼物明细号
+    room_id = db.Column(db.Integer, nullable=False) #房间编号
+    gift_type = db.Column(db.Integer, nullable=False) #0-99 投喂礼物；#101=103，航海；#200：醒目弹幕，
+    send_month = db.Column(db.String(10), nullable=False) #月份 yyyy-mm
+    send_date = db.Column(db.String(10), nullable=False) #投喂日期 yyyy-mm-dd
+    sender_uid = db.Column(db.Integer, nullable=False) #投喂人ID
+    sender_name = db.Column(db.String(50), nullable=False) #投喂人昵称
+    sender_face = db.Column(db.String(500), nullable=False) #投喂人头像
+    receiver_uid = db.Column(db.Integer, nullable=False) #直播间UP的ID
+    receiver_name = db.Column(db.String(50), nullable=False) #直播间UP的昵称
+    receiver_face = db.Column(db.String(500), nullable=False) #直播间UP的头像
+    gift_id = db.Column(db.Integer, nullable=False) #礼物编号
+    gift_name = db.Column(db.String(50), nullable=False) #礼物名称
+    gift_num = db.Column(db.Integer, nullable=False) #投喂数量
+    gift_price_origin = db.Column(db.NUMERIC(10, 2), nullable=False) #礼物单价
+    gift_total_coin = db.Column(db.NUMERIC(10, 2), nullable=False) #投喂礼物价值 数量*单价
+    blind_gift_id = db.Column(db.Integer, nullable=False) #盲盒的礼物ID。如果是盲盒爆出的礼物，此字段值＞０，否则为０
+    blind_gift_name = db.Column(db.String(50), nullable=False) #盲盒的名称
+    blind_gift_price = db.Column(db.NUMERIC(10, 2), nullable=False) #盲盒的单价
+    blind_gift_total = db.Column(db.NUMERIC(10, 2), nullable=False) #盲盒的总价值 数量*盲盒的单价
+    total_scope = db.Column(db.NUMERIC(10, 2), nullable=False) #爆出礼物的价值与盲盒价值的差额
     created_at = db.Column(db.DateTime, default=datetime.now)
 
     def to_dict(self):
@@ -206,18 +203,54 @@ class SendGiftDetail(db.Model):
             'receiver_name': self.receiver_name,
             'receiver_face': self.receiver_face,
             'gift_id': self.gift_id,
+            'gift_type':self.gift_type,
             'gift_name': self.gift_name,
             'gift_num': self.gift_num,
             'gift_price_origin': self.gift_price_origin,
             'gift_total_coin': self.gift_total_coin,
-            'gift_total_gold': self.gift_total_gold,
-            'gift_total_cny': self.gift_total_cny,
             'blind_gift_id': self.blind_gift_id,
             'blind_gift_name': self.blind_gift_name,
             'blind_gift_price': self.blind_gift_price,
             'blind_gift_total': self.blind_gift_total,
             'total_scope': self.total_scope,
-            'total_scope_gold': self.total_scope_gold,
-            'total_scope_cny': self.total_scope_cny,
+            'created_at': self.created_at.isoformat() if self.created_at else None
+        }
+
+class RoomReceiveGifts(db.Model):
+    """房间每月收到的礼物汇总"""
+    __tablename__ = 'room_receive_gifts'
+    id = db.Column(db.Integer, primary_key=True, nullable=False)  #直播间礼物汇总ID
+    room_id = db.Column(db.Integer, nullable=False) #房间号
+    send_month = db.Column(db.String(10), nullable=False) #统计的月份 yyyy-mm
+    gift_total_num = db.Column(db.Integer, nullable=False) #收到的礼物总数
+    gift_total_coin = db.Column(db.NUMERIC(10, 2), nullable=False) #收到的礼物总价值
+    blind_gift_num = db.Column(db.NUMERIC(10, 2), nullable=False) #盲盒的总数量
+    blind_gift_total = db.Column(db.NUMERIC(10, 2), nullable=False) #盲盒的总投入
+    blind_gift_scope = db.Column(db.NUMERIC(10, 2), nullable=False) #盲盒的盈亏
+    first_uid = db.Column(db.Integer, nullable=False) #当月投喂礼物价值最高的用户ID
+    first_name = db.Column(db.String(50), nullable=False) #当月投喂礼物价值最高的用户昵称
+    first_face = db.Column(db.String(500), nullable=False) #当月投喂礼物价值最高的用户头像
+    first_gift_total = db.Column(db.NUMERIC(10, 2), nullable=False) #榜首送出的礼物总价值
+    blind_first_uid = db.Column(db.Integer, nullable=False) #当月盲盒盈亏最高的用户ID
+    blind_first_name = db.Column(db.String(50), nullable=False) #当月盲盒盈亏最高的用户昵称
+    blind_first_face = db.Column(db.String(500), nullable=False) #当月盲盒盈亏最高的用户头像
+    blind_first_scope = db.Column(db.NUMERIC(10, 2), nullable=False) #盲盒榜首的总盈亏
+    created_at = db.Column(db.DateTime, default=datetime.now)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'room_id': self.room_id,
+            'send_month': self.send_month,
+            'gift_total_num': self.gift_total_num,
+            'gift_total_coin': self.gift_total_coin,
+            'blind_gift_total': self.blind_gift_total,
+            'blind_gift_scope': self.blind_gift_scope,
+            'first_uid': self.first_uid,
+            'first_name': self.first_name,
+            'first_face': self.first_face,
+            'blind_first_uid': self.blind_first_uid,
+            'blind_first_name': self.blind_first_name,
+            'blind_first_face': self.blind_first_face,
             'created_at': self.created_at.isoformat() if self.created_at else None
         }

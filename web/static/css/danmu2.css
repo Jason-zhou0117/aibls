@@ -51,6 +51,42 @@ body {
             display: none;
         }
 
+        .column-header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.stat-icon-btn {
+    background: rgba(255,255,255,0.15);
+    border: none;
+    color: #FF9800;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+}
+
+.stat-icon-btn:hover {
+    background: rgba(255,255,255,0.3);
+    transform: scale(1.05);
+    color: #FFD700;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+    .stat-icon-btn {
+        width: 24px;
+        height: 24px;
+        font-size: 12px;
+    }
+}
+
         .column-header {
             flex-shrink: 0;
             padding: 12px 15px;

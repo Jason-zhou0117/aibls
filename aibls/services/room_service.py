@@ -2,7 +2,8 @@ from bilibili_api import Credential
 from flask import current_app
 
 from aibls.models.database import db, RoomInfo
-from aibls.services import bili_live_service,bili_user_service
+from aibls.services.bili_live_service import bili_live_service
+from aibls.services.bili_user_service import bili_user_service
 
 
 class RoomService:
@@ -55,6 +56,14 @@ class RoomService:
     def get_default_room():
         """获取默认房间"""
         room_data = RoomInfo.query.filter_by(is_default='1').first()
+        if room_data is None:
+            return None
+        return room_data.to_dict()
+
+    @staticmethod
+    def get_room_data(room_id):
+        """获取默认房间"""
+        room_data = RoomInfo.query.filter_by(id=room_id).first()
         if room_data is None:
             return None
         return room_data.to_dict()

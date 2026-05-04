@@ -79,8 +79,8 @@ danmuJs.connect_socket = function () {
 danmuJs.addDanmaku = function(data) {
     const container = document.getElementById('danmaku_messages');
     const div_time = '<div class="message-time">' + (data.time || new Date().toLocaleTimeString()) + '</div>';
-    const div_username = '<div><span class="message-user">' + danmuJs.escapeHtml(data.uname) +':</span></div>';
-    const div_msg = '<div class="message-content">' + danmuJs.escapeHtml(data.msg)+'</div>';
+    const div_username = '<div><span class="message-user">' + danmuJs.escapeHtml(data.sender_name) +':</span></div>';
+    const div_msg = '<div class="message-content">' + danmuJs.escapeHtml(data.message)+'</div>';
     const msgDiv = danmuJs.createMessageDiv('danmaku', div_time + div_username + div_msg);
     container.appendChild(msgDiv);
     danmuJs.scrollToBottom(container);
@@ -120,10 +120,10 @@ danmuJs.addGuard = function(data) {
 /**添加醒目消息消息**/
 danmuJs.addSuperChat = function(data) {
 
-    const container = document.getElementById('gift_messages');
+    const container = document.getElementById('danmaku_messages');
 
     const div_time = '<div class="message-time">' + (data.time || new Date().toLocaleTimeString()) + '</div>';
-    const div_username = '<div><span class="message-user">✨ ' + danmuJs.escapeHtml(data.uname) +':</span></div>';
+    const div_username = '<div><span class="message-user">✨ ' + danmuJs.escapeHtml(data.sender_name) +':</span></div>';
     const div_msg = '<div class="message-content">💰' + danmuJs.escapeHtml(data.message) + '</div>';
     const msgDiv = danmuJs.createMessageDiv('super-chat', div_time + div_username + div_msg);
 

@@ -33,3 +33,10 @@ headJs.openPlayer = function(){
 headJs.openGiftConfig = function(){
     window.open('/gift_config');
 }
+
+/*
+去配置
+*/
+headJs.openGiftStat= function(){
+    window.open('/gift_stat');
+}

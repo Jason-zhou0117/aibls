@@ -35,7 +35,7 @@ from aibls import (
     db
 )
 from aibls.settings import APP_ROOT, IS_EMBEDDED, DEBUG_MODE, STATIC_DIR, TEMPLATE_DIR
-from aibls.views import user_api, room_api, live_api, vip_api,gift_api
+from aibls.views import user_api, room_api, live_api, vip_api, gift_api, stat_api
 
 # 切换到项目根目录
 os.chdir(APP_ROOT)
@@ -78,6 +78,7 @@ def register_blueprint(app: Flask):
     app.register_blueprint(live_api)
     app.register_blueprint(vip_api)
     app.register_blueprint(gift_api)
+    app.register_blueprint(stat_api)
 
     print_registered_routes(app)
 

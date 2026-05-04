@@ -70,8 +70,14 @@
         <div class="column column-gift" id="column_gift">
             <div class="column-header" onclick="danmuJs.toggleColumn('gift')">
                 <span>🎁 礼物 / 上舰</span>
-                <span class="count" id="gift_count">0</span>
-                <button class="collapse-btn" onclick="event.stopPropagation(); danmuJs.toggleColumn('gift')">◀</button>
+                <div class="column-header-right">
+                    <button class="stat-icon-btn" onclick="event.stopPropagation(); headJs.openGiftStat()" title="礼物统计">
+                        📊
+                    </button>
+                    <span class="count" id="gift_count">0</span>
+                    <button class="collapse-btn" onclick="event.stopPropagation(); danmuJs.toggleColumn('gift')">◀
+                    </button>
+                </div>
             </div>
             <div id="gift_messages" class="messages-container"></div>
         </div>

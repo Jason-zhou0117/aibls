@@ -1,0 +1,133 @@
+{
+  'room_display_id': 26172108,
+  'room_real_id': 26172108,
+  'type': 'SUPER_CHAT_MESSAGE',
+  'data': {
+    'cmd': 'SUPER_CHAT_MESSAGE',
+    'data': {
+      'background_bottom_color': '#2A60B2',
+      'background_color': '#EDF5FF',
+      'background_color_end': '#405D85',
+      'background_color_start': '#3171D2',
+      'background_icon': '',
+      'background_image': '',
+      'background_price_color': '#7497CD',
+      'color_point': 0.7,
+      'dmscore': 1176,
+      'end_time': 1777874521,
+      'gift': {
+        'gift_id': 12000,
+        'gift_name': '醒目留言',
+        'num': 1
+      },
+      'group_medal': {
+        'is_lighted': 0,
+        'medal_id': 0,
+        'name': ''
+      },
+      'id': 15747401,
+      'is_mystery': False,
+      'is_ranked': 0,
+      'is_send_audit': 0,
+      'medal_info': {
+        'anchor_roomid': 32529204,
+        'anchor_uname': '妮妮-520二周年庆',
+        'guard_level': 2,
+        'icon_id': 0,
+        'is_lighted': 1,
+        'medal_color': '#ff610b',
+        'medal_color_border': 16771156,
+        'medal_color_end': 16765060,
+        'medal_color_start': 16736523,
+        'medal_level': 55,
+        'medal_name': 'NiNi21',
+        'special': '',
+        'target_id': 3493258770515986
+      },
+      'message': '小金鱼，锁骨好',
+      'message_font_color': '#A3F6FF',
+      'message_trans': '',
+      'price': 30,
+      'rate': 1000,
+      'start_time': 1777874461,
+      'time': 60,
+      'token': '938E8530',
+      'trans_mark': 0,
+      'ts': 1777874461,
+      'uid': 651952808,
+      'uinfo': {
+        'base': {
+          'face': 'https://i2.hdslb.com/bfs/face/eda659f1c67814d644b1dbfbb3c2ed05d2fd9c8d.jpg',
+          'is_mystery': False,
+          'name': '军184',
+          'name_color': 0,
+          'name_color_str': '#666666',
+          'official_info': {
+            'desc': '',
+            'role': 0,
+            'title': '',
+            'type': -1
+          },
+          'origin_info': {
+            'face': 'https://i2.hdslb.com/bfs/face/eda659f1c67814d644b1dbfbb3c2ed05d2fd9c8d.jpg',
+            'name': '军184'
+          },
+          'risk_ctrl_info': None
+        },
+        'guard': {
+          'expired_str': '',
+          'level': 0
+        },
+        'guard_leader': None,
+        'medal': {
+          'color': 16736523,
+          'color_border': 16771156,
+          'color_end': 16765060,
+          'color_start': 16736523,
+          'guard_icon': 'https://i0.hdslb.com/bfs/live/62ac06fd72b05fe22be26426b9e1a8e1fc2c6b89.png',
+          'guard_level': 2,
+          'honor_icon': '',
+          'id': 0,
+          'is_light': 1,
+          'level': 55,
+          'name': 'NiNi21',
+          'ruid': 3493258770515986,
+          'score': 11141692,
+          'typ': 0,
+          'user_receive_count': 0,
+          'v2_medal_color_border': '#F18087',
+          'v2_medal_color_end': '#EC4F6E99',
+          'v2_medal_color_level': '#EC4F6EE6',
+          'v2_medal_color_start': '#EC4F6E99',
+          'v2_medal_color_text': '#FFFFFF'
+        },
+        'title': {
+          'old_title_css_id': '',
+          'title_css_id': ''
+        },
+        'uhead_frame': None,
+        'uid': 651952808,
+        'wealth': None
+      },
+      'user_info': {
+        'face': 'https://i2.hdslb.com/bfs/face/eda659f1c67814d644b1dbfbb3c2ed05d2fd9c8d.jpg',
+        'face_frame': '',
+        'guard_level': 0,
+        'is_main_vip': 1,
+        'is_svip': 0,
+        'is_vip': 0,
+        'level_color': '#ff9f3d',
+        'manager': 0,
+        'name_color': '#666666',
+        'title': '',
+        'uname': '军184',
+        'user_level': 52
+      }
+    },
+    'is_report': True,
+    'msg_id': '93659417982065152:1000:1000',
+    'p_is_ack': True,
+    'p_msg_type': 1,
+    'send_time': 1777874461419
+  }
+}

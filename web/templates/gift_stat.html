@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>礼物统计 - BiliMon</title>
+    <meta name="referrer" content="no-referrer">
+    <link rel="stylesheet" href="/static/css/gift_stat.css">
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">
+                <span class="logo-icon">🎬</span>
+                <span>BiliMon</span>
+            </div>
+            <div class="header-buttons">
+                <a href="/vip_config" class="header-btn">
+                    <span>👑</span> VIP入场
+                </a>
+                <div class="user-info" id="userInfo"  onclick="headJs.openLogin()">
+                    <div class="user-avatar" id="userAvatar"><img src="{{user_face|default('👤')}}" alt="头像"/></div>
+                    <span class="user-name" id="userName">{{ nick_name|default('未登录') }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <!-- 月份选择栏 -->
+        <div class="month-bar">
+            <div class="month-selector">
+                <span class="month-label">选择月份：</span>
+                <select class="month-select" id="monthSelect">
+                    <option value="">加载中...</option>
+                </select>
+            </div>
+            <button class="refresh-btn" id="refreshBtn">🔄 刷新数据</button>
+        </div>
+
+        <!-- 顶部4个卡片区域 -->
+        <div class="stats-cards">
+            <!-- 区域1：礼物统计 -->
+            <div class="stat-card">
+                <div class="stat-card-title">🎁 礼物统计</div>
+                <div class="stat-card-value" id="giftTotalNum">0</div>
+                <div class="stat-card-unit">总数量</div>
+                <div class="stat-card-value" id="giftTotalCny">¥0.00</div>
+                <div class="stat-card-unit">总价值</div>
+            </div>
+
+            <!-- 区域2：盲盒统计 -->
+            <div class="stat-card">
+                <div class="stat-card-title">🎲 盲盒统计</div>
+                <div class="stat-card-value" id="blindGiftNum">0</div>
+                <div class="stat-card-unit">总数量</div>
+                <div class="stat-card-value" id="blindGiftTotal">¥0.00</div>
+                <div class="stat-card-unit">总投入</div>
+                <div class="stat-card-value" id="blindGiftScope">¥0.00</div>
+                <div class="stat-card-unit">总盈亏</div>
+            </div>
+
+            <!-- 区域3：投喂榜首 -->
+            <div class="stat-card">
+                <div class="stat-card-title">🏆 投喂榜首</div>
+                <div id="firstUserInfo">
+                    <div class="no-user-tip">暂无数据</div>
+                </div>
+            </div>
+
+            <!-- 区域4：盲盒盈亏榜首 -->
+            <div class="stat-card">
+                <div class="stat-card-title">🎯 盲盒盈亏榜首</div>
+                <div id="blindFirstUserInfo">
+                    <div class="no-user-tip">暂无数据</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 下部双列表：盲盒列表 + 用户排名 -->
+        <div class="bottom-section">
+            <!-- 左侧：盲盒分组列表 -->
+            <div class="blind-list-panel">
+                <div class="panel-header">
+                    <span class="panel-title">📦 盲盒分组 <span class="count" id="blindCount"></span></span>
+                </div>
+                <div class="blind-list" id="blindBoxList">
+                    <div class="empty-tip">加载中...</div>
+                </div>
+            </div>
+
+            <!-- 右侧：用户投喂排名 -->
+            <div class="rank-list-panel">
+                <div class="panel-header">
+                    <span class="panel-title">👥 用户投喂排名 <span class="count" id="rankCount"></span></span>
+                </div>
+                <div class="rank-list" id="userRankList">
+                    <div class="empty-tip">请先选择盲盒</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/gift_stat.js"></script>
+</body>
+</html>

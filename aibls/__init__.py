@@ -17,7 +17,7 @@ from .config import get_app_config
 from .stock_io import socketio, message_queue
 from .db_init import init_db
 from .models import db, VIPUser, UserVideo,GiftInfo,GiftVideo,LoginCookie
-from .views import user_api,room_api,live_api,vip_api,gift_api
+from .views import user_api,room_api,live_api,vip_api,gift_api,stat_api
 from .services import bili_user_service,bili_live_service,vip_service,gift_service
 
 __all__ = [
@@ -43,6 +43,7 @@ __all__ = [
     'live_api',
     'vip_api',
     'gift_api',
+    'stat_api',
     'bili_user_service'  ,
     'bili_live_service'  ,
     'vip_service',

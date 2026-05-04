@@ -1,0 +1,146 @@
+{
+  'room_display_id': 1871517879,
+  'room_real_id': 1871517879,
+  'type': 'DANMU_MSG',
+  'data': {
+    'cmd': 'DANMU_MSG',
+    'dm_v2': '',
+    'info': [
+      [
+        0,
+        1,
+        25,
+        16777215,
+        1777890919731,
+        323515279,
+        0,
+        'fb519ef7',
+        0,
+        0,
+        0,
+        '',
+        0,
+        '{}',
+        '{}',
+        {
+          'extra': '{"send_from_me":false,"master_player_hidden":false,"mode":0,"color":16777215,"dm_type":0,"font_size":25,"player_mode":1,"show_player_type":0,"content":"[热][热][热]","user_hash":"4216430327","emoticon_unique":"","bulge_display":0,"recommend_score":1,"dm_score":0,"chronos_force_display":0,"main_state_dm_color":"","objective_state_dm_color":"","direction":0,"pk_direction":0,"quartet_direction":0,"anniversary_crowd":0,"yeah_space_type":"","yeah_space_url":"","jump_to_url":"","space_type":"","space_url":"","animation":{},"emots":{"[热]":{"count":3,"descript":"[热]","emoji":"[热]","emoticon_id":278,"emoticon_unique":"emoji_278","height":20,"url":"http://i0.hdslb.com/bfs/live/6df760280b17a6cbac8c1874d357298f982ba4cf.png","width":20}},"is_audited":false,"id_str":"0923bb1656d86d6170862ac92369f8763156","icon":null,"show_reply":true,"reply_mid":476624650,"reply_uname":"戒女团别薅已吃草","reply_uname_color":"#FB7299","reply_is_mystery":false,"reply_type_enum":1,"hit_combo":0,"esports_jump_url":"","is_mirror":false,"is_collaboration_member":false,"card":{"card_type":0,"oid_str":"","oid_str_1":"","origin_oid_str":"","share_id":"","share_origin":"","from":"","card_content":null},"voice":null,"background_type":0}',
+          'mode': 0,
+          'show_player_type': 0,
+          'user': {
+            'base': {
+              'face': 'https://i0.hdslb.com/bfs/face/6eb26d0be84cb0efcdf6148b336988390e44e84a.jpg',
+              'is_mystery': False,
+              'name': 'Goat小葵',
+              'name_color': 0,
+              'name_color_str': '',
+              'official_info': {
+                'desc': '',
+                'role': 0,
+                'title': '',
+                'type': -1
+              },
+              'origin_info': {
+                'face': 'https://i0.hdslb.com/bfs/face/6eb26d0be84cb0efcdf6148b336988390e44e84a.jpg',
+                'name': 'Goat小葵'
+              },
+              'risk_ctrl_info': None
+            },
+            'guard': None,
+            'guard_leader': {
+              'is_guard_leader': False
+            },
+            'medal': {
+              'color': 398668,
+              'color_border': 398668,
+              'color_end': 6850801,
+              'color_start': 398668,
+              'guard_icon': '',
+              'guard_level': 0,
+              'honor_icon': '',
+              'id': 6777142,
+              'is_light': 1,
+              'level': 26,
+              'name': '玫瑰舞',
+              'ruid': 3546926748273001,
+              'score': 11239,
+              'typ': 0,
+              'user_receive_count': 0,
+              'v2_medal_color_border': '#3FB4F699',
+              'v2_medal_color_end': '#3FB4F699',
+              'v2_medal_color_level': '#3FB4F6E6',
+              'v2_medal_color_start': '#3FB4F699',
+              'v2_medal_color_text': '#FFFFFF'
+            },
+            'title': {
+              'old_title_css_id': '',
+              'title_css_id': ''
+            },
+            'uhead_frame': None,
+            'uid': 3546934105082634,
+            'wealth': None
+          }
+        },
+        {
+          'activity_identity': '',
+          'activity_source': 0,
+          'not_show': 0
+        },
+        0
+      ],
+      '[热][热][热]',
+      [
+        3546934105082634,
+        'Goat小葵',
+        1,
+        0,
+        0,
+        10000,
+        1,
+        ''
+      ],
+      [
+        26,
+        '玫瑰舞',
+        'XHA春日玫瑰',
+        1871517879,
+        398668,
+        '',
+        0,
+        398668,
+        398668,
+        6850801,
+        0,
+        1,
+        3546926748273001
+      ],
+      [
+        16,
+        0,
+        6406234,
+        '>50000',
+        0
+      ],
+      [
+        '',
+        ''
+      ],
+      0,
+      0,
+      None,
+      {
+        'ct': '681229A5',
+        'ts': 1777890919
+      },
+      0,
+      0,
+      None,
+      None,
+      0,
+      504,
+      [
+        29
+      ],
+      None
+    ]
+  }
+}

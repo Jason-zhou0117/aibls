@@ -33,19 +33,16 @@ class SendGiftService:
                 receiver_name = send_gift.get('receiver_name'),
                 receiver_face = send_gift.get('receiver_face'),
                 gift_id = send_gift.get('gift_id'),
+                gift_type = send_gift.get('gift_type'),
                 gift_name = send_gift.get('gift_name'),
                 gift_num = send_gift.get('gift_num'),
                 gift_price_origin = send_gift.get('price'),
                 gift_total_coin = send_gift.get('total_coin'),
-                gift_total_gold = send_gift.get('total_coin') / 100,
-                gift_total_cny = send_gift.get('total_coin') / 1000,
                 blind_gift_id = send_gift.get('blind_gift_id'),
                 blind_gift_name = send_gift.get('blind_gift_name'),
                 blind_gift_price = send_gift.get('blind_gift_price'),
                 blind_gift_total = send_gift.get('blind_gift_total'),
-                total_scope = send_gift.get('total_scope'),
-                total_scope_gold = send_gift.get('total_scope') / 100,
-                total_scope_cny = send_gift.get('total_scope') / 1000
+                total_scope = send_gift.get('total_scope')
             )
 
             db.session.add(send_gift_data)
