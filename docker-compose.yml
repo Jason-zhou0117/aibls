@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  bilimon:
+    build: .
+    container_name: bilimon
+    restart: always
+    network_mode: host
+    volumes:
+      - ./logs:/app/logs
+      - ./bili_mon.db:/app/bili_mon.db
+      - ./video:/app/video
+    environment:
+      - DOCKER_ENV=true
+      - PORT=5001
+      - TZ=Asia/Shanghai

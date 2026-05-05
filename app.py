@@ -6,17 +6,9 @@ BiliMon 弹幕监控系统 - 主入口
 
 import os
 import sys
-# ==================== 环境初始化 ====================
-
-# 将当前目录添加到 Python 路径
-current_dir = os.path.dirname(os.path.abspath(__file__))
-if current_dir not in sys.path:
-    sys.path.insert(0, current_dir)
-
-
-
 import logging
 import time
+import threading
 from logging.handlers import RotatingFileHandler
 
 from flask import Flask, jsonify
@@ -24,7 +16,6 @@ from flask_session import Session
 
 from aibls.generator_manager import init_generator, stop_generator
 from aibls.services.message_consumer import MessageConsumer
-
 
 # 从 aibls 包导入
 from aibls import (
@@ -34,11 +25,28 @@ from aibls import (
     message_queue,
     db
 )
-from aibls.settings import APP_ROOT, IS_EMBEDDED, DEBUG_MODE, STATIC_DIR, TEMPLATE_DIR
+from aibls.settings import (
+    APP_ROOT,
+    IS_EMBEDDED,
+    IN_DOCKER,
+    DEBUG_MODE,
+    STATIC_DIR,
+    TEMPLATE_DIR,
+    LOG_DIR
+)
 from aibls.views import user_api, room_api, live_api, vip_api, gift_api, stat_api
 
+# ==================== 环境初始化 ====================
+
+# 将当前目录添加到 Python 路径
+current_dir = os.path.dirname(os.path.abspath(__file__))
+if current_dir not in sys.path:
+    sys.path.insert(0, current_dir)
+
 # 切换到项目根目录
-os.chdir(APP_ROOT)
+if os.path.exists(APP_ROOT):
+    os.chdir(APP_ROOT)
+    print(f"[App] 切换工作目录到: {APP_ROOT}")
 
 
 # ==================== 创建应用 ====================
@@ -53,21 +61,20 @@ def create_app():
     app_config = get_app_config()
     app.config.from_object(app_config)
     app.debug = DEBUG_MODE
-    #先初始化数据
-    init_db(app)  # 初始化数据库（只会执行一次建表）
-    #然后将Session指向数据库
+
+    # 初始化数据库（只会执行一次建表）
+    init_db(app)
+
+    # 将 Session 指向数据库
     app.config['SESSION_SQLALCHEMY'] = db
-    # 初始化扩展
+
+    # 初始化 Session 扩展
     Session(app)
 
     # 注册蓝图和日志
     register_blueprint(app)
     register_log(app)
 
-    #迁移数据
-    # with app.app_context():
-    #     from aibls.utils.migrate_json_to_db import migrate_json_to_db
-    #     migrate_json_to_db()
     return app
 
 
@@ -108,52 +115,67 @@ def register_log(app: Flask):
         datefmt='%Y-%m-%d %H:%M:%S'
     )
 
-    # 1. 文件处理器（记录 INFO 及以上级别）
-    str_day = time.strftime("%Y-%m-%d", time.localtime())
-    log_dir = os.path.join(APP_ROOT, 'logs')
-    os.makedirs(log_dir, exist_ok=True)
+    # 确保日志目录存在（Docker 中可能由卷挂载）
+    try:
+        os.makedirs(LOG_DIR, exist_ok=True)
+        log_writable = os.access(LOG_DIR, os.W_OK)
+    except Exception as e:
+        log_writable = False
+        print(f"[App] 日志目录创建失败: {e}")
 
-    file_handler = RotatingFileHandler(
-        os.path.join(log_dir, f'log-{str_day}.log'),
-        maxBytes=10 * 1024 * 1024,
-        backupCount=10,
-        encoding='utf-8'
-    )
-    file_handler.setLevel(logging.INFO)  # 文件只记录 INFO 及以上
-    file_handler.setFormatter(formatter)
-    app.logger.addHandler(file_handler)
+    if log_writable:
+        # 1. 文件处理器（记录 INFO 及以上级别）
+        str_day = time.strftime("%Y-%m-%d", time.localtime())
+        file_handler = RotatingFileHandler(
+            os.path.join(LOG_DIR, f'log-{str_day}.log'),
+            maxBytes=10 * 1024 * 1024,
+            backupCount=10,
+            encoding='utf-8'
+        )
+        file_handler.setLevel(logging.INFO)
+        file_handler.setFormatter(formatter)
+        app.logger.addHandler(file_handler)
 
-    # 2. 控制台处理器（记录 DEBUG 及以上级别，便于调试）
-    console_handler = logging.StreamHandler()
-    console_handler.setLevel(logging.DEBUG)  # 控制台记录所有
+        # 2. 错误文件处理器（单独记录错误）
+        error_handler = RotatingFileHandler(
+            os.path.join(LOG_DIR, f'error-{str_day}.log'),
+            maxBytes=10 * 1024 * 1024,
+            backupCount=5,
+            encoding='utf-8'
+        )
+        error_handler.setLevel(logging.ERROR)
+        error_handler.setFormatter(formatter)
+        app.logger.addHandler(error_handler)
+    else:
+        print(f"[App] 日志目录不可写，跳过文件日志: {LOG_DIR}")
+
+    # 3. 控制台处理器（所有环境都需要）
+    console_handler = logging.StreamHandler(sys.stdout)
+    console_handler.setLevel(logging.DEBUG)
     console_handler.setFormatter(formatter)
     app.logger.addHandler(console_handler)
 
-    # 3. 错误文件处理器（单独记录错误）
-    error_handler = RotatingFileHandler(
-        os.path.join(log_dir, f'error-{str_day}.log'),
-        maxBytes=10 * 1024 * 1024,
-        backupCount=5,
-        encoding='utf-8'
-    )
-    error_handler.setLevel(logging.ERROR)  # 只记录 ERROR 及以上
-    error_handler.setFormatter(formatter)
-    app.logger.addHandler(error_handler)
-
     app.logger.info("日志系统初始化完成")
+    if IN_DOCKER:
+        app.logger.info("运行环境: Docker")
+    elif IS_EMBEDDED:
+        app.logger.info("运行环境: Windows 嵌入式")
+    else:
+        app.logger.info("运行环境: 开发环境")
 
 
 # ==================== 初始化应用 ====================
 
 app = create_app()
-# ✅ 立即初始化 generator
+
+# 初始化 generator
 init_generator(app)
 
 # 初始化消费者并传入 app
 message_consumer = MessageConsumer(app)
-# ✅ 启动消费者线程
-import threading
-consumer_thread = threading.Thread(target=message_consumer.run, daemon=True)
+
+# 启动消费者线程
+consumer_thread = threading.Thread(target=message_consumer.run, daemon=True, name="MessageConsumer")
 consumer_thread.start()
 app.logger.info("消息消费者线程已启动")
 
@@ -166,6 +188,7 @@ socketio.init_app(app,
 
 
 # ==================== 路由 ====================
+
 @app.route('/debug/routes')
 def debug_routes():
     """调试路由 - 查看所有路由"""
@@ -183,32 +206,62 @@ def debug_routes():
     })
 
 
+@app.route('/health')
+def health_check():
+    """健康检查接口（用于 Docker 健康检查）"""
+    return jsonify({
+        'status': 'ok',
+        'environment': 'docker' if IN_DOCKER else ('embedded' if IS_EMBEDDED else 'development'),
+        'timestamp': time.strftime('%Y-%m-%d %H:%M:%S')
+    })
+
+
 # ==================== 启动入口 ====================
 
 if __name__ == "__main__":
     try:
-        PORT = 5001
+        # 端口配置（支持环境变量）
+        PORT = int(os.environ.get('PORT', 5001))
+        HOST = os.environ.get('HOST', '0.0.0.0')
+
         print("=" * 60)
-        print(f"运行环境: {'嵌入式运行' if IS_EMBEDDED else '开发环境'}")
+        if IN_DOCKER:
+            print("运行环境: Docker 容器")
+        elif IS_EMBEDDED:
+            print("运行环境: Windows 嵌入式运行")
+        else:
+            print("运行环境: 开发环境 (PyCharm)")
         print(f"项目目录: {APP_ROOT}")
         print(f"启动服务器...")
         print(f"队列大小: {message_queue.qsize()}")
         print("=" * 60)
-        print(f"访问地址: http://localhost:{PORT}")
+        print(f"访问地址: http://{HOST}:{PORT}")
+        if IN_DOCKER:
+            print(f"容器内地址: http://localhost:{PORT}")
         print("=" * 60)
 
         # 根据环境选择运行参数
-        if DEBUG_MODE:
+        if IN_DOCKER:
+            # Docker 环境：生产模式，禁用 debug
+            socketio.run(app,
+                         host=HOST,
+                         port=PORT,
+                         debug=False,
+                         allow_unsafe_werkzeug=True,
+                         use_reloader=False)
+        elif DEBUG_MODE:
             # 开发环境（PyCharm）
             socketio.run(app,
                          debug=True,
+                         host='127.0.0.1',
                          port=PORT,
                          use_reloader=False,
                          log_output=True)
         else:
-            # 生产环境（嵌入式）
+            # 生产环境（Windows 嵌入式）
             socketio.run(app,
                          debug=False,
+                         host='127.0.0.1',
                          port=PORT,
                          allow_unsafe_werkzeug=True,
                          use_reloader=False)

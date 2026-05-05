@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Windows 嵌入式 Python（Docker 中不需要）
+runtime/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# 日志
+logs/*.log
+
+# Git
+.git/
+.gitignore
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Windows 批处理文件
+*.bat
+启动*.bat
+停止*.bat
+
+# 其他临时文件
+get-pip.py
+install_deps.bat
+*.db-journal
+.env

@@ -120,6 +120,7 @@ class GiftStatService:
         gift_total_num = sum(r.gift_num for r in normal_records)
         gift_total_coin = sum(r.gift_total_coin for r in normal_records)
 
+        all_total_coin = gift_total_coin
         # 统计盲盒相关（只统计 blind_gift_id > 0 的记录，即从盲盒爆出的礼物）
         blind_records = [r for r in records if r.blind_gift_id > 0]
         blind_gift_num = sum(r.gift_num for r in blind_records if r.gift_num)
@@ -129,7 +130,7 @@ class GiftStatService:
 
         # 盲盒总盈亏：只统计 blind_gift_id > 0 的记录（即从盲盒爆出的礼物）
         blind_gift_scope = sum(r.total_scope for r in blind_records if r.total_scope)
-
+        all_total_coin = all_total_coin + blind_gift_total + blind_gift_scope
         # 统计上舰（gift_type = 100）
         guard_records = [r for r in records if r.gift_type == 100]
         guard_stats = {
@@ -142,12 +143,15 @@ class GiftStatService:
             if r.gift_id == 10001:  # 总督
                 guard_stats['governor']['count'] += r.gift_num
                 guard_stats['governor']['amount'] += r.gift_total_coin
+                all_total_coin = all_total_coin + r.gift_total_coin
             elif r.gift_id == 10002:  # 提督
                 guard_stats['lieutenant']['count'] += r.gift_num
                 guard_stats['lieutenant']['amount'] += r.gift_total_coin
+                all_total_coin = all_total_coin + r.gift_total_coin
             elif r.gift_id == 10003:  # 舰长
                 guard_stats['captain']['count'] += r.gift_num
                 guard_stats['captain']['amount'] += r.gift_total_coin
+                all_total_coin = all_total_coin + r.gift_total_coin
 
         # 找出投喂礼物价值最高的用户
         user_gift_total = {}
@@ -189,6 +193,7 @@ class GiftStatService:
         return {
             'gift_total_num': gift_total_num,
             'gift_total_coin': gift_total_coin,
+            'all_total_coin': all_total_coin,
             'blind_gift_num': blind_gift_num,
             'blind_gift_total': blind_gift_total,
             'blind_gift_scope': blind_gift_scope,
@@ -243,6 +248,7 @@ class GiftStatService:
             'room_id': room_id,
             'gift_total_num': stats['gift_total_num'],
             'gift_total_cny': GiftStatService.to_cny(stats['gift_total_coin']),
+            'all_total_coin': GiftStatService.to_cny(stats['all_total_coin']),
             'blind_gift_num': stats['blind_gift_num'],
             'blind_gift_total_cny': GiftStatService.to_cny(stats['blind_gift_total']),
             'blind_gift_scope_cny': GiftStatService.to_cny(stats['blind_gift_scope']),

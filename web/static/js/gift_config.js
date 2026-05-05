@@ -381,7 +381,7 @@ class GiftConfigManager {
         }
         if (profileName) profileName.textContent = gift.gift_name;
         if (profileId) profileId.textContent = `礼物ID: ${gift.gift_id}`;
-        if (profilePrice) profilePrice.textContent = `价格: ¥${this.formatPrice(gift.price_cny)} (${gift.price_gold} 金瓜子)`;
+        if (profilePrice) profilePrice.textContent = `价格: ¥${this.formatPrice(gift.price_cny)} (${gift.price_gold} 电池)`;
     }
 
     clearDetailPanel() {
@@ -454,8 +454,8 @@ class GiftConfigManager {
                     <input type="text" class="modal-input" id="giftNameInput" placeholder="请输入礼物名称">
                 </div>
                 <div class="modal-form-group">
-                    <label class="modal-label">礼物原价（金瓜子）</label>
-                    <input type="number" step="1" class="modal-input" id="priceOriginInput" placeholder="请输入礼物原价（金瓜子）">
+                    <label class="modal-label">礼物原价（电池）</label>
+                    <input type="number" step="1" class="modal-input" id="priceOriginInput" placeholder="请输入礼物原价（电池）">
                 </div>
                 <div class="modal-buttons">
                     <button class="modal-btn modal-btn-secondary" id="cancelBtn">取消</button>

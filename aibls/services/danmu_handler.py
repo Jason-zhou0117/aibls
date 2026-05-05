@@ -377,7 +377,7 @@ class AsyncMessageGenerator:
                     video_url = video.get("url", "")
                     video_path = video.get("path", "")
                     video_title = video.get("title", "")
-                    logger.info(f"礼物特效: {gift_name} (UID: {video_gift_id})，触发视频播放: {video.get('url', '')}")
+                    logger.info(f"上舰特效: {gift_name} (UID: {video_gift_id})，触发视频播放: {video.get('url', '')}")
 
                     video_command = {
                         "type": "video_command",  # 特殊类型，用于区分
@@ -388,6 +388,8 @@ class AsyncMessageGenerator:
                         "video_name": video_title,
                         "timestamp": datetime.now().isoformat()
                     }
+
+                    logger.info(f"上舰: {gift_name} 开通{guard_name}")
                     # 放入消息队列，由消费者推送到前端
                     self.message_queue.put(video_command)
 

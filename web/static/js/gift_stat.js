@@ -157,7 +157,7 @@ class GiftStatManager {
         // 顶部总金额
         const totalAmountEl = document.getElementById('totalAmount');
         if (totalAmountEl) {
-            totalAmountEl.innerHTML = `总金额：¥${this.formatPrice(data.gift_total_cny)}`;
+            totalAmountEl.innerHTML = `总金额：¥${this.formatPrice(data.all_total_coin)}`;
         }
 
         // 1. 普通礼物统计
