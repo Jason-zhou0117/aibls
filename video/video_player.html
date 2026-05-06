@@ -6,7 +6,6 @@
     <title>欢迎视频播放器 - 竖屏版</title>
     <link rel="icon" href="https://www.bilibili.com/favicon.ico">
     <link rel="stylesheet" href="video_player.css">
-    <script src="https://cdn.socket.io/4.5.1/socket.io.min.js"></script>
 </head>
 <body>
     <div class="video-container" id="videoContainer">
@@ -17,6 +16,9 @@
         </video>
     </div>
     <div class="status disconnected" id="status">⚫ 等待连接...</div>
+
+    <!-- 借鉴他的设计：用 object 控件监控服务状态，绕过 file:// 限制 -->
+    <object id="serviceMonitor" data="about:blank" type="text/plain" style="visibility: hidden; width: 0; height: 0;"></object>
 
     <script src="video_player.js"></script>
 </body>

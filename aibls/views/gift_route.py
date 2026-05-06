@@ -220,15 +220,15 @@ def upload_gift_video():
 
     original_name = secure_filename(file.filename)
     file_ext = file.filename.rsplit('.', 1)[1].lower()
-    new_filename = f"gift_{uuid.uuid4().hex[:12]}.{file_ext}"
+    # new_filename = f"gift_{uuid.uuid4().hex[:12]}.{file_ext}"
 
     # 确保目录存在
     os.makedirs(VIDEO_DIR, exist_ok=True)
-    save_path = os.path.join(VIDEO_DIR, new_filename)
+    save_path = os.path.join(VIDEO_DIR, file.filename)
+    if not os.path.exists(save_path):
+        file.save(save_path)
 
-    file.save(save_path)
-
-    video_url = f"/static/videos/{new_filename}"
+    video_url = f"/static/videos/{file.filename}"
     title = original_name.rsplit('.', 1)[0]
 
     return jsonify({

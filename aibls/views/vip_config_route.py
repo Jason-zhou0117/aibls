@@ -179,13 +179,14 @@ def upload_video():
     original_name = secure_filename(file.filename)
     logger.info(f"上传视频文件得文件名为={original_name}")
     file_ext = file.filename.rsplit('.', 1)[1].lower()
-    new_filename = f"{uuid.uuid4().hex[:12]}.{file_ext}"
-    save_path = VIPConfig.get_video_path(new_filename)
+    # new_filename = f"{uuid.uuid4().hex[:12]}.{file_ext}"
+    save_path = VIPConfig.get_video_path(file.filename)
 
-    file.save(str(save_path))
+    if not os.path.exists(save_path):
+        file.save(str(save_path))
 
     # 生成访问URL
-    video_url = f"/static/videos/{new_filename}"
+    video_url = f"/static/videos/{file.filename}"
 
     return jsonify({
         'code': 0,
