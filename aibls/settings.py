@@ -46,7 +46,8 @@ else:
 # 子目录路径
 STATIC_DIR = os.path.join(APP_ROOT, 'web', 'static')
 TEMPLATE_DIR = os.path.join(APP_ROOT, 'web', 'templates')
-VIDEO_DIR = os.path.join(APP_ROOT, 'video')        # 视频文件目录（Docker 中挂载）
+VIDEO_DIR = os.path.join(APP_ROOT, 'web', 'static', 'videos')
+# VIDEO_DIR = os.path.join(STATIC_DIR, 'video')        # 视频文件目录（Docker 中挂载）
 LOG_DIR = os.path.join(APP_ROOT, 'logs')
 
 # 兼容旧版视频目录（如果 video 目录不存在，尝试使用 web/static/videos）
