@@ -133,6 +133,19 @@ class LogoffService:
             return None, str(e)
 
     @staticmethod
+    def update_logoff(id_key,room_id:int,start_time:str,end_time:str):
+        """更新挂机房间"""
+        logoff:LogOffRoom = LogOffRoom.query.filter_by(id=id_key).first()
+        if not logoff:
+            return False, "挂机房间不存在"
+        logoff.start_time = time.fromisoformat(start_time)
+        logoff.end_time = time.fromisoformat(end_time)
+        logoff.room_id = room_id
+        db.session.commit()
+
+        return logoff.to_dict(), None
+
+    @staticmethod
     def delete_logoff(id_key):
         """删除挂机房间"""
         logoff = LogOffRoom.query.filter_by(id=id_key).first()

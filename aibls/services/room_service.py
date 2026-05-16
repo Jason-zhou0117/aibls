@@ -80,4 +80,14 @@ class RoomService:
         rooms = RoomInfo.query.all()
         return [r.to_list_dict() for r in rooms]
 
+    @staticmethod
+    def delete_room(room_id):
+        """获取默认房间"""
+        room_data = RoomInfo.query.filter_by(id=room_id).first()
+        if room_data is None:
+            return None
+        db.session.delete(room_data)
+        db.session.commit()
+        return True, "删除成功"
+
 room_service = RoomService()

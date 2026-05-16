@@ -313,41 +313,447 @@ danmuJs.applyFilter = function () {
     });
 }
 
+// danmu.js - 添加弹框相关方法和重写 changeRoom
 
-danmuJs.changeRoom = function (){
-    let room_id = prompt('请输入房间号：');
-    // 取消处理
-    if (room_id === null) {
-//        showMessage('已取消输入', false);
+// 在 danmuJs 对象中添加以下属性和方法
+
+danmuJs.modalOverlay = null;  // 弹框遮罩层引用
+
+/**
+ * 创建弹框的 HTML 结构（动态生成）
+ */
+danmuJs.createModalHTML = function() {
+    // 检查是否已存在弹框
+    if (document.querySelector('.modal-overlay')) {
         return;
     }
-    if (room_id == ""){
-        alert("请输入房间号");
-        return
+
+    const modalHTML = `
+        <div class="modal-overlay" id="roomModal">
+            <div class="modal-container">
+                <div class="modal-header">
+                    <h3>切换直播间</h3>
+                    <button class="modal-close" id="modalCloseBtn">✕</button>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-search">
+                        <input type="text" id="roomSearchInput" placeholder="🔍 搜索房间号或主播名..." autocomplete="off">
+                    </div>
+
+                    <div class="modal-section">
+                        <div class="modal-section-title">已保存的房间</div>
+                        <div class="room-list-container" id="roomListContainer">
+                            <div class="room-list-empty">加载中...</div>
+                        </div>
+                    </div>
+
+                    <div class="modal-divider">
+                        <span>或</span>
+                    </div>
+
+                    <div class="modal-new-room">
+                        <input type="text" id="newRoomIdInput" placeholder="输入新房间号" autocomplete="off">
+                        <div class="modal-hint">例如：123456</div>
+                    </div>
+
+                    <div class="modal-error" id="modalErrorMsg"></div>
+
+                    <div class="modal-buttons">
+                        <button class="modal-btn modal-btn-cancel" id="modalCancelBtn">取消</button>
+                        <button class="modal-btn modal-btn-confirm" id="modalConfirmBtn">确认</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    danmuJs.modalOverlay = document.getElementById('roomModal');
+};
+
+/**
+ * 显示弹框
+ */
+danmuJs.showModal = async function() {
+    // 创建弹框（如果不存在）
+    danmuJs.createModalHTML();
+
+    // 加载房间列表
+    await danmuJs.loadRoomList();
+
+    // 显示弹框
+    danmuJs.modalOverlay.classList.add('active');
+
+    // 绑定事件
+    danmuJs.bindModalEvents();
+};
+
+/**
+ * 隐藏弹框
+ */
+danmuJs.hideModal = function() {
+    if (danmuJs.modalOverlay) {
+        danmuJs.modalOverlay.classList.remove('active');
+        // 清空输入框和错误提示
+        const newRoomInput = document.getElementById('newRoomIdInput');
+        const searchInput = document.getElementById('roomSearchInput');
+        const errorMsg = document.getElementById('modalErrorMsg');
+        if (newRoomInput) newRoomInput.value = '';
+        if (searchInput) searchInput.value = '';
+        if (errorMsg) errorMsg.classList.remove('show');
+        // 清空选中状态
+        danmuJs.selectedRoomId = null;
     }
-    formData = new FormData();
-    formData.append('room_id', room_id);
-    fetch('/api/update_room',{
-        method:"post",
-        body:formData,
-        headers:{}
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.code == 0){
-           location.reload();
+};
+
+/**
+ * 加载房间列表
+ */
+danmuJs.loadRoomList = async function() {
+    const container = document.getElementById('roomListContainer');
+    if (!container) return;
+
+    container.innerHTML = '<div class="room-list-empty">加载中...</div>';
+
+    try {
+        const response = await fetch('/api/searchrooms');
+        const data = await response.json();
+
+        if (data.code === 0 && data.rooms && data.rooms.length > 0) {
+            // 保存房间列表到全局
+            danmuJs.roomList = data.rooms;
+            // 获取当前房间号
+            danmuJs.currentRoomId = danmuJs.getCurrentRoomIdFromPage();
+            // 渲染列表
+            danmuJs.renderRoomList(danmuJs.roomList);
+        } else {
+            container.innerHTML = '<div class="room-list-empty">暂无已保存的房间</div>';
         }
-        else{
-            alert(data.message);
-        }
-    })
-    .catch(error => console.error('Error:', error))
-    .finally(() => {
+    } catch (error) {
+        console.error('加载房间列表失败:', error);
+        container.innerHTML = '<div class="room-list-empty">加载失败，请重试</div>';
+    }
+};
+
+/**
+ * 从页面获取当前房间号
+ */
+danmuJs.getCurrentRoomIdFromPage = function() {
+    const roomIdSpan = document.getElementById('room_id_display');
+    if (roomIdSpan) {
+        const text = roomIdSpan.innerText;
+        const match = text.match(/\[(\d+)\]/);
+        return match ? parseInt(match[1]) : null;
+    }
+    return null;
+};
+
+/**
+ * 渲染房间列表（带删除按钮）
+ */
+danmuJs.renderRoomList = function(rooms) {
+    const container = document.getElementById('roomListContainer');
+    if (!container) return;
+
+    if (!rooms || rooms.length === 0) {
+        container.innerHTML = '<div class="room-list-empty">暂无已保存的房间</div>';
+        return;
+    }
+
+    let html = '';
+    rooms.forEach(room => {
+        const roomId = room.room_id || room.id;
+        const ownerName = room.owner_name || room.title || '未知主播';
+        const isDefault = room.is_default === '1' || roomId === danmuJs.currentRoomId;
+        const selectedClass = (danmuJs.selectedRoomId === roomId) ? 'selected' : '';
+
+        // 当前房间不显示删除按钮，或者显示禁用状态的删除按钮
+        const deleteBtnHtml = isDefault
+            ? '<button class="room-delete-btn disabled" disabled title="不能删除当前房间">🚫</button>'
+            : '<button class="room-delete-btn" data-room-id="' + roomId + '" title="删除房间">🗑️</button>';
+
+        html += `
+            <div class="room-option ${selectedClass}" data-room-id="${roomId}" data-room-name="${ownerName}">
+                <div class="room-option-radio"></div>
+                <div class="room-option-info">
+                    <div class="room-option-id">房间 ${roomId}</div>
+                    <div class="room-option-name">${danmuJs.escapeHtml(ownerName)}</div>
+                </div>
+                ${isDefault ? '<span class="room-option-current">当前</span>' : ''}
+                ${deleteBtnHtml}
+            </div>
+        `;
     });
-}
 
+    container.innerHTML = html;
 
+    // 绑定点击选择事件
+    container.querySelectorAll('.room-option').forEach(option => {
+        option.addEventListener('click', (e) => {
+            // 防止点击删除按钮时触发选中
+            if (e.target.classList.contains('room-delete-btn')) {
+                return;
+            }
+            const roomId = parseInt(option.dataset.roomId);
+            danmuJs.selectRoom(roomId);
+        });
+    });
 
+    // 绑定删除按钮事件（仅对非禁用按钮）
+    container.querySelectorAll('.room-delete-btn:not(.disabled)').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const roomId = btn.dataset.roomId;
+            await danmuJs.deleteRoom(roomId);
+        });
+    });
+};
+
+/**
+ * 删除房间
+ */
+danmuJs.deleteRoom = async function(roomId) {
+    // 检查是否为当前房间
+    if (roomId == danmuJs.currentRoomId) {
+        danmuJs.showModalError('不能删除当前正在使用的房间，请先切换到其他房间');
+        return;
+    }
+
+    // 确认删除
+    if (!confirm(`确定要删除房间 ${roomId} 吗？\n删除后该房间将从列表中移除。`)) {
+        return;
+    }
+
+    // 显示删除中状态
+    const btn = document.querySelector(`.room-delete-btn[data-room-id="${roomId}"]`);
+    const originalText = btn ? btn.innerHTML : '🗑️';
+    if (btn) {
+        btn.innerHTML = '⏳';
+        btn.disabled = true;
+    }
+
+    try {
+        const response = await fetch(`/api/room/${roomId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        const data = await response.json();
+
+        if (data.code === 0) {
+            // 删除成功，刷新房间列表
+            await danmuJs.loadRoomList();
+            // 清空选中状态
+            danmuJs.selectedRoomId = null;
+            // 清空错误提示
+            const errorMsg = document.getElementById('modalErrorMsg');
+            if (errorMsg) errorMsg.classList.remove('show');
+        } else {
+            danmuJs.showModalError(data.message || '删除失败，请重试');
+            if (btn) {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+    } catch (error) {
+        console.error('删除房间失败:', error);
+        danmuJs.showModalError('网络错误，请稍后重试');
+        if (btn) {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    }
+};
+
+/**
+ * 选中房间
+ */
+danmuJs.selectRoom = function(roomId) {
+    danmuJs.selectedRoomId = roomId;
+
+    // 更新样式
+    document.querySelectorAll('.room-option').forEach(option => {
+        const optRoomId = parseInt(option.dataset.roomId);
+        if (optRoomId === roomId) {
+            option.classList.add('selected');
+        } else {
+            option.classList.remove('selected');
+        }
+    });
+
+    // 清空新房间号输入框
+    const newRoomInput = document.getElementById('newRoomIdInput');
+    if (newRoomInput) newRoomInput.value = '';
+
+    // 清空错误提示
+    const errorMsg = document.getElementById('modalErrorMsg');
+    if (errorMsg) errorMsg.classList.remove('show');
+};
+
+/**
+ * 搜索过滤房间列表
+ */
+danmuJs.filterRoomList = function(keyword) {
+    if (!danmuJs.roomList) return;
+
+    if (!keyword.trim()) {
+        danmuJs.renderRoomList(danmuJs.roomList);
+        return;
+    }
+
+    const filtered = danmuJs.roomList.filter(room => {
+        const roomId = String(room.room_id || room.id);
+        const ownerName = (room.owner_name || room.title || '').toLowerCase();
+        const kw = keyword.toLowerCase();
+        return roomId.includes(kw) || ownerName.includes(kw);
+    });
+
+    danmuJs.renderRoomList(filtered);
+};
+
+/**
+ * 提交房间切换
+ */
+danmuJs.submitRoomChange = async function() {
+    let roomId = null;
+
+    // 1. 获取选中的房间或输入的新房间号
+    if (danmuJs.selectedRoomId) {
+        roomId = danmuJs.selectedRoomId;
+    } else {
+        const newRoomInput = document.getElementById('newRoomIdInput');
+        const newRoomId = newRoomInput ? newRoomInput.value.trim() : '';
+        if (newRoomId) {
+            roomId = parseInt(newRoomId);
+            if (isNaN(roomId)) {
+                danmuJs.showModalError('请输入数字房间号');
+                return;
+            }
+        }
+    }
+
+    if (!roomId) {
+        danmuJs.showModalError('请选择或输入房间号');
+        return;
+    }
+
+    // 2. 如果选择的房间就是当前房间，直接关闭
+    if (roomId === danmuJs.currentRoomId) {
+        danmuJs.hideModal();
+        return;
+    }
+
+    // 3. 显示加载状态
+    const confirmBtn = document.getElementById('modalConfirmBtn');
+    const originalText = confirmBtn ? confirmBtn.innerText : '确认';
+    if (confirmBtn) {
+        confirmBtn.innerText = '提交中...';
+        confirmBtn.disabled = true;
+    }
+
+    try {
+        const formData = new FormData();
+        formData.append('room_id', roomId);
+
+        const response = await fetch('/api/update_room', {
+            method: 'POST',
+            body: formData
+        });
+        const data = await response.json();
+
+        if (data.code === 0) {
+            // 刷新页面
+            location.reload();
+        } else {
+            danmuJs.showModalError(data.message || '切换失败，请重试');
+            if (confirmBtn) {
+                confirmBtn.innerText = originalText;
+                confirmBtn.disabled = false;
+            }
+        }
+    } catch (error) {
+        console.error('切换房间失败:', error);
+        danmuJs.showModalError('网络错误，请稍后重试');
+        if (confirmBtn) {
+            confirmBtn.innerText = originalText;
+            confirmBtn.disabled = false;
+        }
+    }
+};
+
+/**
+ * 显示弹框错误提示
+ */
+danmuJs.showModalError = function(message) {
+    const errorMsg = document.getElementById('modalErrorMsg');
+    if (errorMsg) {
+        errorMsg.innerText = message;
+        errorMsg.classList.add('show');
+    }
+};
+
+/**
+ * 绑定弹框事件
+ */
+danmuJs.bindModalEvents = function() {
+    // 关闭按钮
+    const closeBtn = document.getElementById('modalCloseBtn');
+    if (closeBtn) {
+        closeBtn.onclick = () => danmuJs.hideModal();
+    }
+
+    // 取消按钮
+    const cancelBtn = document.getElementById('modalCancelBtn');
+    if (cancelBtn) {
+        cancelBtn.onclick = () => danmuJs.hideModal();
+    }
+
+    // 确认按钮
+    const confirmBtn = document.getElementById('modalConfirmBtn');
+    if (confirmBtn) {
+        confirmBtn.onclick = () => danmuJs.submitRoomChange();
+    }
+
+    // 搜索输入
+    const searchInput = document.getElementById('roomSearchInput');
+    if (searchInput) {
+        searchInput.oninput = (e) => danmuJs.filterRoomList(e.target.value);
+    }
+
+    // 新房间号输入
+    const newRoomInput = document.getElementById('newRoomIdInput');
+    if (newRoomInput) {
+        newRoomInput.onfocus = () => {
+            // 清空选中状态
+            danmuJs.selectedRoomId = null;
+            document.querySelectorAll('.room-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+        };
+        newRoomInput.onkeypress = (e) => {
+            if (e.key === 'Enter') {
+                danmuJs.submitRoomChange();
+            }
+        };
+    }
+
+    // 点击遮罩层关闭
+    if (danmuJs.modalOverlay) {
+        danmuJs.modalOverlay.onclick = (e) => {
+            if (e.target === danmuJs.modalOverlay) {
+                danmuJs.hideModal();
+            }
+        };
+    }
+};
+
+/**
+ * 重写 changeRoom 方法 - 使用自定义弹框
+ */
+danmuJs.changeRoom = function() {
+    danmuJs.showModal();
+};
 
 
 

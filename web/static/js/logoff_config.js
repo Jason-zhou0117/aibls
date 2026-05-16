@@ -270,7 +270,7 @@ async function loadUserLogoffs(uid) {
     }
 }
 
-// 渲染挂机设定列表
+// 渲染挂机设定列表（添加编辑按钮）
 function renderLogoffList(logoffs) {
     const container = document.getElementById('logoffList');
     if (!container) return;
@@ -286,7 +286,7 @@ function renderLogoffList(logoffs) {
             `<div class="cover-placeholder">🎬</div>`;
 
         return `
-            <div class="logoff-item">
+            <div class="logoff-item" data-logoff-id="${logoff.id}">
                 <div class="logoff-cover">
                     ${coverHtml}
                 </div>
@@ -295,12 +295,161 @@ function renderLogoffList(logoffs) {
                     <div class="logoff-time">⏰ ${formatTime(logoff.start_time)} - ${formatTime(logoff.end_time)}</div>
                     <div class="logoff-roomid">房间号: ${logoff.room_id}</div>
                 </div>
-                <button class="logoff-delete" onclick="window.logoffConfig.deleteLogoff('${logoff.id}')" title="删除">🗑</button>
+                <div class="logoff-actions">
+                    <button class="logoff-edit" data-id="${logoff.id}" title="编辑">✏️</button>
+                    <button class="logoff-delete" data-id="${logoff.id}" title="删除">🗑️</button>
+                </div>
             </div>
         `;
     }).join('');
+
+    // 绑定编辑按钮事件
+    container.querySelectorAll('.logoff-edit').forEach(btn => {
+        btn.onclick = (e) => {
+            e.stopPropagation();
+            const logoffId = btn.dataset.id;
+            const logoff = logoffs.find(l => l.id == logoffId);
+            if (logoff) {
+                showEditLogoffModal(logoff);
+            }
+        };
+    });
+
+    // 绑定删除按钮事件
+    container.querySelectorAll('.logoff-delete').forEach(btn => {
+        btn.onclick = (e) => {
+            e.stopPropagation();
+            const logoffId = btn.dataset.id;
+            deleteLogoff(logoffId);
+        };
+    });
 }
 
+// 显示编辑挂机设定弹窗
+async function showEditLogoffModal(logoff) {
+    if (!currentUser) {
+        showMessage('请先选择用户', true);
+        return;
+    }
+
+    const rooms = await getRoomList();
+    if (rooms.length === 0) {
+        showMessage('暂无可用房间，请先在弹幕页面添加房间', true);
+        return;
+    }
+
+    // 提取时间（去掉秒数，只保留 HH:MM）
+    let startTime = logoff.start_time || '';
+    let endTime = logoff.end_time || '';
+    if (startTime && startTime.length > 5) {
+        startTime = startTime.substring(0, 5);
+    }
+    if (endTime && endTime.length > 5) {
+        endTime = endTime.substring(0, 5);
+    }
+
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = `
+        <div class="modal">
+            <div class="modal-title">✏️ 编辑挂机设定</div>
+            <div class="modal-form-group">
+                <label class="modal-label">选择房间</label>
+                <select class="modal-select" id="roomSelect">
+                    <option value="">请选择直播间</option>
+                    ${rooms.map(room => `
+                        <option value="${room.room_id}" ${room.room_id == logoff.room_id ? 'selected' : ''}>
+                            ${escapeHtml(room.owner_name || room.title)}（${room.room_id}）
+                        </option>
+                    `).join('')}
+                </select>
+            </div>
+            <div class="time-row">
+                <div class="modal-form-group">
+                    <label class="modal-label">开始时间</label>
+                    <input type="time" class="modal-input" id="startTime" value="${startTime}">
+                </div>
+                <span class="time-separator">—</span>
+                <div class="modal-form-group">
+                    <label class="modal-label">结束时间</label>
+                    <input type="time" class="modal-input" id="endTime" value="${endTime}">
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-secondary" id="cancelBtn">取消</button>
+                <button class="modal-btn modal-btn-primary" id="confirmBtn">确认修改</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+
+    const close = () => overlay.remove();
+
+    const confirmBtn = overlay.querySelector('#confirmBtn');
+    if (confirmBtn) {
+        confirmBtn.onclick = async () => {
+            const roomSelect = overlay.querySelector('#roomSelect');
+            const roomId = roomSelect ? roomSelect.value : '';
+            let startTimeVal = overlay.querySelector('#startTime') ? overlay.querySelector('#startTime').value : '';
+            let endTimeVal = overlay.querySelector('#endTime') ? overlay.querySelector('#endTime').value : '';
+
+            if (!roomId) {
+                showMessage('请选择房间', true);
+                return;
+            }
+            if (!startTimeVal || !endTimeVal) {
+                showMessage('请填写挂机时段', true);
+                return;
+            }
+
+            // 确保时间格式正确
+            if (startTimeVal && startTimeVal.length === 5) {
+                startTimeVal = startTimeVal + ':00';
+            }
+            if (endTimeVal && endTimeVal.length === 5) {
+                endTimeVal = endTimeVal + ':00';
+            }
+
+            console.log('编辑提交数据:', {
+                logoff_id: logoff.id,
+                room_id: parseInt(roomId),
+                start_time: startTimeVal,
+                end_time: endTimeVal
+            });
+
+            try {
+                const resp = await fetch(`/logoff_api/logoff/${logoff.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        room_id: parseInt(roomId),
+                        start_time: startTimeVal,
+                        end_time: endTimeVal
+                    })
+                });
+                const data = await resp.json();
+                console.log('编辑挂机设定返回:', data);
+
+                if (data.code === 0) {
+                    showMessage('修改成功');
+                    close();
+                    await loadUserLogoffs(currentUser.userid);
+                    await loadUserList();
+                } else {
+                    showMessage(data.message || '修改失败', true);
+                }
+            } catch (error) {
+                console.error('修改失败:', error);
+                showMessage('修改失败: ' + error.message, true);
+            }
+        };
+    }
+
+    const cancelBtn = overlay.querySelector('#cancelBtn');
+    if (cancelBtn) cancelBtn.onclick = close;
+
+    overlay.onclick = (e) => { if (e.target === overlay) close(); };
+}
 // 删除挂机设定
 async function deleteLogoff(logoffId) {
     if (!confirm('确定删除这个挂机设定吗？')) return;

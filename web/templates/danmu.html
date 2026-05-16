@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}" type="text/css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/head.css') }}" type="text/css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/danmu2.css') }}" type="text/css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modal.css') }}" type="text/css">
     <link rel="icon" href="{{ url_for('static', filename='images/bicon.png') }}">
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
     <script src="{{ url_for('static', filename='js/head.js') }}" ></script>
@@ -49,9 +50,6 @@
                 <button class="header-btn" id="config_btn" onclick="headJs.openConfig()">
                     <span class="btn-icon">⚙️️</span>
                     <span>配置</span>
-                </button>
-                <button class="header-btn" onclick="headJs.openLogOff()">
-                    <span>🎥</span> 挂机配置
                 </button>
                 <!-- 登录用户按钮/用户信息 -->
                 <div id="user_area">

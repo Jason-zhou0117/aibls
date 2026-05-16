@@ -19,6 +19,7 @@ from .db_init import init_db
 from .models import db, VIPUser, UserVideo,GiftInfo,GiftVideo,LoginCookie
 from .views import user_api,room_api,live_api,vip_api,gift_api,stat_api
 from .services import bili_user_service,bili_live_service,vip_service,gift_service
+from .scheduler import danmaku_scheduler
 
 __all__ = [
     'APP_ROOT',
@@ -47,5 +48,6 @@ __all__ = [
     'bili_user_service'  ,
     'bili_live_service'  ,
     'vip_service',
+    'danmaku_scheduler',
     'gift_service'           # 添加
 ]

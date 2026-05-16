@@ -14,7 +14,6 @@ from logging.handlers import RotatingFileHandler
 from flask import Flask, jsonify
 from flask_session import Session
 
-from aibls.scheduler import danmaku_scheduler
 
 # 将当前目录添加到 Python 路径
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -50,7 +49,7 @@ if os.path.exists(APP_ROOT):
 from aibls.views import user_api, room_api, live_api, vip_api, gift_api, stat_api, logoff_api
 from aibls.generator_manager import init_generator, stop_generator
 from aibls.services.message_consumer import MessageConsumer
-
+from aibls.scheduler import danmaku_scheduler
 # ==================== 创建应用 ====================
 
 def create_app():

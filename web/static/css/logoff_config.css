@@ -698,3 +698,31 @@ input:checked + .toggle-slider:before {
         width: 100%;
     }
 }
+
+/* 挂机设定卡片按钮区域 */
+.logoff-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.logoff-edit, .logoff-delete {
+    background: none;
+    border: none;
+    color: #aaa;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 8px;
+    border-radius: 6px;
+    transition: all 0.3s;
+}
+
+.logoff-edit:hover {
+    color: #4CAF50;
+    background: rgba(76, 175, 80, 0.1);
+}
+
+.logoff-delete:hover {
+    color: #f44336;
+    background: rgba(244, 67, 54, 0.1);
+}

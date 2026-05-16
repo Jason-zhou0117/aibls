@@ -47,6 +47,17 @@ def update_room():
         return jsonify({"code": -210001, "message": str(e)})
 
 
+
+@room_api.route('/api/room/<room_id>', methods=['DELETE'])
+@check_session_2api_decorator
+def delete_video(room_id):
+    """删除房间"""
+    success, message = room_service.delete_room(room_id)
+    if not success:
+        return jsonify({'code': -1, 'message': message})
+
+    return jsonify({'code': 0, 'message': message})
+
 @room_api.route("/api/searchrooms")
 @check_session_2api_decorator
 def search_room_list():

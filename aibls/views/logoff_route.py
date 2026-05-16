@@ -173,8 +173,8 @@ def delete_logoff_user(uid):
 
 @logoff_api.route('/logoff_api/users/<uid>', methods=['PUT'])
 @check_session_2api_decorator
-def update_vip_user(uid):
-    """更新VIP用户信息"""
+def update_logoff_user(uid):
+    """更新挂机用户信息"""
     data = request.get_json()
     login_user = session.get("login_user")
     credential = LoginCookie.dic_to_credential(login_user)
@@ -230,3 +230,19 @@ def delete_logoff(logoff_id):
         return jsonify({'code': -1, 'message': message})
 
     return jsonify({'code': 0, 'message': message})
+
+@logoff_api.route('/logoff_api/logoff/<logoff_id>', methods=['PUT'])
+@check_session_2api_decorator
+def update_logoff_room(logoff_id):
+    """更新挂机设定信息"""
+    data = request.get_json()
+    user, error = logoff_service.update_logoff(
+        id_key=logoff_id,
+        room_id=int(data.get('room_id')),
+        start_time=data.get('start_time'),
+        end_time=data.get('end_time')
+    )
+    if error:
+        return jsonify({'code': -1, 'message': error})
+
+    return jsonify({'code': 0, 'data': user, 'message': '更新成功'})
