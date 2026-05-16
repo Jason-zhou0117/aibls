@@ -138,7 +138,7 @@ class LogoffService:
         logoff:LogOffRoom = LogOffRoom.query.filter_by(id=id_key).first()
         if not logoff:
             return False, "挂机房间不存在"
-        if not room_id and room_id is not None:
+        if room_id is not None:
             logoff.start_time = time.fromisoformat(start_time)
             logoff.end_time = time.fromisoformat(end_time)
             logoff.room_id = room_id

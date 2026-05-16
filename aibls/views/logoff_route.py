@@ -237,9 +237,11 @@ def update_logoff_room(logoff_id):
     """更新挂机设定信息"""
     data = request.get_json()
     room_id = data.get('room_id')
-    print(f"更新状态{room_id}")
-    if not room_id and room_id is not None:
+    print(f"更新状态:{room_id}")
+    if room_id is not None:
+        print(f"更新状态:{room_id}")
         logoff, error = logoff_service.update_logoff(
+
             id_key=logoff_id,
             room_id=int(data.get('room_id')),
             start_time=data.get('start_time'),
