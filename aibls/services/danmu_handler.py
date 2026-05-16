@@ -153,7 +153,7 @@ class AsyncMessageGenerator:
             }
 
             # 调试输出
-            logger.info(f"弹幕-文字: {sender_name}: {msg} [粉丝牌: {medal_name} Lv.{medal_level}]")
+            logger.debug(f"弹幕-文字: {sender_name}: {msg} [粉丝牌: {medal_name} Lv.{medal_level}]")
 
             self.message_queue.put(danmu_data)
         except Exception as e:
@@ -181,7 +181,7 @@ class AsyncMessageGenerator:
             sender_base:dict = sender_uinfo.get("base")
             sender_name = sender_base.get("name")
             sender_face = sender_base.get("face")
-            logger.info(f"************礼物弹幕，送礼人:uid= {sender_uid},昵称={sender_name}")
+            logger.debug(f"************礼物弹幕，送礼人:uid= {sender_uid},昵称={sender_name}")
 
             #收礼物人信息
             room_id = self.room_id
@@ -190,7 +190,7 @@ class AsyncMessageGenerator:
             receiver_base: dict = receiver_info.get("base")
             receiver_name = receiver_base.get("name")
             receiver_face = receiver_base.get("face")
-            logger.info(f"************礼物弹幕，收礼人:房间号={room_id},uid= {receiver_uid},昵称={receiver_name}")
+            logger.debug(f"************礼物弹幕，收礼人:房间号={room_id},uid= {receiver_uid},昵称={receiver_name}")
 
 
             #礼物信息
@@ -200,7 +200,7 @@ class AsyncMessageGenerator:
             gift_num = data.get("num")
             gift_price = data.get("price")
             gift_total_coin = gift_num  * gift_price
-            logger.info(f"************礼物弹幕，礼物信息:礼物={gift_name}（{gift_id}）,类型= {gift_type},数量={gift_num},单价={gift_price},总数={gift_total_coin}")
+            logger.debug(f"************礼物弹幕，礼物信息:礼物={gift_name}（{gift_id}）,类型= {gift_type},数量={gift_num},单价={gift_price},总数={gift_total_coin}")
 
             #盲盒相关信息
             blind_gift = data.get("blind_gift")
@@ -214,7 +214,7 @@ class AsyncMessageGenerator:
                 blind_gift_name = blind_gift.get("original_gift_name")
                 blind_gift_price = blind_gift.get("original_gift_price")
                 blind_gift_total = gift_num * blind_gift_price
-                logger.info(
+                logger.debug(
                     f"************礼物弹幕，礼物信息:盲盒爆出={blind_gift_name}（{blind_gift_id}）,盲盒单价={blind_gift_price},盲盒总数={blind_gift_total}")
 
             total_scope = gift_total_coin - blind_gift_total
@@ -244,7 +244,7 @@ class AsyncMessageGenerator:
             #将弹幕放入消息队列
             self.message_queue.put(info)
 
-            logger.info(f"准备查询礼物视频，礼物编号={gift_id}")
+            logger.debug(f"准备查询礼物视频，礼物编号={gift_id}")
             # 2. 检查是否为VIP用户，发送视频播放指令
             # 在函数内部导入，避免循环导入
             from aibls.services.gift_service import gift_service
@@ -257,14 +257,14 @@ class AsyncMessageGenerator:
                 with current_app.app_context():
                     gift_videos, error = gift_service.get_gift_videos(gift_id)
 
-            logger.info(f"查询到礼物 {gift_id}下的视频数为:{len(gift_videos)}")
+            logger.debug(f"查询到礼物 {gift_id}下的视频数为:{len(gift_videos)}")
 
             if len(gift_videos) > 0:
                 video = random.choice(gift_videos)
                 video_url = video.get("url", "")
                 video_path = video.get("path", "")
                 video_title = video.get("title", "")
-                logger.info(f"礼物特效: {gift_name} (UID: {gift_id})，触发视频播放: {video.get('url', '')}")
+                logger.debug(f"礼物特效: {gift_name} (UID: {gift_id})，触发视频播放: {video.get('url', '')}")
 
                 video_command = {
                     "type": "video_command",  # 特殊类型，用于区分
@@ -351,13 +351,13 @@ class AsyncMessageGenerator:
                 "guard_name": guard_name,
                 "num": gift_num
             }
-            logger.info(f"上舰: {gift_name} 开通{guard_name}")
+            logger.debug(f"上舰: {gift_name} 开通{guard_name}")
 
             #将弹幕放入消息队列
             self.message_queue.put(info)
 
             if video_gift_id is not None:
-                logger.info(f"准备查询上舰的视频，礼物编号={video_gift_id}")
+                logger.debug(f"准备查询上舰的视频，礼物编号={video_gift_id}")
                 # 2. 检查是否为VIP用户，发送视频播放指令
                 # 在函数内部导入，避免循环导入
                 from aibls.services.gift_service import gift_service
@@ -370,14 +370,14 @@ class AsyncMessageGenerator:
                     with current_app.app_context():
                         gift_videos, error = gift_service.get_gift_videos(video_gift_id)
 
-                logger.info(f"查询到礼物 {video_gift_id}下的视频数为:{len(gift_videos)}")
+                logger.debug(f"查询到礼物 {video_gift_id}下的视频数为:{len(gift_videos)}")
 
                 if len(gift_videos) > 0:
                     video = random.choice(gift_videos)
                     video_url = video.get("url", "")
                     video_path = video.get("path", "")
                     video_title = video.get("title", "")
-                    logger.info(f"上舰特效: {gift_name} (UID: {video_gift_id})，触发视频播放: {video.get('url', '')}")
+                    logger.debug(f"上舰特效: {gift_name} (UID: {video_gift_id})，触发视频播放: {video.get('url', '')}")
 
                     video_command = {
                         "type": "video_command",  # 特殊类型，用于区分
@@ -389,7 +389,7 @@ class AsyncMessageGenerator:
                         "timestamp": datetime.now().isoformat()
                     }
 
-                    logger.info(f"上舰: {gift_name} 开通{guard_name}")
+                    logger.debug(f"上舰: {gift_name} 开通{guard_name}")
                     # 放入消息队列，由消费者推送到前端
                     self.message_queue.put(video_command)
 
@@ -463,7 +463,7 @@ class AsyncMessageGenerator:
                 "message": message,
                 "message_time":message_time  # 持续时间(秒)
             }
-            logger.info(f"醒目留言: {data['user_info']['uname']} 留言: {data['message']} ￥{data['price']}")
+            logger.debug(f"醒目留言: {data['user_info']['uname']} 留言: {data['message']} ￥{data['price']}")
             # 将弹幕放入消息队列
             self.message_queue.put(info)
 
@@ -514,12 +514,12 @@ class AsyncMessageGenerator:
                     "user_face": user_face,
                     "msg": f" 欢迎 {user_name} ({user_id}) 进入直播间！"
                 }
-                logger.info(f"用户进入房间消息：{info}")
+                logger.debug(f"用户进入房间消息：{info}")
 
                 # 将弹幕放入消息队列
                 self.message_queue.put(info)
 
-                logger.info(f"准备查询VIP视频 {user_id}")
+                logger.debug(f"准备查询VIP视频 {user_id}")
                 # 2. 检查是否为VIP用户，发送视频播放指令
                 # 在函数内部导入，避免循环导入
                 from aibls.services.vip_service import vip_service
@@ -531,14 +531,14 @@ class AsyncMessageGenerator:
                     from flask import current_app
                     with current_app.app_context():
                         vip_videos,error = vip_service.get_user_videos(user_id)
-                logger.info(f"查询到用户 {user_id}下的VIP视频数为:{len(vip_videos)}")
+                logger.debug(f"查询到用户 {user_id}下的VIP视频数为:{len(vip_videos)}")
 
                 if len(vip_videos) > 0:
                     video = random.choice(vip_videos)
                     video_url = video.get("url", "")
                     video_path = video.get("path", "")
                     video_title = video.get("title", "")
-                    logger.info(f"VIP用户入场: {user_name} (UID: {user_id})，触发视频播放: {video.get('url', '')}")
+                    logger.debug(f"VIP用户入场: {user_name} (UID: {user_id})，触发视频播放: {video.get('url', '')}")
 
                     video_command = {
                         "type": "video_command",  # 特殊类型，用于区分
@@ -602,12 +602,12 @@ class AsyncMessageGenerator:
                 "fans_medal_name":fans_medal_name,
                 "msg": f" 欢迎 {guard_name} {user_name} 进入直播间！"
             }
-            logger.info(f"欢迎 {guard_name} {user_name} 进入直播间！")
+            logger.debug(f"欢迎 {guard_name} {user_name} 进入直播间！")
 
             # 将弹幕放入消息队列
             self.message_queue.put(info)
 
-            logger.info(f"准备查询VIP视频 {user_id}")
+            logger.debug(f"准备查询VIP视频 {user_id}")
             # 2. 检查是否为VIP用户，发送视频播放指令
             # 在函数内部导入，避免循环导入
             from aibls.services.vip_service import vip_service
@@ -621,14 +621,14 @@ class AsyncMessageGenerator:
                     vip_videos,error = vip_service.get_user_videos(user_id)
 
 
-            logger.info(f"查询到用户 {user_id}下的VIP视频数为{len(vip_videos)}")
+            logger.debug(f"查询到用户 {user_id}下的VIP视频数为{len(vip_videos)}")
 
             if len(vip_videos) > 0:
                 video = random.choice(vip_videos)
                 video_url = video.get("url", "")
                 video_path = video.get("path", "")
                 video_title = video.get("title", "")
-                logger.info(f"VIP用户入场: {user_name} (UID: {user_id})，触发视频播放: {video.get('url', '')}")
+                logger.debug(f"VIP用户入场: {user_name} (UID: {user_id})，触发视频播放: {video.get('url', '')}")
 
                 video_command = {
                     "type": "video_command",  # 特殊类型，用于区分

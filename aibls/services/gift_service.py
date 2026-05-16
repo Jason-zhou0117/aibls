@@ -281,7 +281,7 @@ class GiftService:
         logger = current_app.logger
         try:
             list_gifts = gifts_data.get("list",[])
-            logger.info(f'同步的禮物數量：{len(list_gifts)}')
+            logger.debug(f'同步的禮物數量：{len(list_gifts)}')
             for g in list_gifts:
                 is_abandoned, reason = GiftService.is_gift_abandoned(g)
                 if is_abandoned:

@@ -44,7 +44,7 @@ def _clear_qrcode_file(qrcode_key: int = None):
         file_path = _get_qrcode_path(qrcode_key)
         if os.path.exists(file_path):
             os.remove(file_path)
-            logger.info(f"清除二维码文件: {file_path}")
+            logger.debug(f"清除二维码文件: {file_path}")
 
 
 def _copy_qrcode_local(qrcode_url: str, qrcode_key: int) -> str:
@@ -78,7 +78,7 @@ def login_page():
     logger = current_app.logger
     """登录页面"""
     login_user = session.get("login_user", {})
-    logger.info(f"登录页面的登录用户：{login_user}")
+    logger.debug(f"登录页面的登录用户：{login_user}")
     return render_template('login.html',
                            nick_name=login_user.get("nick_name", "未登录"),
                            user_face=login_user.get("user_face", ""))
@@ -89,7 +89,7 @@ def refresh_qrcode():
     logger = current_app.logger
 
     """刷新登录二维码"""
-    logger.info("开始生成登录二维码")
+    logger.debug("开始生成登录二维码")
 
     # 清除旧数据
     _clear_qrcode_file()
@@ -106,7 +106,7 @@ def refresh_qrcode():
     session["qrcode_key"] = qrcode_key
     session.modified = True
 
-    logger.info(f"二维码生成成功, KEY={qrcode_key}, URL={img_url}")
+    logger.debug(f"二维码生成成功, KEY={qrcode_key}, URL={img_url}")
 
     return jsonify({"code": 0, "img_url": img_url})
 
@@ -118,7 +118,7 @@ def poll_status():
     logger = current_app.logger
     try:
         qrcode_key = session.get("qrcode_key")
-        logger.info(f"校验扫码状态, KEY={qrcode_key}")
+        logger.debug(f"校验扫码状态, KEY={qrcode_key}")
 
         if qrcode_key is None:
             return jsonify({"code": 1, "text": "需要重新生成二维码！"})

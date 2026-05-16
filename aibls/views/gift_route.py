@@ -35,7 +35,7 @@ def _get_login_credential() -> Credential:
 @check_session_2api_decorator
 def refresh_gift_route():
     room_data = room_service.get_default_room()
-    logger.info(f'获取默认房间信息{room_data}')
+    logger.debug(f'获取默认房间信息{room_data}')
     room_id = room_data.get('id')
     gif_common: dict = asyncio.run(bili_live_service.get_gif_config(room_id))
 

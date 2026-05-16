@@ -18,14 +18,14 @@ class BiliUserService:
         :return: 登录用户信息
         """
         logger = current_app.logger
-        logger.info("登录用户的凭据：UID={},AC_TIME_VALUE={}"
+        logger.debug("登录用户的凭据：UID={},AC_TIME_VALUE={}"
                     .format(credential.dedeuserid, credential.ac_time_value))
         try:
             # 获取Bili用户对象
             bili_user: User = user.User(int(credential.dedeuserid), credential)
             # 获取Bili用户信息
             bili_user_info: dict = await bili_user.get_user_info()
-            logger.info("验证登录信息是否过期用户信息")
+            logger.debug("验证登录信息是否过期用户信息")
             dict_user = {
                 "login_id": bili_user.get_uid(),
                 "nick_name": bili_user_info["name"],
@@ -47,15 +47,15 @@ class BiliUserService:
         logger = current_app.logger
         try:
             # 根据房间号，获取房主的用户信息
-            logger.info("开始获取用户信息：target_uid={}".format(target_uid))
+            logger.debug("开始获取用户信息：target_uid={}".format(target_uid))
 
             user_obj = user.User(int(target_uid), credential=login_user_credential)
             user_info: dict[str, Any] =  await user_obj.get_user_info()
-            logger.info("如下是获取的用户信息：昵称={}（uid={})的信息:{}".format(user_info["name"],target_uid,
+            logger.debug("如下是获取的用户信息：昵称={}（uid={})的信息:{}".format(user_info["name"],target_uid,
                                                                          user_info))
             return user_info
         except Exception as e:
-            logger.info(e)
+            logger.error(e)
             return None
 
 bili_user_service = BiliUserService()

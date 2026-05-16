@@ -20,7 +20,7 @@ class BiliLiveService:
             logger.info(f"获取B站房间信息如下：是Room_ID={room_id}的信息:{room_info}")
             return room_info
         except Exception as e:
-            logger.info(e)
+            logger.error(e)
             return None
 
     @staticmethod
@@ -36,7 +36,7 @@ class BiliLiveService:
             logger.info(f"获取B站房间的礼物信息下：是Room_ID={room_id}的信息:{gift_common}")
             return gift_common
         except Exception as e:
-            logger.info(e)
+            logger.error(e)
             return None
 
     @staticmethod
@@ -52,7 +52,7 @@ class BiliLiveService:
             logger.info(f"获取B站房间的礼物信息下：是Room_ID={room_id}的信息:{gift_common}")
             return gift_common
         except Exception as e:
-            logger.info(e)
+            logger.error(e)
             return None
 
     @staticmethod
@@ -67,6 +67,6 @@ class BiliLiveService:
             await live_obj.send_danmaku(danmu,room_id)
 
         except Exception as e:
-            logger.info(f"发送弹幕失败：{e}")
+            logger.error(f"发送弹幕失败：{e}")
 
 bili_live_service = BiliLiveService()

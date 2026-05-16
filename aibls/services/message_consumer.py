@@ -66,7 +66,7 @@ class MessageConsumer:
         """推送消息到前端"""
         try:
             message['pushed_at'] = datetime.now().isoformat()
-            self.logger.info(f"推送消息: {message}")
+            self.logger.debug(f"推送消息: {message}")
 
             msg_type = message.get("type")
 
@@ -77,7 +77,7 @@ class MessageConsumer:
                         socketio.emit('video_command', message)
                 else:
                     socketio.emit('video_command', message)
-                self.logger.info(f"已推送视频指令: {message.get('uname')}")
+                self.logger.debug(f"已推送视频指令: {message.get('uname')}")
             else:
                 if self.app:
                     with self.app.app_context():

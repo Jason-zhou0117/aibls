@@ -174,10 +174,10 @@ def upload_video():
 
     if not allowed_file(file.filename):
         return jsonify({'code': -1, 'message': '不支持的文件格式，请上传 mp4/webm/avi/mov/mkv'})
-    logger.info(f"上传视频文件得文件名为={file.filename}")
+    logger.debug(f"上传视频文件得文件名为={file.filename}")
     # 生成安全的文件名
     original_name = secure_filename(file.filename)
-    logger.info(f"上传视频文件得文件名为={original_name}")
+    logger.debug(f"上传视频文件得文件名为={original_name}")
     file_ext = file.filename.rsplit('.', 1)[1].lower()
     # new_filename = f"{uuid.uuid4().hex[:12]}.{file_ext}"
     save_path = VIPConfig.get_video_path(file.filename)
@@ -221,7 +221,7 @@ def test_play_video():
     data = request.get_json()
     video_id_key = data.get('id_key')
 
-    logger.info(f'测试时的={video_id_key}')
+    logger.debug(f'测试时的={video_id_key}')
 
     video = vip_service.get_video_by_id(video_id_key)
     if not video:
@@ -249,7 +249,7 @@ def test_play_video():
     # 通过 SocketIO 推送到视频播放器
     socketio.emit('video_command', test_command)
 
-    logger.info(f"测试播放视频: {video_name} ({video_url}),path: {video_path}")
+    logger.debug(f"测试播放视频: {video_name} ({video_url}),path: {video_path}")
 
     return jsonify({
         'code': 0,

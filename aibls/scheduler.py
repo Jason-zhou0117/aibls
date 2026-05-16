@@ -53,7 +53,7 @@ class DanmakuScheduler:
             while self.running:
                 try:
                     # 随机间隔 5-9 分钟 (300-540 秒)
-                    interval = random.randint(300, 480)
+                    interval = random.randint(180, 300)
                     self.logger.debug(f"下次发送弹幕将在 {interval // 60} 分钟后")
                     time.sleep(interval)
 

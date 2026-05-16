@@ -145,7 +145,7 @@ class VIPService:
 
         try:
             user_list = VIPUser.query.all()
-            logger.info(f'同步的VIP用户數量：{len(user_list)}')
+            logger.debug(f'同步的VIP用户數量：{len(user_list)}')
             for u in user_list:
                 bili_user = await bili_user_service.get_user_info(u.userid,login_credential)
                 u.name = bili_user.get("name")

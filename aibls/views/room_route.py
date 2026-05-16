@@ -37,7 +37,7 @@ def update_room():
 
         credential = _get_login_credential()
         result,message = asyncio.run(room_service.set_default_room(room_id,credential))
-        logger.info(f"保存房间数据结果:result={result},message={message}")
+        logger.debug(f"保存房间数据结果:result={result},message={message}")
         if result:
             return jsonify({"code": 0, "message": "更新成功"})
         else:
