@@ -133,14 +133,18 @@ class LogoffService:
             return None, str(e)
 
     @staticmethod
-    def update_logoff(id_key,room_id:int,start_time:str,end_time:str):
+    def update_logoff(id_key,room_id:int,start_time:str,end_time:str,is_open:str):
         """更新挂机房间"""
         logoff:LogOffRoom = LogOffRoom.query.filter_by(id=id_key).first()
         if not logoff:
             return False, "挂机房间不存在"
-        logoff.start_time = time.fromisoformat(start_time)
-        logoff.end_time = time.fromisoformat(end_time)
-        logoff.room_id = room_id
+        if not room_id and room_id is not None:
+            logoff.start_time = time.fromisoformat(start_time)
+            logoff.end_time = time.fromisoformat(end_time)
+            logoff.room_id = room_id
+            logoff.is_open = is_open
+        else:
+            logoff.is_open = is_open
         db.session.commit()
 
         return logoff.to_dict(), None
@@ -173,6 +177,7 @@ class LogoffService:
         # 使用 with_entities 明确指定要查询的字段
         query = LogOffRoom.query.filter(
             LogOffRoom.user_id == uid,
+            LogOffRoom.is_open == 'Y',
             or_(
                 and_(
                     LogOffRoom.start_time <= LogOffRoom.end_time,

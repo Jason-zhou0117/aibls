@@ -308,6 +308,7 @@ class LogOffRoom(db.Model):
     owner_id = db.Column(db.Integer, nullable=False)
     owner_name = db.Column(db.String(100), nullable=False)
     owner_face = db.Column(db.String(500), nullable=False)
+    is_open = db.Column(String(1), nullable=True)
 
     def to_dict(self):
         """转换为字典"""
@@ -319,6 +320,7 @@ class LogOffRoom(db.Model):
             'owner_id': self.owner_id,
             'owner_name': self.owner_name, #房间主播名
             'owner_face': self.owner_face,
+            "is_open": self.is_open,
             'cover_url': self.cover_url, #房间标题
             'start_time': self.start_time.strftime('%H:%M:%S') if self.start_time else None,
             'end_time': self.end_time.strftime('%H:%M:%S') if self.end_time else None

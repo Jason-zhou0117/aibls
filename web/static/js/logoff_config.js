@@ -270,7 +270,7 @@ async function loadUserLogoffs(uid) {
     }
 }
 
-// 渲染挂机设定列表（添加编辑按钮）
+// 渲染挂机设定列表（添加滑块开关）
 function renderLogoffList(logoffs) {
     const container = document.getElementById('logoffList');
     if (!container) return;
@@ -285,6 +285,9 @@ function renderLogoffList(logoffs) {
             `<img src="${logoff.cover_url}" alt="封面" onerror="this.parentElement.innerHTML='<div class=\'cover-placeholder\'>🎬</div>'">` :
             `<div class="cover-placeholder">🎬</div>`;
 
+        // 获取 is_open 状态（后端返回 "Y" 或 "N"）
+        const isOpen = logoff.is_open === "Y" || logoff.is_open === true;
+
         return `
             <div class="logoff-item" data-logoff-id="${logoff.id}">
                 <div class="logoff-cover">
@@ -296,12 +299,26 @@ function renderLogoffList(logoffs) {
                     <div class="logoff-roomid">房间号: ${logoff.room_id}</div>
                 </div>
                 <div class="logoff-actions">
+                    <label class="logoff-switch">
+                        <input type="checkbox" class="logoff-toggle" data-id="${logoff.id}" ${isOpen ? 'checked' : ''}>
+                        <span class="logoff-slider"></span>
+                    </label>
                     <button class="logoff-edit" data-id="${logoff.id}" title="编辑">✏️</button>
                     <button class="logoff-delete" data-id="${logoff.id}" title="删除">🗑️</button>
                 </div>
             </div>
         `;
     }).join('');
+
+    // 绑定滑块开关事件
+    container.querySelectorAll('.logoff-toggle').forEach(toggle => {
+        toggle.onchange = async (e) => {
+            e.stopPropagation();
+            const logoffId = toggle.dataset.id;
+            const isChecked = toggle.checked;
+            await updateLogoffStatus(logoffId, isChecked);
+        };
+    });
 
     // 绑定编辑按钮事件
     container.querySelectorAll('.logoff-edit').forEach(btn => {
@@ -323,6 +340,46 @@ function renderLogoffList(logoffs) {
             deleteLogoff(logoffId);
         };
     });
+}
+
+// 更新挂机设定的开关状态
+async function updateLogoffStatus(logoffId, isChecked) {
+    const isOpenValue = isChecked ? "Y" : "N";
+
+    console.log('更新开关状态:', { logoffId, isOpen: isOpenValue });
+
+    try {
+        const resp = await fetch(`/logoff_api/logoff/${logoffId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ is_open: isOpenValue })
+        });
+        const data = await resp.json();
+        console.log('更新开关状态返回:', data);
+
+        if (data.code === 0) {
+            showMessage(isChecked ? '已开启挂机' : '已关闭挂机');
+            // 刷新列表
+            if (currentUser) {
+                await loadUserLogoffs(currentUser.userid);
+            }
+        } else {
+            showMessage(data.message || '更新失败', true);
+            // 恢复开关状态
+            const toggle = document.querySelector(`.logoff-toggle[data-id="${logoffId}"]`);
+            if (toggle) {
+                toggle.checked = !isChecked;
+            }
+        }
+    } catch (error) {
+        console.error('更新开关状态失败:', error);
+        showMessage('更新失败: ' + error.message, true);
+        // 恢复开关状态
+        const toggle = document.querySelector(`.logoff-toggle[data-id="${logoffId}"]`);
+        if (toggle) {
+            toggle.checked = !isChecked;
+        }
+    }
 }
 
 // 显示编辑挂机设定弹窗
@@ -347,6 +404,9 @@ async function showEditLogoffModal(logoff) {
     if (endTime && endTime.length > 5) {
         endTime = endTime.substring(0, 5);
     }
+
+    // 获取 is_open 状态
+    const isOpen = logoff.is_open === "Y" || logoff.is_open === true;
 
     const overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
@@ -375,6 +435,16 @@ async function showEditLogoffModal(logoff) {
                     <input type="time" class="modal-input" id="endTime" value="${endTime}">
                 </div>
             </div>
+            <div class="modal-form-group">
+                <label class="modal-label" style="display: flex; align-items: center; gap: 12px;">
+                    <span>是否启用挂机：</span>
+                    <label class="modal-toggle-switch">
+                        <input type="checkbox" id="isOpenToggle" ${isOpen ? 'checked' : ''}>
+                        <span class="modal-toggle-slider"></span>
+                    </label>
+                    <span id="isOpenStatus" style="font-size: 12px; color: #aaa;">${isOpen ? '已启用' : '已禁用'}</span>
+                </label>
+            </div>
             <div class="modal-buttons">
                 <button class="modal-btn modal-btn-secondary" id="cancelBtn">取消</button>
                 <button class="modal-btn modal-btn-primary" id="confirmBtn">确认修改</button>
@@ -382,6 +452,15 @@ async function showEditLogoffModal(logoff) {
         </div>
     `;
     document.body.appendChild(overlay);
+
+    // 绑定弹窗内的开关状态显示
+    const modalToggle = overlay.querySelector('#isOpenToggle');
+    const modalStatus = overlay.querySelector('#isOpenStatus');
+    if (modalToggle && modalStatus) {
+        modalToggle.onchange = () => {
+            modalStatus.textContent = modalToggle.checked ? '已启用' : '已禁用';
+        };
+    }
 
     const close = () => overlay.remove();
 
@@ -392,6 +471,8 @@ async function showEditLogoffModal(logoff) {
             const roomId = roomSelect ? roomSelect.value : '';
             let startTimeVal = overlay.querySelector('#startTime') ? overlay.querySelector('#startTime').value : '';
             let endTimeVal = overlay.querySelector('#endTime') ? overlay.querySelector('#endTime').value : '';
+            const isOpenChecked = modalToggle ? modalToggle.checked : false;
+            const isOpenValue = isOpenChecked ? "Y" : "N";
 
             if (!roomId) {
                 showMessage('请选择房间', true);
@@ -414,7 +495,8 @@ async function showEditLogoffModal(logoff) {
                 logoff_id: logoff.id,
                 room_id: parseInt(roomId),
                 start_time: startTimeVal,
-                end_time: endTimeVal
+                end_time: endTimeVal,
+                is_open: isOpenValue
             });
 
             try {
@@ -424,7 +506,8 @@ async function showEditLogoffModal(logoff) {
                     body: JSON.stringify({
                         room_id: parseInt(roomId),
                         start_time: startTimeVal,
-                        end_time: endTimeVal
+                        end_time: endTimeVal,
+                        is_open: isOpenValue
                     })
                 });
                 const data = await resp.json();
@@ -450,6 +533,8 @@ async function showEditLogoffModal(logoff) {
 
     overlay.onclick = (e) => { if (e.target === overlay) close(); };
 }
+
+
 // 删除挂机设定
 async function deleteLogoff(logoffId) {
     if (!confirm('确定删除这个挂机设定吗？')) return;
