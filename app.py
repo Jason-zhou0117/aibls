@@ -14,6 +14,7 @@ from logging.handlers import RotatingFileHandler
 from flask import Flask, jsonify
 from flask_session import Session
 
+from aibls.scheduler import danmaku_scheduler
 
 # 将当前目录添加到 Python 路径
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -46,7 +47,7 @@ if os.path.exists(APP_ROOT):
     os.chdir(APP_ROOT)
     print(f"[App] 切换工作目录到: {APP_ROOT}")
 
-from aibls.views import user_api, room_api, live_api, vip_api, gift_api, stat_api
+from aibls.views import user_api, room_api, live_api, vip_api, gift_api, stat_api, logoff_api
 from aibls.generator_manager import init_generator, stop_generator
 from aibls.services.message_consumer import MessageConsumer
 
@@ -87,6 +88,7 @@ def register_blueprint(app: Flask):
     app.register_blueprint(vip_api)
     app.register_blueprint(gift_api)
     app.register_blueprint(stat_api)
+    app.register_blueprint(logoff_api)
 
     print_registered_routes(app)
 
@@ -188,6 +190,11 @@ socketio.init_app(app,
                   engineio_logger=True)
 
 
+# 初始化定时发送弹幕调度器
+danmaku_scheduler.init_app(app)
+danmaku_scheduler.start()
+app.logger.info("定时发送弹幕调度器已启动")
+
 # ==================== 路由 ====================
 
 @app.route('/debug/routes')
@@ -270,4 +277,5 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print("\n👋 正在关闭服务器...")
         stop_generator()
+        danmaku_scheduler.stop()
         print("服务器已关闭")

@@ -4,11 +4,13 @@ import os
 
 from bilibili_api import Credential
 from bilibili_api.login_v2 import QrCodeLogin, QrCodeLoginEvents
-from flask import jsonify, session, render_template, current_app
+from flask import jsonify, session, render_template, current_app, request
 
-from aibls.services import bili_user_service
+from aibls import LoginCookie
+from aibls.decorators import check_session_2api_decorator
+from aibls.services import bili_user_service, logoff_service
 from aibls.utils import snowflake
-from aibls.views import user_api
+from aibls.views import logoff_api
 from aibls.settings import STATIC_DIR
 
 
@@ -73,18 +75,18 @@ def _do_qrcode_event(event) -> dict | None:
 
 # ==================== 路由 ====================
 
-@user_api.route('/login/page')
-def login_page():
+@logoff_api.route('/logoff_api/page')
+def logoff_page():
     logger = current_app.logger
     """登录页面"""
     login_user = session.get("login_user", {})
-    logger.info(f"登录页面的登录用户：{login_user}")
-    return render_template('login.html',
+    logger.info(f"挂机界面的用户：{login_user}")
+    return render_template('logoff_config.html',
                            nick_name=login_user.get("nick_name", "未登录"),
                            user_face=login_user.get("user_face", ""))
 
 
-@user_api.route("/login/qrcode")
+@logoff_api.route("/logoff_api/qrcode")
 def refresh_qrcode():
     logger = current_app.logger
 
@@ -111,7 +113,7 @@ def refresh_qrcode():
     return jsonify({"code": 0, "img_url": img_url})
 
 
-@user_api.route("/login/poll")
+@logoff_api.route("/logoff_api/poll")
 def poll_status():
     """轮询扫码状态"""
 
@@ -132,7 +134,7 @@ def poll_status():
         if result["code"] == 0:
             credential :Credential = qrcode_login.get_credential()
             login_user = asyncio.run(bili_user_service.test_login_status(credential))
-            session["login_user"] = login_user
+            logoff_service.add_user(login_user)
             _clear_qrcode_file(qrcode_key)
             return jsonify({"code": 0, "text": "成功"})
 
@@ -141,3 +143,90 @@ def poll_status():
     except Exception as e:
         logger.error(f"轮询扫码状态异常: {e}")
         return jsonify({"code": 1102, "text": str(e)})
+
+@logoff_api.route('/logoff_api/users', methods=['GET'])
+@check_session_2api_decorator
+def get_logoff_users():
+    """获取扫码登录用户列表"""
+    users = logoff_service.get_all_users()
+    return jsonify({'code': 0, 'data': users})
+
+@logoff_api.route('/logoff_api/users/<uid>', methods=['GET'])
+@check_session_2api_decorator
+def get_logoff_user_detail(uid):
+    """获取单个VIP用户详情"""
+    user = logoff_service.get_user_by_uid(uid)
+    if not user:
+        return jsonify({'code': -1, 'message': '用户不存在'})
+
+    return jsonify({'code': 0, 'data': user.to_dict()})
+
+@logoff_api.route('/logoff_api/users/<uid>', methods=['DELETE'])
+@check_session_2api_decorator
+def delete_logoff_user(uid):
+    """删除挂机用户"""
+    success, message = logoff_service.delete_user(uid)
+    if not success:
+        return jsonify({'code': -1, 'message': message})
+
+    return jsonify({'code': 0, 'message': message})
+
+@logoff_api.route('/logoff_api/users/<uid>', methods=['PUT'])
+@check_session_2api_decorator
+def update_vip_user(uid):
+    """更新VIP用户信息"""
+    data = request.get_json()
+    login_user = session.get("login_user")
+    credential = LoginCookie.dic_to_credential(login_user)
+    logoff_user = asyncio.run(bili_user_service.get_user_info(uid,credential))
+    user, error = logoff_service.update_user(
+        uid,
+        name=logoff_user.get('name'),
+        face=logoff_user.get('face'),
+        is_open=data.get('is_open')
+    )
+    if error:
+        return jsonify({'code': -1, 'message': error})
+
+    return jsonify({'code': 0, 'data': user, 'message': '更新成功'})
+
+# ==================== 挂机房间设定 ====================
+@logoff_api.route('/logoff_api/users/<uid>/logoffs', methods=['GET'])
+@check_session_2api_decorator
+def get_user_logoffs(uid):
+    """获取指定用户的入场视频列表"""
+    logoffs, error = logoff_service.get_user_logoff(uid)
+    if error:
+        return jsonify({'code': -1, 'message': error})
+
+    return jsonify({'code': 0, 'data': logoffs})
+
+@logoff_api.route('/logoff_api/videos', methods=['POST'])
+@check_session_2api_decorator
+def add_logoff():
+    """添加入场视频"""
+    data = request.get_json()
+    uid = int(data.get('uid'))
+    room_id = int(data.get('room_id'))
+    start_time = data.get('start_time')
+    end_time = data.get('end_time')
+
+    if not uid or not room_id:
+        return jsonify({'code': -1, 'message': '参数不完整'})
+
+    logoff, error = logoff_service.add_logoff(uid, room_id,start_time, end_time)
+    if error:
+        return jsonify({'code': -1, 'message': error})
+
+    return jsonify({'code': 0, 'data': logoff, 'message': '添加成功'})
+
+
+@logoff_api.route('/logoff_api/logoff/<logoff_id>', methods=['DELETE'])
+@check_session_2api_decorator
+def delete_logoff(logoff_id):
+    """删除入场视频"""
+    success, message = logoff_service.delete_logoff(logoff_id)
+    if not success:
+        return jsonify({'code': -1, 'message': message})
+
+    return jsonify({'code': 0, 'message': message})

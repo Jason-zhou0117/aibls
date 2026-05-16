@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="referrer" content="no-referrer">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>挂机用户配置 - BiliMon</title>
+    <link rel="icon" href="{{ url_for('static', filename='images/bicon.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}" type="text/css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/logoff_config.css') }}" type="text/css">
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">
+                <span class="logo-icon">🎬</span>
+                <span>BiliMon</span>
+            </div>
+            <div class="header-buttons">
+                <a href="/gift_config" class="header-btn">
+                    <span>🎁</span> 礼物特效
+                </a>
+                <div class="user-info" id="userInfo" onclick="headJs.openLogin()">
+                    <div class="user-avatar" id="userAvatar">
+                        <img src="{{ user_face|default('') }}" alt="头像"/>
+                    </div>
+                    <span class="user-name" id="userName">{{ nick_name|default('未登录') }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <!-- 左侧面板 - 挂机用户列表 -->
+        <div class="left-panel">
+            <div class="panel-header">
+                <span class="panel-title">👥 挂机用户配置</span>
+                <button class="toolbar-btn" id="addUserBtn" title="新增用户（扫码登录）">+</button>
+            </div>
+            <div class="user-list" id="userList">
+                <div class="empty-tip">暂无挂机用户<br>点击 [+] 添加</div>
+            </div>
+        </div>
+
+        <!-- 右侧面板 -->
+        <div class="right-panel">
+            <!-- 用户信息区域 -->
+            <div class="user-info-section">
+                <div class="section-title">👤 用户信息</div>
+                <div class="user-profile">
+                    <div class="profile-avatar" id="profileAvatar">
+                        <span style="font-size: 40px;">👤</span>
+                    </div>
+                    <div class="profile-info">
+                        <div class="profile-name" id="profileName">未选择用户</div>
+                        <div class="profile-uid" id="profileUid"></div>
+                        <div class="toggle-group">
+                            <span class="toggle-label">是否启动挂机：</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="isOpenToggle">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span class="toggle-status" id="toggleStatus">否</span>
+                            <button class="submit-btn" id="submitConfigBtn">💾 提交修改</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 挂机设定列表区域 -->
+            <div class="logoff-section">
+                <div class="logoff-header">
+                    <div class="section-title">🏠 挂机设定列表</div>
+                    <button class="toolbar-btn" id="addLogoffBtn" title="新增挂机设定">+</button>
+                </div>
+                <div class="logoff-list" id="logoffList">
+                    <div class="empty-tip">请先选择用户</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/head.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/logoff_config.js') }}"></script>
+    <script>
+        init();
+    </script>
+</body>
+</html>

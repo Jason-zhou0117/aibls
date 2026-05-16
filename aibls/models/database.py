@@ -2,6 +2,8 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
+from sqlalchemy import BigInteger, String, Text
+
 db = SQLAlchemy()
 
 
@@ -153,6 +155,7 @@ class RoomInfo(db.Model):
     def to_dict(self):
         return {
             'id': self.id,
+            'room_id': self.id,
             'title': self.title,
             'cover_url': self.cover_url,
             'owner_id': self.owner_id,
@@ -162,6 +165,18 @@ class RoomInfo(db.Model):
             'created_at': self.created_at.isoformat() if self.created_at else None
         }
 
+    def to_list_dict(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'room_id': self.id,
+            'cover_url': self.cover_url,
+            'owner_id': self.owner_id,
+            'owner_name': self.owner_name,
+            'owner_face': self.owner_face,
+            'is_default': self.is_default,
+            'created_at': self.created_at.isoformat() if self.created_at else None
+        }
 
 class SendGiftDetail(db.Model):
     """礼物投喂明细表"""
@@ -253,4 +268,58 @@ class RoomReceiveGifts(db.Model):
             'blind_first_name': self.blind_first_name,
             'blind_first_face': self.blind_first_face,
             'created_at': self.created_at.isoformat() if self.created_at else None
+        }
+
+class LogOffUser(db.Model):
+    """用户 Session 表"""
+    __tablename__ = "logoff_users"
+
+    user_id = db.Column(BigInteger, primary_key=True, nullable=False)
+    user_name = db.Column(String(100), nullable=True)
+    user_face = db.Column(String(500), nullable=True)
+    credential = db.Column(Text, nullable=False)
+    is_open = db.Column(String(1), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.now)
+
+    # 关联视频
+    logoffs = db.relationship('LogOffRoom', backref='logoff_users', lazy='dynamic', cascade='all, delete-orphan')
+
+    def to_dict(self):
+        return {
+            "userid": self.user_id,
+            "name": self.user_name,
+            "face": self.user_face,
+            "credential": self.user_face,
+            "is_open": self.is_open,
+            "created_at": self.created_at.isoformat() if self.created_at else None
+        }
+
+
+class LogOffRoom(db.Model):
+    """入场视频表"""
+    __tablename__ = 'logoff_rooms'
+    id = db.Column(db.String(50), primary_key=True, nullable=False)
+    user_id = db.Column(db.BigInteger, db.ForeignKey('logoff_users.user_id', ondelete='CASCADE'), nullable=False)
+    start_time = db.Column(db.Time, nullable=False)  # 起始时间
+    end_time = db.Column(db.Time, nullable=False)  # 结束时间
+    room_id = db.Column(db.BigInteger,nullable=False)
+    title = db.Column(db.String(200), nullable=False)
+    cover_url = db.Column(db.String(500), nullable=False)
+    owner_id = db.Column(db.Integer, nullable=False)
+    owner_name = db.Column(db.String(100), nullable=False)
+    owner_face = db.Column(db.String(500), nullable=False)
+
+    def to_dict(self):
+        """转换为字典"""
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'room_id': self.room_id,
+            'title': self.title,
+            'owner_id': self.owner_id,
+            'owner_name': self.owner_name, #房间主播名
+            'owner_face': self.owner_face,
+            'cover_url': self.cover_url, #房间标题
+            'start_time': self.start_time.strftime('%H:%M:%S') if self.start_time else None,
+            'end_time': self.end_time.strftime('%H:%M:%S') if self.end_time else None
         }

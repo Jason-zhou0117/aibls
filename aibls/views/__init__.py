@@ -12,6 +12,7 @@ live_api = Blueprint("live_api", __name__)
 vip_api = Blueprint("vip_api", __name__)
 gift_api = Blueprint("gift_api", __name__)
 stat_api = Blueprint("stat_api", __name__)
+logoff_api = Blueprint("logoff_api", __name__)
 
 # ==================== 导入路由（必须在蓝图定义之后）====================
 from aibls.views import login_route
@@ -20,6 +21,7 @@ from aibls.views import live_route
 from aibls.views import vip_config_route
 from aibls.views import gift_route
 from aibls.views import gift_stat_route
+from aibls.views import logoff_route
 
 __all__ = [
     'user_api',
@@ -27,5 +29,6 @@ __all__ = [
     'live_api',
     'vip_api',
     'gift_api',
-    'stat_api'
+    'stat_api',
+    'logoff_api'
 ]

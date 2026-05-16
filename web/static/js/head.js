@@ -40,3 +40,10 @@ headJs.openGiftConfig = function(){
 headJs.openGiftStat= function(){
     window.open('/gift_stat');
 }
+
+/*
+去配置
+*/
+headJs.openLogOff= function(){
+    window.open('/logoff_api/page');
+}
