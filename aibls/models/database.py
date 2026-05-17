@@ -279,6 +279,7 @@ class LogOffUser(db.Model):
     user_face = db.Column(String(500), nullable=True)
     credential = db.Column(Text, nullable=False)
     is_open = db.Column(String(1), nullable=True)
+    double_majoring = db.Column(String(1), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.now)
 
     # 关联视频
@@ -291,6 +292,7 @@ class LogOffUser(db.Model):
             "face": self.user_face,
             "credential": self.user_face,
             "is_open": self.is_open,
+            "double_majoring": self.double_majoring,
             "created_at": self.created_at.isoformat() if self.created_at else None
         }
 

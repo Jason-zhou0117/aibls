@@ -153,7 +153,7 @@ class AsyncMessageGenerator:
             }
 
             # 调试输出
-            logger.debug(f"弹幕-文字: {sender_name}: {msg} [粉丝牌: {medal_name} Lv.{medal_level}]")
+            logger.info(f"弹幕-文字: {sender_name}: {msg} [粉丝牌: {medal_name} Lv.{medal_level}]")
 
             self.message_queue.put(danmu_data)
         except Exception as e:
@@ -200,7 +200,7 @@ class AsyncMessageGenerator:
             gift_num = data.get("num")
             gift_price = data.get("price")
             gift_total_coin = gift_num  * gift_price
-            logger.debug(f"************礼物弹幕，礼物信息:礼物={gift_name}（{gift_id}）,类型= {gift_type},数量={gift_num},单价={gift_price},总数={gift_total_coin}")
+            logger.info(f"************礼物弹幕，礼物信息:礼物={gift_name}（{gift_id}）,类型= {gift_type},数量={gift_num},单价={gift_price},总数={gift_total_coin}")
 
             #盲盒相关信息
             blind_gift = data.get("blind_gift")
@@ -351,7 +351,7 @@ class AsyncMessageGenerator:
                 "guard_name": guard_name,
                 "num": gift_num
             }
-            logger.debug(f"上舰: {gift_name} 开通{guard_name}")
+            logger.info(f"上舰: {gift_name} 开通{guard_name}")
 
             #将弹幕放入消息队列
             self.message_queue.put(info)
@@ -463,7 +463,7 @@ class AsyncMessageGenerator:
                 "message": message,
                 "message_time":message_time  # 持续时间(秒)
             }
-            logger.debug(f"醒目留言: {data['user_info']['uname']} 留言: {data['message']} ￥{data['price']}")
+            logger.info(f"醒目留言: {data['user_info']['uname']} 留言: {data['message']} ￥{data['price']}")
             # 将弹幕放入消息队列
             self.message_queue.put(info)
 
@@ -514,7 +514,7 @@ class AsyncMessageGenerator:
                     "user_face": user_face,
                     "msg": f" 欢迎 {user_name} ({user_id}) 进入直播间！"
                 }
-                logger.debug(f"用户进入房间消息：{info}")
+                logger.info(f"用户进入房间消息：{info}")
 
                 # 将弹幕放入消息队列
                 self.message_queue.put(info)

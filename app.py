@@ -20,6 +20,28 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 if current_dir not in sys.path:
     sys.path.insert(0, current_dir)
 
+# 加载 .env 文件（支持嵌入式环境）
+def load_env_file():
+    env_path = os.path.join(os.path.dirname(__file__), '.env')
+    if not os.path.exists(env_path):
+        print(f"[App] .env 文件不存在: {env_path}")
+        return
+    with open(env_path, 'r', encoding='utf-8') as f:
+        for line in f:
+            line = line.strip()
+            if not line or line.startswith('#'):
+                continue
+            if '=' in line:
+                key, value = line.split('=', 1)
+                os.environ[key] = value
+                print(f"[App] 加载环境变量: {key}={value[:20]}...")
+
+# 在文件开头调用
+load_env_file()
+print(f"[DEBUG] LLM_PROVIDER = {os.environ.get('LLM_PROVIDER', 'NOT SET')}")
+print(f"[DEBUG] DEEPSEEK_API_KEY = {os.environ.get('DEEPSEEK_API_KEY', 'NOT SET')[:20]}...")
+
+
 # 从 aibls 包导入
 from aibls import (
     get_app_config,
@@ -45,6 +67,8 @@ from aibls.settings import (
 if os.path.exists(APP_ROOT):
     os.chdir(APP_ROOT)
     print(f"[App] 切换工作目录到: {APP_ROOT}")
+
+
 
 from aibls.views import user_api, room_api, live_api, vip_api, gift_api, stat_api, logoff_api
 from aibls.generator_manager import init_generator, stop_generator
@@ -109,7 +133,7 @@ def register_log(app: Flask):
     app.logger.handlers.clear()
 
     # 设置根日志级别
-    app.logger.setLevel(logging.DEBUG)
+    app.logger.setLevel(logging.INFO)
 
     # 日志格式
     formatter = logging.Formatter(
@@ -185,8 +209,8 @@ app.logger.info("消息消费者线程已启动")
 socketio.init_app(app,
                   cors_allowed_origins="*",
                   async_mode='gevent',
-                  logger=True,
-                  engineio_logger=True)
+                  logger=False,
+                  engineio_logger=False)
 
 
 # 初始化定时发送弹幕调度器

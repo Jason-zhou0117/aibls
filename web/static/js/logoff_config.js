@@ -44,12 +44,16 @@ function clearRightPanel() {
     const profileUid = document.getElementById('profileUid');
     const toggleSwitch = document.getElementById('isOpenToggle');
     const toggleStatus = document.getElementById('toggleStatus');
+    const doubleMajoringToggle = document.getElementById('doubleMajoringToggle');
+    const doubleMajoringStatus = document.getElementById('doubleMajoringStatus');
 
     if (profileAvatar) profileAvatar.innerHTML = '<span style="font-size: 40px;">👤</span>';
     if (profileName) profileName.textContent = '未选择用户';
     if (profileUid) profileUid.textContent = '';
     if (toggleSwitch) toggleSwitch.checked = false;
     if (toggleStatus) toggleStatus.textContent = '否';
+    if (doubleMajoringToggle) doubleMajoringToggle.checked = false;
+    if (doubleMajoringStatus) doubleMajoringStatus.textContent = '否';
 
     const logoffList = document.getElementById('logoffList');
     if (logoffList) logoffList.innerHTML = '<div class="empty-tip">请先选择用户</div>';
@@ -69,11 +73,23 @@ function getIsOpenString(isChecked) {
     return isChecked ? "Y" : "N";
 }
 
+// 获取 double_majoring 的布尔值（后端返回 "Y" 或 "N"）
+function getDoubleMajoringValue(user) {
+    if (!user || user.double_majoring === undefined) return false;
+    return user.double_majoring === "Y" || user.double_majoring === "y" || user.double_majoring === true || user.double_majoring === 1;
+}
+
+// 将布尔值转换为后端需要的 "Y"/"N"
+function getDoubleMajoringString(isChecked) {
+    return isChecked ? "Y" : "N";
+}
+
 // 选中用户（核心函数）
 function selectUser(user) {
     console.log('========== selectUser 被调用 ==========');
     console.log('用户对象:', user);
     console.log('user.is_open 原始值:', user.is_open, '类型:', typeof user.is_open);
+    console.log('user.double_majoring 原始值:', user.double_majoring, '类型:', typeof user.double_majoring);
 
     if (!user) {
         console.warn('用户对象为空');
@@ -96,16 +112,24 @@ function selectUser(user) {
     const profileUid = document.getElementById('profileUid');
     const toggleSwitch = document.getElementById('isOpenToggle');
     const toggleStatus = document.getElementById('toggleStatus');
+    const doubleMajoringToggle = document.getElementById('doubleMajoringToggle');
+    const doubleMajoringStatus = document.getElementById('doubleMajoringStatus');
 
+    // 修复头像显示
     if (profileAvatar) {
         if (user.face && user.face.startsWith('http')) {
             profileAvatar.innerHTML = `<img src="${user.face}" alt="头像" onerror="this.parentElement.innerHTML='<span style=\'font-size:40px;\'>👤</span>'">`;
+        } else if (user.user_face && user.user_face.startsWith('http')) {
+            // 兼容 user_face 字段
+            profileAvatar.innerHTML = `<img src="${user.user_face}" alt="头像" onerror="this.parentElement.innerHTML='<span style=\'font-size:40px;\'>👤</span>'">`;
         } else {
-            profileAvatar.innerHTML = `<span style="font-size: 40px;">${(user.name || user.nickname || '?').charAt(0)}</span>`;
+            // 没有头像时显示默认图标或用户名首字母
+            const firstChar = (user.name || user.nickname || user.user_name || '?').charAt(0);
+            profileAvatar.innerHTML = `<span style="font-size: 40px;">${firstChar}</span>`;
         }
     }
 
-    if (profileName) profileName.textContent = user.name || user.nickname || '未知用户';
+    if (profileName) profileName.textContent = user.name || user.nickname || user.user_name || '未知用户';
     if (profileUid) profileUid.textContent = `UID: ${user.userid}`;
 
     // 计算 is_open 布尔值（兼容 "Y"/"N"）
@@ -117,6 +141,17 @@ function selectUser(user) {
     }
     if (toggleStatus) {
         toggleStatus.textContent = isOpen ? '是' : '否';
+    }
+
+    // 计算 double_majoring 布尔值
+    const doubleMajoring = getDoubleMajoringValue(user);
+    console.log('计算后的双修状态:', doubleMajoring);
+
+    if (doubleMajoringToggle) {
+        doubleMajoringToggle.checked = doubleMajoring;
+    }
+    if (doubleMajoringStatus) {
+        doubleMajoringStatus.textContent = doubleMajoring ? '是' : '否';
     }
 
     // 加载挂机设定列表
@@ -210,7 +245,7 @@ async function deleteUser(uid, name) {
     }
 }
 
-// 提交修改（是否启动挂机）- 提交 "Y"/"N" 字符串
+// 提交修改（是否启动挂机 + 是否双修）- 提交 "Y"/"N" 字符串
 async function submitUserConfig() {
     if (!currentUser) {
         showMessage('请先选择用户', true);
@@ -218,32 +253,43 @@ async function submitUserConfig() {
     }
 
     const toggleSwitch = document.getElementById('isOpenToggle');
+    const doubleMajoringToggle = document.getElementById('doubleMajoringToggle');
     const isChecked = toggleSwitch ? toggleSwitch.checked : false;
+    const doubleMajoringChecked = doubleMajoringToggle ? doubleMajoringToggle.checked : false;
+
     // 转换为后端需要的 "Y" 或 "N"
     const isOpenValue = getIsOpenString(isChecked);
+    const doubleMajoringValue = getDoubleMajoringString(doubleMajoringChecked);
 
-    console.log('提交修改 - 用户:', currentUser.userid, 'is_open:', isOpenValue);
+    console.log('提交修改 - 用户:', currentUser.userid, 'is_open:', isOpenValue, 'double_majoring:', doubleMajoringValue);
 
     try {
         const resp = await fetch(`/logoff_api/users/${currentUser.userid}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ is_open: isOpenValue })
+            body: JSON.stringify({
+                is_open: isOpenValue,
+                double_majoring: doubleMajoringValue
+            })
         });
         const data = await resp.json();
         console.log('提交修改返回:', data);
 
         if (data.code === 0) {
             showMessage('保存成功');
-            // 更新本地数据的 is_open 值（保持 "Y"/"N" 格式）
+            // 更新本地数据的值（保持 "Y"/"N" 格式）
             if (currentUser) {
                 currentUser.is_open = isOpenValue;
+                currentUser.double_majoring = doubleMajoringValue;
             }
             // 同时更新列表中的用户数据
             const listUser = logoffUsers.find(u => u.userid == currentUser.userid);
             if (listUser) {
                 listUser.is_open = isOpenValue;
+                listUser.double_majoring = doubleMajoringValue;
             }
+            // 刷新左侧列表显示（更新双修状态显示）
+            renderUserList();
         } else {
             showMessage(data.message || '保存失败', true);
         }
@@ -724,7 +770,6 @@ async function getRoomList() {
 }
 
 // 显示新增挂机设定弹窗
-// 显示新增挂机设定弹窗
 async function showAddLogoffModal() {
     if (!currentUser) {
         showMessage('请先选择用户', true);
@@ -838,14 +883,25 @@ async function showAddLogoffModal() {
     overlay.onclick = (e) => { if (e.target === overlay) close(); };
 }
 
-// 开关状态变化时的处理
+// 挂机开关状态变化时的处理
 function onToggleChange() {
     const toggleSwitch = document.getElementById('isOpenToggle');
     const toggleStatus = document.getElementById('toggleStatus');
     if (toggleSwitch && toggleStatus) {
         const isChecked = toggleSwitch.checked;
         toggleStatus.textContent = isChecked ? '是' : '否';
-        console.log('开关状态变化:', isChecked ? '开启' : '关闭');
+        console.log('挂机开关状态变化:', isChecked ? '开启' : '关闭');
+    }
+}
+
+// 双修开关状态变化时的处理
+function onDoubleMajoringChange() {
+    const doubleMajoringToggle = document.getElementById('doubleMajoringToggle');
+    const doubleMajoringStatus = document.getElementById('doubleMajoringStatus');
+    if (doubleMajoringToggle && doubleMajoringStatus) {
+        const isChecked = doubleMajoringToggle.checked;
+        doubleMajoringStatus.textContent = isChecked ? '是' : '否';
+        console.log('双修开关状态变化:', isChecked ? '开启' : '关闭');
     }
 }
 
@@ -863,6 +919,12 @@ function bindEvents() {
     const toggleSwitch = document.getElementById('isOpenToggle');
     if (toggleSwitch) {
         toggleSwitch.onchange = onToggleChange;
+    }
+
+    // 绑定双修开关事件
+    const doubleMajoringToggle = document.getElementById('doubleMajoringToggle');
+    if (doubleMajoringToggle) {
+        doubleMajoringToggle.onchange = onDoubleMajoringChange;
     }
 }
 
