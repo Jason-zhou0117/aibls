@@ -42,9 +42,11 @@ def danmu_page():
     login_user = session.get("login_user")
     user_credential:Credential = LoginCookie.dic_to_credential(login_user)
 
+    # 从 session 获取性格，如果没有则使用默认
+    personality = session.get('robot_personality', 'sycophant')
     # 【新增】创建机器人
     from aibls.services.danmu_robot import create_robot
-    robot = create_robot(personality="tsundere")  # 默认傲娇型
+    robot = create_robot(personality=personality)  # 默认傲娇型
     robot.test_mode = False  # 生产环境关闭测试模式
 
     # 设置机器人uid（用于过滤自回）
@@ -60,6 +62,10 @@ def danmu_page():
         room_owner = room_data["owner_name"]
         generator.connect(user_credential, room_id)
         generator.start()
+
+        generator.set_robot(robot, room_data=room_data, login_user=login_user)
+
+
         print(f"✅ 生成器已启动，房间: {room_id}")
 
     return render_template('danmu.html',
@@ -247,6 +253,8 @@ def robot_set_personality(personality_id):
     global generator
     if generator and generator.robot:
         if generator.robot.set_personality(personality_id):
+            # 保存到 session
+            session['robot_personality'] = personality_id
             name = PERSONALITIES.get(personality_id, {}).get('name', personality_id)
             return {'code': 0, 'message': f'已切换至{name}'}
         return {'code': -1, 'message': f'无效的性格: {personality_id}'}

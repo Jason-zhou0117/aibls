@@ -1,0 +1,146 @@
+{
+  'room_display_id': 32529204,
+  'room_real_id': 32529204,
+  'type': 'DANMU_MSG',
+  'data': {
+    'cmd': 'DANMU_MSG',
+    'dm_v2': '',
+    'info': [
+      [
+        0,
+        4,
+        25,
+        14893055,
+        1778998615979,
+        485572443,
+        0,
+        'b5b135f5',
+        0,
+        0,
+        0,
+        '',
+        0,
+        '{}',
+        '{}',
+        {
+          'extra': '{"send_from_me":false,"master_player_hidden":false,"mode":0,"color":14893055,"dm_type":0,"font_size":25,"player_mode":4,"show_player_type":0,"content":"你叫什么？","user_hash":"3048289781","emoticon_unique":"","bulge_display":0,"recommend_score":0,"dm_score":0,"chronos_force_display":0,"main_state_dm_color":"","objective_state_dm_color":"","direction":0,"pk_direction":0,"quartet_direction":0,"anniversary_crowd":0,"yeah_space_type":"","yeah_space_url":"","jump_to_url":"","space_type":"","space_url":"","animation":{},"emots":null,"is_audited":false,"id_str":"15c3de251d266b4f050754f0296a095d3171","icon":{"prefix":{"type":1,"resource":"ChronosWealth_6.png"}},"show_reply":true,"reply_mid":3546817130138147,"reply_uname":"依呀妮","reply_uname_color":"#FB7299","reply_is_mystery":false,"reply_type_enum":1,"hit_combo":0,"esports_jump_url":"","is_mirror":false,"is_collaboration_member":false,"card":{"card_type":0,"oid_str":"","oid_str_1":"","origin_oid_str":"","share_id":"","share_origin":"","from":"","card_content":null},"voice":null,"background_type":0}',
+          'mode': 0,
+          'show_player_type': 0,
+          'user': {
+            'base': {
+              'face': 'https://i2.hdslb.com/bfs/face/eda659f1c67814d644b1dbfbb3c2ed05d2fd9c8d.jpg',
+              'is_mystery': False,
+              'name': '军184',
+              'name_color': 0,
+              'name_color_str': '',
+              'official_info': {
+                'desc': '',
+                'role': 0,
+                'title': '',
+                'type': -1
+              },
+              'origin_info': {
+                'face': 'https://i2.hdslb.com/bfs/face/eda659f1c67814d644b1dbfbb3c2ed05d2fd9c8d.jpg',
+                'name': '军184'
+              },
+              'risk_ctrl_info': None
+            },
+            'guard': None,
+            'guard_leader': {
+              'is_guard_leader': False
+            },
+            'medal': {
+              'color': 16736523,
+              'color_border': 16771156,
+              'color_end': 16765060,
+              'color_start': 16736523,
+              'guard_icon': 'https://i0.hdslb.com/bfs/live/62ac06fd72b05fe22be26426b9e1a8e1fc2c6b89.png',
+              'guard_level': 2,
+              'honor_icon': '',
+              'id': 1453228,
+              'is_light': 1,
+              'level': 56,
+              'name': 'NiNi21',
+              'ruid': 3493258770515986,
+              'score': 12174593,
+              'typ': 0,
+              'user_receive_count': 0,
+              'v2_medal_color_border': '#F18087',
+              'v2_medal_color_end': '#EC4F6E99',
+              'v2_medal_color_level': '#EC4F6EE6',
+              'v2_medal_color_start': '#EC4F6E99',
+              'v2_medal_color_text': '#FFFFFF'
+            },
+            'title': {
+              'old_title_css_id': 'title-1084-1',
+              'title_css_id': 'title-1084-1'
+            },
+            'uhead_frame': None,
+            'uid': 651952808,
+            'wealth': None
+          }
+        },
+        {
+          'activity_identity': '',
+          'activity_source': 0,
+          'not_show': 0
+        },
+        6
+      ],
+      '你叫什么？',
+      [
+        651952808,
+        '军184',
+        1,
+        0,
+        0,
+        10000,
+        1,
+        '#E17AFF'
+      ],
+      [
+        56,
+        'NiNi21',
+        '妮妮-21号二周年庆版',
+        32529204,
+        16736523,
+        '',
+        0,
+        16771156,
+        16736523,
+        16765060,
+        2,
+        1,
+        3493258770515986
+      ],
+      [
+        52,
+        0,
+        16752445,
+        4501,
+        1
+      ],
+      [
+        'title-1084-1',
+        'title-1084-1'
+      ],
+      0,
+      2,
+      None,
+      {
+        'ct': 'B0F9A858',
+        'ts': 1778998615
+      },
+      0,
+      0,
+      None,
+      None,
+      0,
+      1296,
+      [
+        60
+      ],
+      None
+    ]
+  }
+}

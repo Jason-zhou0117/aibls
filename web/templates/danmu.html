@@ -82,8 +82,15 @@
 
         <div class="column column-danmaku">
             <div class="column-header">
-                <span>💬 弹幕 / 醒目留言</span>
-                <span class="count" id="danmaku_count">0</span>
+                <div class="column-header-left">
+                    <span>💬 弹幕 / 醒目留言</span>
+                </div>
+                <div class="column-header-right">
+                    <button class="robot-icon-btn" id="robot_config_btn" onclick="danmuJs.openRobotConfig()" title="机器人设置">
+                        🤖
+                    </button>
+                    <span class="count" id="danmaku_count">0</span>
+                </div>
             </div>
             <div id="danmaku_messages" class="messages-container"></div>
         </div>
@@ -95,6 +102,27 @@
                 <button class="collapse-btn" onclick="event.stopPropagation(); danmuJs.toggleColumn('welcome')">▶</button>
             </div>
             <div id="welcome_messages" class="messages-container"></div>
+        </div>
+    </div>
+    <div class="modal-overlay" id="robotModal">
+        <div class="modal-container modal-sm">
+            <div class="modal-header">
+                <h3>🤖 机器人设置</h3>
+                <button class="modal-close" id="robotModalCloseBtn">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="robot-personality-list" id="robotPersonalityList">
+                    <!-- 动态加载性格选项 -->
+                </div>
+                <div class="robot-status-info" id="robotStatusInfo">
+                    <!-- 显示机器人状态 -->
+                </div>
+                <div class="modal-error" id="robotModalErrorMsg"></div>
+                <div class="modal-buttons">
+                    <button class="modal-btn modal-btn-cancel" id="robotModalCancelBtn">取消</button>
+                    <button class="modal-btn modal-btn-confirm" id="robotModalConfirmBtn">确认</button>
+                </div>
+            </div>
         </div>
     </div>
 </body>

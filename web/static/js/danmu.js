@@ -4,7 +4,10 @@ const danmuJs = {
         isRunning: false,
         roomTitle: '',
         counts: { gift: 0, danmaku: 0, welcome: 0 },
-        collapsedColumns: { gift: false, welcome: false }
+        collapsedColumns: { gift: false, welcome: false },
+        currentPersonality: null,  // 当前性格
+        robotEnabled: true,        // 机器人启用状态
+        personalities: []         // 性格列表
 }
 
 danmuJs.init = function () {
@@ -14,6 +17,8 @@ danmuJs.init = function () {
     danmuJs.currentFilter = 'all';
     danmuJs.messageCounts = {total: 0, danmaku: 0, gift: 0, welcome: 0, guard: 0, super_chat: 0};
 
+    // 新增：初始化机器人
+    danmuJs.initRobot();
 }
 
 /**链接WebSocket**/
@@ -324,7 +329,8 @@ danmuJs.modalOverlay = null;  // 弹框遮罩层引用
  */
 danmuJs.createModalHTML = function() {
     // 检查是否已存在弹框
-    if (document.querySelector('.modal-overlay')) {
+    if (document.getElementById('roomModal')) {
+        danmuJs.modalOverlay = document.getElementById('roomModal');
         return;
     }
 
@@ -377,6 +383,12 @@ danmuJs.createModalHTML = function() {
 danmuJs.showModal = async function() {
     // 创建弹框（如果不存在）
     danmuJs.createModalHTML();
+
+    // 确保 modalOverlay 存在
+    if (!danmuJs.modalOverlay) {
+        console.error('弹框创建失败');
+        return;
+    }
 
     // 加载房间列表
     await danmuJs.loadRoomList();
@@ -748,6 +760,343 @@ danmuJs.bindModalEvents = function() {
     }
 };
 
+/**
+ * 获取当前性格（从 Session 或默认）
+ */
+danmuJs.getCurrentPersonality = async function() {
+    try {
+        const response = await fetch('/robot/status');
+        const data = await response.json();
+        if (data.code !== -1) {
+            danmuJs.currentPersonality = data.personality_id;
+            danmuJs.robotEnabled = data.enabled;
+        } else {
+            // 如果机器人未初始化，使用默认
+            danmuJs.currentPersonality = 'sycophant';
+        }
+    } catch (error) {
+        console.error('获取机器人状态失败:', error);
+        danmuJs.currentPersonality = 'sycophant';
+    }
+    return danmuJs.currentPersonality;
+};
+
+/**
+ * 获取性格列表
+ */
+danmuJs.getPersonalities = async function() {
+    try {
+        const response = await fetch('/robot/get_personalities');
+        const data = await response.json();
+        if (data.code === 0) {
+            danmuJs.personalities = data.personalities;
+            return danmuJs.personalities;
+        }
+    } catch (error) {
+        console.error('获取性格列表失败:', error);
+    }
+    return [];
+};
+
+/**
+ * 打开机器人配置弹框
+ */
+danmuJs.openRobotConfig = async function() {
+    // 获取当前状态和性格列表
+    await danmuJs.getCurrentPersonality();
+    await danmuJs.getPersonalities();
+
+    // 创建弹框（如果不存在）
+    danmuJs.createRobotModalHTML();
+
+    // 渲染性格列表
+    danmuJs.renderPersonalityList();
+
+    // 渲染状态信息
+    danmuJs.renderRobotStatus();
+
+    // 显示弹框
+    const modal = document.getElementById('robotModal');
+    if (modal) {
+        modal.classList.add('active');
+    }
+
+    // 绑定事件
+    danmuJs.bindRobotModalEvents();
+};
+
+/**
+ * 创建机器人配置弹框 HTML
+ */
+danmuJs.createRobotModalHTML = function() {
+    if (document.getElementById('robotModal')) {
+        return;
+    }
+
+    const modalHTML = `
+        <div class="modal-overlay" id="robotModal">
+            <div class="modal-container modal-sm">
+                <div class="modal-header">
+                    <h3>🤖 机器人设置</h3>
+                    <button class="modal-close" id="robotModalCloseBtn">✕</button>
+                </div>
+                <div class="modal-body">
+                    <div class="robot-personality-list" id="robotPersonalityList">
+                        <div class="room-list-empty">加载中...</div>
+                    </div>
+                    <div class="robot-status-info" id="robotStatusInfo">
+                        <!-- 状态信息 -->
+                    </div>
+                    <div class="modal-error" id="robotModalErrorMsg"></div>
+                    <div class="modal-buttons">
+                        <button class="modal-btn modal-btn-cancel" id="robotModalCancelBtn">取消</button>
+                        <button class="modal-btn modal-btn-confirm" id="robotModalConfirmBtn">确认</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+};
+
+/**
+ * 渲染性格列表
+ */
+danmuJs.renderPersonalityList = function() {
+    const container = document.getElementById('robotPersonalityList');
+    if (!container) return;
+
+    if (!danmuJs.personalities || danmuJs.personalities.length === 0) {
+        container.innerHTML = '<div class="room-list-empty">暂无可用性格</div>';
+        return;
+    }
+
+    // 性格描述映射
+    const descMap = {
+        'tsundere': '傲娇大小姐，毒舌但善良，喜欢用"哼"、"才不是"',
+        'flattering': '温柔小可爱，说话甜甜的，喜欢夸赞观众',
+        'sycophant': '主播头号场控，无脑吹捧，热情带节奏'
+    };
+
+    let html = '';
+    danmuJs.personalities.forEach(personality => {
+        const selectedClass = (danmuJs.currentPersonality === personality.id) ? 'selected' : '';
+        const desc = descMap[personality.id] || '有趣的机器人性格';
+
+        html += `
+            <div class="robot-personality-option ${selectedClass}" data-personality-id="${personality.id}">
+                <div class="robot-personality-radio"></div>
+                <div class="robot-personality-info">
+                    <div class="robot-personality-name">${danmuJs.escapeHtml(personality.name)}</div>
+                    <div class="robot-personality-desc">${desc}</div>
+                </div>
+            </div>
+        `;
+    });
+
+    container.innerHTML = html;
+
+    // 绑定点击选择事件
+    container.querySelectorAll('.robot-personality-option').forEach(option => {
+        option.addEventListener('click', () => {
+            const personalityId = option.dataset.personalityId;
+            danmuJs.selectPersonality(personalityId);
+        });
+    });
+};
+
+/**
+ * 选中性格
+ */
+danmuJs.selectPersonality = function(personalityId) {
+    danmuJs.selectedPersonality = personalityId;
+
+    // 更新样式
+    document.querySelectorAll('.robot-personality-option').forEach(option => {
+        const optId = option.dataset.personalityId;
+        if (optId === personalityId) {
+            option.classList.add('selected');
+        } else {
+            option.classList.remove('selected');
+        }
+    });
+
+    // 清空错误提示
+    const errorMsg = document.getElementById('robotModalErrorMsg');
+    if (errorMsg) errorMsg.classList.remove('show');
+};
+
+/**
+ * 渲染机器人状态信息
+ */
+danmuJs.renderRobotStatus = function() {
+    const container = document.getElementById('robotStatusInfo');
+    if (!container) return;
+
+    const statusText = danmuJs.robotEnabled ? '✅ 已启用' : '⛔ 已禁用';
+    const currentName = danmuJs.getPersonalityName(danmuJs.currentPersonality);
+
+    container.innerHTML = `
+        <div>🤖 机器人状态: ${statusText}</div>
+        <div>🎭 当前性格: <span>${currentName}</span></div>
+        <div style="font-size: 11px; margin-top: 5px;">💡 提示：机器人会自动回复弹幕、感谢礼物、欢迎入场</div>
+    `;
+};
+
+/**
+ * 获取性格名称
+ */
+danmuJs.getPersonalityName = function(personalityId) {
+    const personality = danmuJs.personalities.find(p => p.id === personalityId);
+    return personality ? personality.name : '无下限马屁精';
+};
+
+/**
+ * 提交机器人配置
+ */
+danmuJs.submitRobotConfig = async function() {
+    let personalityId = danmuJs.selectedPersonality;
+
+    if (!personalityId) {
+        personalityId = danmuJs.currentPersonality;
+    }
+
+    if (!personalityId) {
+        danmuJs.showRobotModalError('请选择一种性格');
+        return;
+    }
+
+    // 如果性格没变，直接关闭
+    if (personalityId === danmuJs.currentPersonality) {
+        danmuJs.hideRobotModal();
+        return;
+    }
+
+    // 显示加载状态
+    const confirmBtn = document.getElementById('robotModalConfirmBtn');
+    const originalText = confirmBtn ? confirmBtn.innerText : '确认';
+    if (confirmBtn) {
+        confirmBtn.innerText = '切换中...';
+        confirmBtn.disabled = true;
+    }
+
+    try {
+        const response = await fetch(`/robot/set_personality/${personalityId}`);
+        const data = await response.json();
+
+        if (data.code === 0) {
+            danmuJs.currentPersonality = personalityId;
+            danmuJs.showRobotModalError(data.message || '切换成功', 'success');
+
+            // 延迟关闭弹框
+            setTimeout(() => {
+                danmuJs.hideRobotModal();
+            }, 1000);
+        } else {
+            danmuJs.showRobotModalError(data.message || '切换失败，请重试');
+        }
+    } catch (error) {
+        console.error('切换性格失败:', error);
+        danmuJs.showRobotModalError('网络错误，请稍后重试');
+    } finally {
+        if (confirmBtn) {
+            confirmBtn.innerText = originalText;
+            confirmBtn.disabled = false;
+        }
+    }
+};
+
+/**
+ * 显示机器人弹框错误提示
+ */
+danmuJs.showRobotModalError = function(message, type = 'error') {
+    const errorMsg = document.getElementById('robotModalErrorMsg');
+    if (errorMsg) {
+        errorMsg.innerText = message;
+        errorMsg.classList.add('show');
+        if (type === 'success') {
+            errorMsg.style.backgroundColor = 'rgba(76, 175, 80, 0.2)';
+            errorMsg.style.color = '#4CAF50';
+        } else {
+            errorMsg.style.backgroundColor = 'rgba(244, 67, 54, 0.2)';
+            errorMsg.style.color = '#f44336';
+        }
+        setTimeout(() => {
+            errorMsg.classList.remove('show');
+            errorMsg.style.backgroundColor = '';
+            errorMsg.style.color = '';
+        }, 2000);
+    }
+};
+
+/**
+ * 隐藏机器人弹框
+ */
+danmuJs.hideRobotModal = function() {
+    const modal = document.getElementById('robotModal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
+    danmuJs.selectedPersonality = null;
+};
+
+/**
+ * 绑定机器人弹框事件
+ */
+danmuJs.bindRobotModalEvents = function() {
+    const closeBtn = document.getElementById('robotModalCloseBtn');
+    const cancelBtn = document.getElementById('robotModalCancelBtn');
+    const confirmBtn = document.getElementById('robotModalConfirmBtn');
+    const modal = document.getElementById('robotModal');
+
+    if (closeBtn) {
+        closeBtn.onclick = () => danmuJs.hideRobotModal();
+    }
+
+    if (cancelBtn) {
+        cancelBtn.onclick = () => danmuJs.hideRobotModal();
+    }
+
+    if (confirmBtn) {
+        confirmBtn.onclick = () => danmuJs.submitRobotConfig();
+    }
+
+    if (modal) {
+        modal.onclick = (e) => {
+            if (e.target === modal) {
+                danmuJs.hideRobotModal();
+            }
+        };
+    }
+};
+
+/**
+ * 页面加载时获取并保存机器人状态到 Session
+ */
+danmuJs.initRobot = async function() {
+    try {
+        // 获取机器人状态
+        const response = await fetch('/robot/status');
+        const data = await response.json();
+
+        if (data.code !== -1) {
+            danmuJs.currentPersonality = data.personality_id;
+            danmuJs.robotEnabled = data.enabled;
+
+            // 如果当前性格不是默认的，但 Session 中没有，可以在这里处理
+            // 后端已经在 set_personality 时保存到 session 了
+        } else {
+            // 机器人未初始化，设置默认性格
+            danmuJs.currentPersonality = 'sycophant';
+            // 调用后端设置默认性格
+            await fetch('/robot/set_personality/sycophant');
+        }
+    } catch (error) {
+        console.error('初始化机器人状态失败:', error);
+        danmuJs.currentPersonality = 'sycophant';
+    }
+};
 /**
  * 重写 changeRoom 方法 - 使用自定义弹框
  */

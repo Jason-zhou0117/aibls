@@ -1,8 +1,10 @@
 import asyncio
+import json
 
 import random
 import threading
 import time
+import traceback
 from datetime import datetime
 
 from bilibili_api import Credential, live, sync, user, Danmaku
@@ -26,15 +28,21 @@ class AsyncMessageGenerator:
         self.running = False
         self.generator_id = random.randint(1000, 9999)
         self._room = None
+        self.host_name = None  # 主播昵称
+        self.host_uid = None   # 主播UID
         self.app = app
         self.robot = None  # 新增：弹幕机器人实例
         self.bot_uid = None  # 新增：机器人自己的uid
+        self.room_data = None   # 房间信息（包含主播昵称、UID、房间标题等）
         self._reply_tasks = set()  # 新增：追踪机器人回复任务
         self.last_bot_message = {"text": "", "time": 0}  # 新增：记录自己发的弹幕
 
-    def set_robot(self, robot):
+    def set_robot(self, robot, room_data=None, login_user=None):
         """注入机器人实例"""
         self.robot = robot
+        if robot:
+            robot.set_room_info(room_data)
+            robot.set_login_user(login_user)
 
     def set_bot_uid(self, uid):
         """设置机器人自己的uid"""
@@ -43,22 +51,67 @@ class AsyncMessageGenerator:
             self.robot.set_bot_uid(uid)
 
     async def _send_danmaku(self, text: str) -> bool:
-        """发送弹幕 - 调用 bili_live_service（独立连接）"""
+        """发送弹幕，递归切分"""
         if not text or not text.strip():
             return False
 
-        text = text[:40].strip()
+        text = text.strip()
 
-        # 测试模式
         if self.robot and self.robot.test_mode:
             self.app.logger.info(f"[TEST_MODE] 机器人将发送: {text}")
             return True
 
-        # 调用独立服务发送，不影响接收连接
+        # 20字以内直接发送
+        if len(text) <= 20:
+            return await self._send_single_danmaku(text)
+
+        # 找标点切分
+        split_pos = self._find_split_pos(text)
+
+        # 如果 split_pos 等于 len(text)（切点末尾）或等于 mid（没找到标点），强制20字切
+        if split_pos >= len(text) or split_pos == len(text) // 2:
+            part1 = text[:20]
+            part2 = text[20:]
+            self.app.logger.warning(f"无合适标点，强制在20字处切: {part1}")
+        else:
+            part1 = text[:split_pos].strip()
+            part2 = text[split_pos:].strip()
+
+        # 如果第二段为空，只发第一段
+        if not part2:
+            return await self._send_single_danmaku(part1)
+
+        # 递归处理
+        result1 = await self._send_danmaku(part1)
+        await asyncio.sleep(2)
+        result2 = await self._send_danmaku(part2)
+
+        return result1 and result2
+
+    def _find_split_pos(self, text: str) -> int:
+        punct = ['。', '.', '！', '!', '？', '?', '~', '～', '；', ';', '、', ' ', '，', ',']
+
+        mid = len(text) // 2
+
+        # 从中间往左找第一个标点
+        for i in range(mid, -1, -1):
+            if text[i] in punct:
+                return i + 1
+
+        # 往右找
+        for i in range(mid + 1, len(text)):
+            if text[i] in punct:
+                return i + 1
+
+        return mid
+
+    async def _send_single_danmaku(self, text: str) -> bool:
+        """发送单条弹幕"""
         return await bili_live_service.send_danmu(
             room_id=self.room_id,
             credential=self.credential,
-            text=text
+            text=text,
+            logger=self.app.logger
         )
 
     def _register_event_listeners(self):
@@ -74,6 +127,10 @@ class AsyncMessageGenerator:
         self.room_id = room_id
         self.room_info = room_service.get_room_data(room_id)
         self._room = live.LiveDanmaku(room_id, False, self.credential)
+        # 获取主播信息
+        if self.room_info:
+            self.set_room_data = self.room_info.get("owner_name")
+            self.host_uid = self.room_info.get("owner_id")
 
     def start(self):
         """启动消息生成器线程"""
@@ -166,19 +223,34 @@ class AsyncMessageGenerator:
             # 解析用户ID和昵称
             sender_uid = user_info[0]
             sender_name = user_info[1]
+            sender_face = ""
+            guard_level = 0
 
-            # 【新增】过滤自己的弹幕
-            if self.bot_uid and sender_uid == self.bot_uid:
-                return
+            reply_mid = None
+            reply_name = None
+            is_at_bot = False
 
-            # 【新增】过滤刚发的相同内容（防止B站回显）
-            now = time.time()
-            if now - self.last_bot_message['time'] < 2:
-                if msg == self.last_bot_message['text']:
-                    return
-
-            #获取用户详情
-            user_detail = await self.load_user_info(sender_uid)
+            if len(info[0]) > 15 and info[0][15] and isinstance(info[0][15], dict):
+                extra_str = info[0][15].get('extra', '')
+                if extra_str:
+                    try:
+                        extra_data = json.loads(extra_str)
+                        reply_mid = extra_data.get('reply_mid', 0)
+                        reply_name = extra_data.get('reply_name', '')
+                        # 判断：reply_mid 存在 且 不为0 且 等于机器人UID
+                        if self.bot_uid and reply_mid and reply_mid != 0 and str(reply_mid) == str(self.bot_uid):
+                            is_at_bot = True
+                            logger.info(f"🤖 被用户 {sender_name} @了！")
+                    except json.JSONDecodeError as e:
+                        logger.debug(f"解析extra失败: {e}")
+                # 开始分析粉丝信息
+                sender_data = info[0][15].get('user', '')
+                user_base = sender_data.get('base')
+                sender_face = user_base.get('face',"")
+                medal_data = sender_data.get('medal')
+                guard_level = medal_data.get('guard_level')
+            #     #获取用户详情
+            # user_detail = await self.load_user_info(sender_uid)
 
             # 解析粉丝牌信息 (如果有)
             medal_info = info[3] if len(info) > 3 else []
@@ -200,11 +272,15 @@ class AsyncMessageGenerator:
                 "room_id":self.room_id,
                 "sender_uid": sender_uid,  # 用户昵称
                 "sender_name": sender_name,  # 用户ID
-                "sender_face" : user_detail["face"] if user_detail is not None else "",
+                "sender_face" : sender_face,
                 "timestamp": timestamp,  # 时间戳
                 "send_time":dt_str,
-                "medal_name": medal_name,  # 粉丝牌名称
-                "medal_level":medal_level,  # 粉丝牌等级
+                "reply_mid":reply_mid if reply_mid and reply_mid != 0 else None,
+                "reply_name":reply_name,
+                "is_at_bot":is_at_bot,
+                "fans_name": medal_name,  # 粉丝牌名称
+                "fans_level":medal_level,  # 粉丝牌等级
+                "guard_level":guard_level,  # 舰长等级
                 "honor_level":honor_level
             }
 
@@ -212,6 +288,16 @@ class AsyncMessageGenerator:
             logger.info(f"弹幕-文字: {sender_name}: {msg} [粉丝牌: {medal_name} Lv.{medal_level}]")
 
             self.message_queue.put(danmu_data)
+
+            # 【新增】过滤自己的弹幕
+            if self.bot_uid and str(sender_uid) == str(self.bot_uid):
+                return
+
+            # 【新增】过滤刚发的相同内容（防止B站回显）
+            now = time.time()
+            if now - self.last_bot_message['time'] < 2:
+                if msg == self.last_bot_message['text']:
+                    return
 
             # 【新增】机器人回复（异步任务，不阻塞）
             if self.robot and self.robot.enabled:
@@ -674,7 +760,7 @@ class AsyncMessageGenerator:
             guard_name = ""
 
             #粉丝信息
-            fans_info = data.get('medal', None)
+            fans_info = user_info.get('medal', None)
             logger.debug(f"粉丝信息： {fans_info} ")
             if fans_info is not None:
                 #灯牌信息
@@ -692,10 +778,10 @@ class AsyncMessageGenerator:
                 "uname": user_name,
                 "uid": user_id,
                 "user_face": user_face,
-                "guard_name":guard_name,
-                "fans_level":fans_level,
-                "guard_level":guard_level,
-                "fans_medal_name":fans_medal_name,
+                "guard_name":guard_name, #舰长类型名字：总督，提督，舰长
+                "fans_level":fans_level, #灯牌等级
+                "guard_level":guard_level, #舰长类型：1=总督 2=提督 3=舰长
+                "fans_medal_name":fans_medal_name, #灯牌名字
                 "msg": f" 欢迎 {guard_name} {user_name} 进入直播间！"
             }
             logger.debug(f"欢迎 {guard_name} {user_name} 进入直播间！")
@@ -750,34 +836,13 @@ class AsyncMessageGenerator:
         except Exception as e:
             logger.error(f"解析进入事件数据出错: {e}")
 
-            # ==================== 新增：机器人回复包装器 ====================
-
-            async def _robot_reply_wrapper(self, event_type: str, data: dict):
-                """机器人回复包装器"""
-                try:
-                    reply = None
-                    if event_type == "danmaku":
-                        reply = await self.robot.handle_danmaku(data)
-                    elif event_type == "gift":
-                        reply = await self.robot.handle_gift(data)
-                    elif event_type == "guard":
-                        reply = await self.robot.handle_guard(data)
-                    elif event_type == "super_chat":
-                        reply = await self.robot.handle_super_chat(data)
-                    elif event_type == "enter":
-                        reply = await self.robot.handle_enter(data)
-
-                    if reply:
-                        # 使用统一发送接口
-                        await self._send_danmaku(reply)
-
-                except Exception as e:
-                    self.app.logger.error(f"机器人回复错误: {e}")
 
     async def _robot_reply_wrapper(self, event_type: str, data: dict):
         """机器人回复包装器"""
         logger = self.app.logger
-        logger.info(f"机器人回复任务开始: {event_type}")
+        logger.info(f"🔍 机器人回复被调用，事件类型: {event_type}")
+        logger.info(f"🔍 调用栈: {''.join(traceback.format_stack()[-5:])}")
+
         try:
             reply = None
             if event_type == "danmaku":
@@ -792,7 +857,7 @@ class AsyncMessageGenerator:
                 reply = await self.robot.handle_enter(data)
 
             if reply:
-                logger.info(f"🤖 机器人将发送: {reply[:30]}...")
+                logger.info(f"🤖 机器人将发送: {reply}")
                 await self._send_danmaku(reply)
             else:
                 logger.info(f"🤖 机器人决定不回复（可能是自己的弹幕或概率过滤）")

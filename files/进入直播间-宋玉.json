@@ -1,0 +1,92 @@
+{
+  'room_display_id': 32529204,
+  'room_real_id': 32529204,
+  'type': 'ENTRY_EFFECT',
+  'data': {
+    'cmd': 'ENTRY_EFFECT',
+    'data': {
+      'id': 135,
+      'uid': 3546748970601156,
+      'target_id': 3493258770515986,
+      'mock_effect': 0,
+      'face': 'https://i0.hdslb.com/bfs/face/4907988c402e4816332a708bb3fe1909bc59b99d.jpg',
+      'privilege_type': 3,
+      'copy_writing': '<%宋玉白凤%> 来了',
+      'copy_color': '#000000',
+      'highlight_color': '#FFF100',
+      'priority': 71,
+      'basemap_url': 'https://i0.hdslb.com/bfs/live/mlive/da6933ea70f31c4df63f4b68b735891284888357.png',
+      'show_avatar': 1,
+      'effective_time': 1,
+      'web_basemap_url': 'https://i0.hdslb.com/bfs/live/mlive/da6933ea70f31c4df63f4b68b735891284888357.png',
+      'web_effective_time': 2,
+      'web_effect_close': 0,
+      'web_close_time': 900,
+      'business': 3,
+      'copy_writing_v2': '<%宋玉白凤%> 来了',
+      'icon_list': [],
+      'max_delay_time': 7,
+      'trigger_time': 1778995635067711117,
+      'identities': 1,
+      'effect_silent_time': 0,
+      'effective_time_new': 0,
+      'web_dynamic_url_webp': '',
+      'web_dynamic_url_apng': '',
+      'mobile_dynamic_url_webp': '',
+      'wealthy_info': None,
+      'new_style': 0,
+      'is_mystery': False,
+      'uinfo': {
+        'uid': 3546748970601156,
+        'base': {
+          'name': '宋玉白凤',
+          'face': 'https://i0.hdslb.com/bfs/face/4907988c402e4816332a708bb3fe1909bc59b99d.jpg',
+          'name_color': 0,
+          'is_mystery': False,
+          'risk_ctrl_info': None,
+          'origin_info': None,
+          'official_info': None,
+          'name_color_str': '#00D1F1'
+        },
+        'medal': {
+          'name': 'NiNi21',
+          'level': 48,
+          'color_start': 16736523,
+          'color_end': 16765060,
+          'color_border': 6809855,
+          'color': 16736523,
+          'id': 1453228,
+          'typ': 0,
+          'is_light': 1,
+          'ruid': 3493258770515986,
+          'guard_level': 3,
+          'score': 2596901,
+          'guard_icon': 'https://i0.hdslb.com/bfs/live/48360c8f3b7de8031e86ff1ef4a2dfc0ec2a61c2.png',
+          'honor_icon': '',
+          'v2_medal_color_start': '#A773F199',
+          'v2_medal_color_end': '#A773F199',
+          'v2_medal_color_border': '#D47AFF',
+          'v2_medal_color_text': '#FFFFFF',
+          'v2_medal_color_level': '#A773F1E6',
+          'user_receive_count': 0
+        },
+        'wealth': {
+          'level': 52,
+          'dm_icon_key': 'ChronosWealth_5.png'
+        },
+        'title': None,
+        'guard': {
+          'level': 3,
+          'expired_str': '2027-04-09 23:59:59'
+        },
+        'uhead_frame': None,
+        'guard_leader': None
+      },
+      'full_cartoon_id': 0,
+      'priority_level': 0,
+      'wealth_style_info': {
+        'url': 'https://i0.hdslb.com/bfs/live/d89b1dbed63531c43b6b5ef903be3ddb6bee0b23.png'
+      }
+    }
+  }
+}
