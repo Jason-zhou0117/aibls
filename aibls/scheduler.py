@@ -43,6 +43,47 @@ class DanmakuScheduler:
             self.thread.join(timeout=5)
         self.logger.info("定时发送弹幕任务已停止")
 
+    def _send_danmu(self):
+        try:
+
+            datas = logoff_service.get_opened_users()
+            if not datas:
+                self.logger.debug("没有可用的用户，跳过本轮")
+                return
+
+            # 遍历所有用户
+            for i, data in enumerate(datas):
+                # 用户之间的间隔
+                interval_user = random.randint(5, 10)
+                text_meditation = "修炼"
+                if data.double_majoring == 'Y':
+                    text_meditation = "双修"
+                # 发送修仙弹幕
+                self._send_meditation_danmaku(data, text_meditation)
+
+                # 间隔后发送成语弹幕
+                interval_chengyu = random.randint(5, 10)
+                time.sleep(interval_chengyu)
+                self._send_chengyu_danmaku(data, "突破")
+
+                # 获取接龙结果
+                # next_chengyu = chengyu_agent.get_next_chengyu(current_chengyu)
+
+                # self.logger.info(f"成语接龙: {current_chengyu} → {next_chengyu}")
+
+                # 更新当前成语为接龙结果
+                # current_chengyu = next_chengyu
+
+                # 用户间间隔
+                if i < len(datas) - 1:
+                    time.sleep(interval_user)
+
+            # 持续接龙，不重置
+            # self.logger.info(f"本轮完成，当前成语: {current_chengyu}，继续下一轮接龙")
+
+        except Exception as e:
+            self.logger.error(f"定时发送弹幕出错: {e}")
+
     def _run(self):
         """后台线程运行 - 持续接龙模式"""
         with self.app.app_context():
@@ -51,50 +92,13 @@ class DanmakuScheduler:
             # self.logger.info(f"成语接龙起始成语: {current_chengyu}")
 
             while self.running:
-                try:
-                    # 随机间隔 5-9 分钟 (300-540 秒)
-                    interval = random.randint(600, 800)
-                    # interval = random.randint(20, 30)
-                    self.logger.debug(f"下次发送弹幕将在 {interval // 60} 分钟后")
-                    time.sleep(interval)
+                self._send_danmu()
+                # 随机间隔 5-9 分钟 (300-540 秒)
+                interval = random.randint(600, 800)
+                # interval = random.randint(20, 30)
+                self.logger.debug(f"下次发送弹幕将在 {interval // 60} 分钟后")
+                time.sleep(interval)
 
-                    datas = logoff_service.get_opened_users()
-                    if not datas:
-                        self.logger.debug("没有可用的用户，跳过本轮")
-                        continue
-
-                    # 遍历所有用户
-                    for i, data in enumerate(datas):
-                        # 用户之间的间隔
-                        interval_user = random.randint(5, 10)
-                        text_meditation = "修炼"
-                        if data.double_majoring=='Y':
-                            text_meditation = "双修"
-                        # 发送修仙弹幕
-                        self._send_meditation_danmaku(data,text_meditation)
-
-                        # 间隔后发送成语弹幕
-                        interval_chengyu = random.randint(5, 10)
-                        time.sleep(interval_chengyu)
-                        self._send_chengyu_danmaku(data, "突破")
-
-                        # 获取接龙结果
-                        # next_chengyu = chengyu_agent.get_next_chengyu(current_chengyu)
-
-                        # self.logger.info(f"成语接龙: {current_chengyu} → {next_chengyu}")
-
-                        # 更新当前成语为接龙结果
-                        # current_chengyu = next_chengyu
-
-                        # 用户间间隔
-                        if i < len(datas) - 1:
-                            time.sleep(interval_user)
-
-                    # 持续接龙，不重置
-                    # self.logger.info(f"本轮完成，当前成语: {current_chengyu}，继续下一轮接龙")
-
-                except Exception as e:
-                    self.logger.error(f"定时发送弹幕出错: {e}")
 
     def _is_within_20_minutes_of_start(self,start_time):
         """
