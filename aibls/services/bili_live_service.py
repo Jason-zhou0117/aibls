@@ -1,3 +1,4 @@
+import logging
 from typing import Any
 
 from bilibili_api import Credential, live, Danmaku
@@ -55,18 +56,24 @@ class BiliLiveService:
             logger.error(e)
             return None
 
-    @staticmethod
-    async def send_danmu(room_id: int, login_user_credential: Credential,text_damnu:str):
-        logger = current_app.logger
-        try:
-            # 根据房间号，获取房主的用户信息
-            logger.info(f"发送弹幕：room_id={room_id}，弹幕：{text_damnu}")
-            # 获取房间信息
-            live_obj = live.LiveRoom(room_id, login_user_credential)
-            danmu = Danmaku(text_damnu)
-            await live_obj.send_danmaku(danmu,room_id)
 
+    @staticmethod
+    async def send_danmu(room_id: int, credential: Credential, text: str, logger=None) -> bool:
+        """发送弹幕到B站（独立连接，不影响接收）"""
+        if logger is None:
+            logger = logging.getLogger(__name__)
+        try:
+            text = text[:40]
+            logger.info(f"发送弹幕：room_id={room_id}，内容={text}")
+
+            live_obj = live.LiveRoom(room_id, credential)
+            danmu = Danmaku(text)
+            await live_obj.send_danmaku(danmu)
+
+            logger.info(f"弹幕发送成功")
+            return True
         except Exception as e:
             logger.error(f"发送弹幕失败：{e}")
+            return False
 
 bili_live_service = BiliLiveService()

@@ -133,7 +133,7 @@ def register_log(app: Flask):
     app.logger.handlers.clear()
 
     # 设置根日志级别
-    app.logger.setLevel(logging.INFO)
+    app.logger.setLevel(logging.DEBUG)
 
     # 日志格式
     formatter = logging.Formatter(

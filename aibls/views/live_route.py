@@ -13,6 +13,7 @@ from aibls.models import LoginCookie
 from aibls.services import room_service
 from aibls.views import live_api
 from aibls.stock_io import socketio, message_queue
+from aibls.services.danmu_robot import create_robot, PERSONALITIES
 
 
 # live_route.py
@@ -40,6 +41,15 @@ def danmu_page():
 
     login_user = session.get("login_user")
     user_credential:Credential = LoginCookie.dic_to_credential(login_user)
+
+    # 【新增】创建机器人
+    from aibls.services.danmu_robot import create_robot
+    robot = create_robot(personality="tsundere")  # 默认傲娇型
+    robot.test_mode = False  # 生产环境关闭测试模式
+
+    # 设置机器人uid（用于过滤自回）
+    generator.set_robot(robot)
+    generator.set_bot_uid(user_credential.dedeuserid)
 
     room_data = room_service.get_default_room()
     room_id = "000000"
@@ -200,3 +210,66 @@ def handle_status_request():
         'queue_size': message_queue.qsize(),
         'timestamp': datetime.now().isoformat()
     })
+
+# ==================== 新增：机器人控制路由 ====================
+@live_api.route('/robot/status')
+def robot_status():
+    """获取机器人状态"""
+    global generator
+    if generator and generator.robot:
+        return generator.robot.get_status()
+    return {'code': -1, 'message': '机器人未初始化'}
+
+
+@live_api.route('/robot/enable')
+def robot_enable():
+    """启用机器人"""
+    global generator
+    if generator and generator.robot:
+        generator.robot.enabled = True
+        return {'code': 0, 'message': '机器人已启用'}
+    return {'code': -1, 'message': '机器人未初始化'}
+
+
+@live_api.route('/robot/disable')
+def robot_disable():
+    """禁用机器人"""
+    global generator
+    if generator and generator.robot:
+        generator.robot.enabled = False
+        return {'code': 0, 'message': '机器人已禁用'}
+    return {'code': -1, 'message': '机器人未初始化'}
+
+
+@live_api.route('/robot/set_personality/<personality_id>')
+def robot_set_personality(personality_id):
+    """切换性格"""
+    global generator
+    if generator and generator.robot:
+        if generator.robot.set_personality(personality_id):
+            name = PERSONALITIES.get(personality_id, {}).get('name', personality_id)
+            return {'code': 0, 'message': f'已切换至{name}'}
+        return {'code': -1, 'message': f'无效的性格: {personality_id}'}
+    return {'code': -1, 'message': '机器人未初始化'}
+
+
+@live_api.route('/robot/set_test_mode/<int:enable>')
+def robot_set_test_mode(enable):
+    """设置测试模式"""
+    global generator
+    if generator and generator.robot:
+        generator.robot.test_mode = (enable == 1)
+        return {'code': 0, 'message': f'测试模式已{"开启" if enable else "关闭"}'}
+    return {'code': -1, 'message': '机器人未初始化'}
+
+
+@live_api.route('/robot/get_personalities')
+def robot_get_personalities():
+    """获取所有可用性格"""
+    return {
+        'code': 0,
+        'personalities': [
+            {'id': pid, 'name': config['name']}
+            for pid, config in PERSONALITIES.items()
+        ]
+    }

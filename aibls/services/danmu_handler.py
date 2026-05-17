@@ -2,10 +2,12 @@ import asyncio
 
 import random
 import threading
+import time
 from datetime import datetime
 
-from bilibili_api import Credential, live, sync, user
+from bilibili_api import Credential, live, sync, user, Danmaku
 
+from aibls.services.bili_live_service import bili_live_service
 from aibls.services.room_service import room_service
 
 
@@ -25,6 +27,47 @@ class AsyncMessageGenerator:
         self.generator_id = random.randint(1000, 9999)
         self._room = None
         self.app = app
+        self.robot = None  # 新增：弹幕机器人实例
+        self.bot_uid = None  # 新增：机器人自己的uid
+        self._reply_tasks = set()  # 新增：追踪机器人回复任务
+        self.last_bot_message = {"text": "", "time": 0}  # 新增：记录自己发的弹幕
+
+    def set_robot(self, robot):
+        """注入机器人实例"""
+        self.robot = robot
+
+    def set_bot_uid(self, uid):
+        """设置机器人自己的uid"""
+        self.bot_uid = str(uid) if uid else None
+        if self.robot:
+            self.robot.set_bot_uid(uid)
+
+    async def _send_danmaku(self, text: str) -> bool:
+        """发送弹幕 - 调用 bili_live_service（独立连接）"""
+        if not text or not text.strip():
+            return False
+
+        text = text[:40].strip()
+
+        # 测试模式
+        if self.robot and self.robot.test_mode:
+            self.app.logger.info(f"[TEST_MODE] 机器人将发送: {text}")
+            return True
+
+        # 调用独立服务发送，不影响接收连接
+        return await bili_live_service.send_danmu(
+            room_id=self.room_id,
+            credential=self.credential,
+            text=text
+        )
+
+    def _register_event_listeners(self):
+        """注册所有事件监听器（重连时重新注册）"""
+        self._room.add_event_listener("DANMU_MSG", self.on_danmaku)
+        self._room.add_event_listener("SEND_GIFT", self.on_gift)
+        self._room.add_event_listener("GUARD_BUY", self.on_buy_guard)
+        self._room.add_event_listener("SUPER_CHAT_MESSAGE", self.on_super_chat)
+        self._room.add_event_listener("ENTRY_EFFECT", self.on_user_enter)
 
     def connect(self, user_credential: Credential, room_id: int):
         self.credential = user_credential
@@ -68,6 +111,7 @@ class AsyncMessageGenerator:
             self.loop.call_soon_threadsafe(self.loop.stop)
         logger.info(f"[{datetime.now().strftime('%H:%M:%S')}] 消息生成器 {self.generator_id} 已停止")
 
+
     def _run_async_loop(self):
         """在新线程中运行异步事件循环"""
         logger = self.app.logger
@@ -90,7 +134,7 @@ class AsyncMessageGenerator:
         self._room.add_event_listener("SEND_GIFT", self.on_gift)  # 赠送礼物
         self._room.add_event_listener("GUARD_BUY", self.on_buy_guard)  # 购买舰长
         self._room.add_event_listener("SUPER_CHAT_MESSAGE", self.on_super_chat)  # 醒目留言
-        self._room.add_event_listener("ENTRY_EFFECT", self.on_user_enter)  # 用户进入直播间
+        self._room.add_event_listener("ENTRY_EFFECT", self.on_user_enter)  # 带身份用户进入直播间
         # self._room.add_event_listener("INTERACT_WORD_V2", self.on_user_enter_v2)  # 用户进入直播间
         self._room.add_event_listener("VIDEO_CONNECTION_MSG", self.on_user_video_link)  # 用户进入直播间
 
@@ -118,9 +162,21 @@ class AsyncMessageGenerator:
             # 解析弹幕内容 - info[1] 是弹幕文本
             msg = info[1]
 
+
             # 解析用户ID和昵称
             sender_uid = user_info[0]
             sender_name = user_info[1]
+
+            # 【新增】过滤自己的弹幕
+            if self.bot_uid and sender_uid == self.bot_uid:
+                return
+
+            # 【新增】过滤刚发的相同内容（防止B站回显）
+            now = time.time()
+            if now - self.last_bot_message['time'] < 2:
+                if msg == self.last_bot_message['text']:
+                    return
+
             #获取用户详情
             user_detail = await self.load_user_info(sender_uid)
 
@@ -156,6 +212,18 @@ class AsyncMessageGenerator:
             logger.info(f"弹幕-文字: {sender_name}: {msg} [粉丝牌: {medal_name} Lv.{medal_level}]")
 
             self.message_queue.put(danmu_data)
+
+            # 【新增】机器人回复（异步任务，不阻塞）
+            if self.robot and self.robot.enabled:
+                # 先加入上下文（用于机器人理解）
+                logger.info(f"🤖 准备调用机器人回复: {msg}")
+                self.robot.add_to_context(sender_name, msg)
+
+                task = asyncio.create_task(
+                    self._robot_reply_wrapper("danmaku", danmu_data)
+                )
+                self._reply_tasks.add(task)
+                task.add_done_callback(self._reply_tasks.discard)
         except Exception as e:
             logger.error(f"解析弹幕数据出错: {e}")
 
@@ -219,7 +287,7 @@ class AsyncMessageGenerator:
 
             total_scope = gift_total_coin - blind_gift_total
 
-            info = {
+            gift_data = {
                 "type": "gift",
                 "msg": f"弹幕-礼物: {sender_name} 投喂 {gift_name} x{gift_num}",  # 弹幕内容 (info[1])
                 "room_id": room_id,
@@ -242,7 +310,7 @@ class AsyncMessageGenerator:
                 "total_scope": total_scope
             }
             #将弹幕放入消息队列
-            self.message_queue.put(info)
+            self.message_queue.put(gift_data)
 
             logger.debug(f"准备查询礼物视频，礼物编号={gift_id}")
             # 2. 检查是否为VIP用户，发送视频播放指令
@@ -283,13 +351,24 @@ class AsyncMessageGenerator:
             from aibls.services.send_gift_service import send_gift_service
             if self.app:
                 with self.app.app_context():
-                    result, message = send_gift_service.add_send_gift(info)
+                    result, message = send_gift_service.add_send_gift(gift_data)
             else:
                 # 如果没传入 app，尝试使用 current_app
                 from flask import current_app
                 with current_app.app_context():
-                    result, message = send_gift_service.add_send_gift(info)
+                    result, message = send_gift_service.add_send_gift(gift_data)
             logger.debug(f"添加投喂记录结果：{result},{message}")
+
+            # 机器人回复
+            if self.robot and self.robot.enabled:
+                task = asyncio.create_task(
+                    self._robot_reply_wrapper("gift", gift_data)
+                )
+                self._reply_tasks.add(task)
+                task.add_done_callback(self._reply_tasks.discard)
+            else:
+                logger.info(f"机器人未启用: robot={self.robot}, enabled={self.robot.enabled if self.robot else None}")
+
         except Exception as e:
             logger.error(f"解析礼物数据出错: {e}")
 
@@ -326,7 +405,7 @@ class AsyncMessageGenerator:
             user_detail = await self.load_user_info(sender_uid)
             sender_face = user_detail["face"] if user_detail is not None else ""
 
-            info = {
+            guard_data = {
                 "type": "guard",
                 "room_id": room_id,
                 "sender_uid": sender_uid,
@@ -354,7 +433,7 @@ class AsyncMessageGenerator:
             logger.info(f"上舰: {gift_name} 开通{guard_name}")
 
             #将弹幕放入消息队列
-            self.message_queue.put(info)
+            self.message_queue.put(guard_data)
 
             if video_gift_id is not None:
                 logger.debug(f"准备查询上舰的视频，礼物编号={video_gift_id}")
@@ -398,13 +477,21 @@ class AsyncMessageGenerator:
             from aibls.services.send_gift_service import send_gift_service
             if self.app:
                 with self.app.app_context():
-                    result, message = send_gift_service.add_send_gift(info)
+                    result, message = send_gift_service.add_send_gift(guard_data)
             else:
                 # 如果没传入 app，尝试使用 current_app
                 from flask import current_app
                 with current_app.app_context():
-                    result, message = send_gift_service.add_send_gift(info)
+                    result, message = send_gift_service.add_send_gift(guard_data)
             logger.debug(f"添加加大航海记录结果：{result},{message}")
+
+            # 机器人回复
+            if self.robot and self.robot.enabled:
+                task = asyncio.create_task(
+                    self._robot_reply_wrapper("guard", guard_data)
+                )
+                self._reply_tasks.add(task)
+                task.add_done_callback(self._reply_tasks.discard)
 
         except Exception as e:
             logger.error(f"解析上舰数据出错: {e}")
@@ -440,7 +527,7 @@ class AsyncMessageGenerator:
             message = data.get("message")
             message_time = data.get("time")
 
-            info = {
+            sc_data = {
                 "type": "super_chat",
                 "room_id": room_id,
                 "sender_uid" : sender_uid,
@@ -465,19 +552,27 @@ class AsyncMessageGenerator:
             }
             logger.info(f"醒目留言: {data['user_info']['uname']} 留言: {data['message']} ￥{data['price']}")
             # 将弹幕放入消息队列
-            self.message_queue.put(info)
+            self.message_queue.put(sc_data)
 
             logger.debug(f"准备添加醒目留言到DB")
             from aibls.services.send_gift_service import send_gift_service
             if self.app:
                 with self.app.app_context():
-                    result, message = send_gift_service.add_send_gift(info)
+                    result, message = send_gift_service.add_send_gift(sc_data)
             else:
                 # 如果没传入 app，尝试使用 current_app
                 from flask import current_app
                 with current_app.app_context():
-                    result, message = send_gift_service.add_send_gift(info)
+                    result, message = send_gift_service.add_send_gift(sc_data)
             logger.debug(f"添加醒目留言记录结果：{result},{message}")
+
+            # 机器人回复
+            if self.robot and self.robot.enabled:
+                task = asyncio.create_task(
+                    self._robot_reply_wrapper("super_chat", sc_data)
+                )
+                self._reply_tasks.add(task)
+                task.add_done_callback(self._reply_tasks.discard)
 
         except Exception as e:
             logger.error(f"解析醒目留言数据出错: {e}")
@@ -567,6 +662,7 @@ class AsyncMessageGenerator:
             user_id = str(data.get('open_id', data.get('uid', '0')))
             user_info = data.get('uinfo', None)
             user_name = ""
+            user_face = ""
             if user_info is not None and user_id != 0:
                 user_info_base = user_info.get('base', None)
                 user_name = user_info_base.get('name', '未知用户')
@@ -591,7 +687,7 @@ class AsyncMessageGenerator:
                 guard_name = guard_levels.get(guard_level, "")
 
 
-            info = {
+            enter_data = {
                 "type": "welcome",
                 "uname": user_name,
                 "uid": user_id,
@@ -605,7 +701,7 @@ class AsyncMessageGenerator:
             logger.debug(f"欢迎 {guard_name} {user_name} 进入直播间！")
 
             # 将弹幕放入消息队列
-            self.message_queue.put(info)
+            self.message_queue.put(enter_data)
 
             logger.debug(f"准备查询VIP视频 {user_id}")
             # 2. 检查是否为VIP用户，发送视频播放指令
@@ -642,9 +738,67 @@ class AsyncMessageGenerator:
                 # 放入消息队列，由消费者推送到前端
                 self.message_queue.put(video_command)
 
+            logger.debug(f"用户进入房间，信息为：{enter_data}")
+                # 机器人回复
+            if self.robot and self.robot.enabled:
+                task = asyncio.create_task(
+                    self._robot_reply_wrapper("enter", enter_data)
+                )
+                self._reply_tasks.add(task)
+                task.add_done_callback(self._reply_tasks.discard)
+
         except Exception as e:
             logger.error(f"解析进入事件数据出错: {e}")
 
+            # ==================== 新增：机器人回复包装器 ====================
+
+            async def _robot_reply_wrapper(self, event_type: str, data: dict):
+                """机器人回复包装器"""
+                try:
+                    reply = None
+                    if event_type == "danmaku":
+                        reply = await self.robot.handle_danmaku(data)
+                    elif event_type == "gift":
+                        reply = await self.robot.handle_gift(data)
+                    elif event_type == "guard":
+                        reply = await self.robot.handle_guard(data)
+                    elif event_type == "super_chat":
+                        reply = await self.robot.handle_super_chat(data)
+                    elif event_type == "enter":
+                        reply = await self.robot.handle_enter(data)
+
+                    if reply:
+                        # 使用统一发送接口
+                        await self._send_danmaku(reply)
+
+                except Exception as e:
+                    self.app.logger.error(f"机器人回复错误: {e}")
+
+    async def _robot_reply_wrapper(self, event_type: str, data: dict):
+        """机器人回复包装器"""
+        logger = self.app.logger
+        logger.info(f"机器人回复任务开始: {event_type}")
+        try:
+            reply = None
+            if event_type == "danmaku":
+                reply = await self.robot.handle_danmaku(data)
+            elif event_type == "gift":
+                reply = await self.robot.handle_gift(data)
+            elif event_type == "guard":
+                reply = await self.robot.handle_guard(data)
+            elif event_type == "super_chat":
+                reply = await self.robot.handle_super_chat(data)
+            elif event_type == "enter":
+                reply = await self.robot.handle_enter(data)
+
+            if reply:
+                logger.info(f"🤖 机器人将发送: {reply[:30]}...")
+                await self._send_danmaku(reply)
+            else:
+                logger.info(f"🤖 机器人决定不回复（可能是自己的弹幕或概率过滤）")
+            logger.info(f"机器人回复生成完成: {reply}")
+        except Exception as e:
+            self.app.logger.error(f"机器人回复错误: {e}", exc_info=True)
 
     async def load_user_info(self,user_id):
         user_obj = user.User(user_id,self.credential)
