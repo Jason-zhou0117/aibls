@@ -50,8 +50,7 @@ def danmu_page():
     robot.test_mode = False  # 生产环境关闭测试模式
 
     # 设置机器人uid（用于过滤自回）
-    generator.set_robot(robot)
-    generator.set_bot_uid(user_credential.dedeuserid)
+    # generator.set_robot(robot)
 
     room_data = room_service.get_default_room()
     room_id = "000000"

@@ -40,15 +40,11 @@ class AsyncMessageGenerator:
     def set_robot(self, robot, room_data=None, login_user=None):
         """注入机器人实例"""
         self.robot = robot
+        self.bot_uid = str(login_user.get("login_id")) if login_user else None
         if robot:
-            robot.set_room_info(room_data)
-            robot.set_login_user(login_user)
+            robot.set_base_info(room_data,login_user)
+            robot.set_app(self.app)
 
-    def set_bot_uid(self, uid):
-        """设置机器人自己的uid"""
-        self.bot_uid = str(uid) if uid else None
-        if self.robot:
-            self.robot.set_bot_uid(uid)
 
     async def _send_danmaku(self, text: str) -> bool:
         """发送弹幕，递归切分"""
@@ -56,54 +52,17 @@ class AsyncMessageGenerator:
             return False
 
         text = text.strip()
-
-        if self.robot and self.robot.test_mode:
-            self.app.logger.info(f"[TEST_MODE] 机器人将发送: {text}")
-            return True
-
-        # 20字以内直接发送
-        if len(text) <= 20:
+        # 36个字以内直接发送
+        if len(text) <= 36:
             return await self._send_single_danmaku(text)
-
-        # 找标点切分
-        split_pos = self._find_split_pos(text)
-
-        # 如果 split_pos 等于 len(text)（切点末尾）或等于 mid（没找到标点），强制20字切
-        if split_pos >= len(text) or split_pos == len(text) // 2:
-            part1 = text[:20]
-            part2 = text[20:]
-            self.app.logger.warning(f"无合适标点，强制在20字处切: {part1}")
         else:
-            part1 = text[:split_pos].strip()
-            part2 = text[split_pos:].strip()
-
-        # 如果第二段为空，只发第一段
-        if not part2:
-            return await self._send_single_danmaku(part1)
-
-        # 递归处理
-        result1 = await self._send_danmaku(part1)
-        await asyncio.sleep(2)
-        result2 = await self._send_danmaku(part2)
-
-        return result1 and result2
-
-    def _find_split_pos(self, text: str) -> int:
-        punct = ['。', '.', '！', '!', '？', '?', '~', '～', '；', ';', '、', ' ', '，', ',']
-
-        mid = len(text) // 2
-
-        # 从中间往左找第一个标点
-        for i in range(mid, -1, -1):
-            if text[i] in punct:
-                return i + 1
-
-        # 往右找
-        for i in range(mid + 1, len(text)):
-            if text[i] in punct:
-                return i + 1
-
-        return mid
+            part1 = text[:36]
+            part2 = text[36:]
+            # 递归处理
+            result1 = await self._send_danmaku(part1)
+            await asyncio.sleep(2)
+            result2 = await self._send_danmaku(part2)
+            return result1 and result2
 
     async def _send_single_danmaku(self, text: str) -> bool:
         """发送单条弹幕"""
@@ -289,6 +248,7 @@ class AsyncMessageGenerator:
 
             self.message_queue.put(danmu_data)
 
+            logger.info(f"🤖 danmu_handler中对比机器人ID，self.bot_uid={self.bot_uid}，sender_uid={sender_uid}")
             # 【新增】过滤自己的弹幕
             if self.bot_uid and str(sender_uid) == str(self.bot_uid):
                 return
@@ -302,7 +262,7 @@ class AsyncMessageGenerator:
             # 【新增】机器人回复（异步任务，不阻塞）
             if self.robot and self.robot.enabled:
                 # 先加入上下文（用于机器人理解）
-                logger.info(f"🤖 准备调用机器人回复: {msg}")
+                logger.info(f"🤖 准备调用机器人UID={self.bot_uid}回复: {msg}")
                 self.robot.add_to_context(sender_name, msg)
 
                 task = asyncio.create_task(
@@ -488,8 +448,7 @@ class AsyncMessageGenerator:
             #投喂人
             sender_uid = data.get("uid")
             sender_name = data.get("username")
-            user_detail = await self.load_user_info(sender_uid)
-            sender_face = user_detail["face"] if user_detail is not None else ""
+            sender_face = data.get("face","")
 
             guard_data = {
                 "type": "guard",
@@ -825,7 +784,7 @@ class AsyncMessageGenerator:
                 self.message_queue.put(video_command)
 
             logger.debug(f"用户进入房间，信息为：{enter_data}")
-                # 机器人回复
+            # 机器人回复
             if self.robot and self.robot.enabled:
                 task = asyncio.create_task(
                     self._robot_reply_wrapper("enter", enter_data)
@@ -840,8 +799,8 @@ class AsyncMessageGenerator:
     async def _robot_reply_wrapper(self, event_type: str, data: dict):
         """机器人回复包装器"""
         logger = self.app.logger
-        logger.info(f"🔍 机器人回复被调用，事件类型: {event_type}")
-        logger.info(f"🔍 调用栈: {''.join(traceback.format_stack()[-5:])}")
+        # logger.info(f"🔍 机器人回复被调用，事件类型: {event_type}")
+        # logger.info(f"🔍 调用栈: {''.join(traceback.format_stack()[-5:])}")
 
         try:
             reply = None
@@ -860,7 +819,7 @@ class AsyncMessageGenerator:
                 logger.info(f"🤖 机器人将发送: {reply}")
                 await self._send_danmaku(reply)
             else:
-                logger.info(f"🤖 机器人决定不回复（可能是自己的弹幕或概率过滤）")
+                logger.info(f"🤖 机器人决定不回复（可能是冷却中、主播训话、发言人=机器人）")
             logger.info(f"机器人回复生成完成: {reply}")
         except Exception as e:
             self.app.logger.error(f"机器人回复错误: {e}", exc_info=True)
