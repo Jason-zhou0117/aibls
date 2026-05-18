@@ -276,7 +276,7 @@ class BoxStatService:
         elif 520 < amount_cny < 1000:
             return "🎉", "大赚"
         elif amount_cny >= 1000:
-            return "👑", "欧皇"
+            return "👑", "欧皇赚"
         elif -50 < amount_cny < 0:
             return "😔", "小亏"
         elif -520 < amount_cny <= -50:
