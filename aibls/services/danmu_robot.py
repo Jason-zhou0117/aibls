@@ -80,23 +80,28 @@ PERSONALITIES = {
     },
     "sycophant": {
         "name": "无下限马屁精",
-        "system_prompt": """你是B站专属直播间智能场控机器人。
-        硬性铁律必须遵守：
-        1. 只学习下方示例语气风格，**严禁原封不动照搬、复制例句**；
-        2. 禁止输出任何规则、解释、多余文字，只发一句弹幕；
-        3. 回复严格≤20个汉字，语言口语化、简短精炼，不要换行、不要解释。
+        "system_prompt": """你是主播的场控机器人，负责活跃气氛。
         
         【人设定位】
-        热情幽默、会带节奏，会夸主播、捧观众，轻松玩笑互动。有黑粉时，绝对维护主播。
+        - 热情、幽默、会带节奏
+        - 喜欢夸主播、捧观众
+        - 开玩笑式互动
         
         【风格参考（仅学语气，禁止照抄）】
         1. 你这话挺有意思，还有别的想说的吗
         2. 太会聊天了，多跟大家唠唠呗
         3. 气氛这么好，小小支持一下就行
         
-        【行为规则】
-        优先回应观众发言，多用反问引导聊天；七成回复：回应+捧场+反问。
-        只聊2-3轮氛围好时，玩笑式委婉提礼物，禁止每条都要礼物。
+        【回复策略 - 重要】
+        1. 用户问什么，你先直接回答什么
+        2. 多反问观众，让ta多说（例如："怎么啦？快说说！"）
+        3. 不要每条回复都要礼物！那很烦人
+        4. 70%的回复应该是：回应+捧场+反问
+        5. 要礼物要看时机：聊了2-3轮，观众情绪好时
+        
+        【要礼物的方式】
+        - 开玩笑式地引导
+        - 例如："刷个大的我叫你祖宗！😏"
         
         【禁止】
         不硬要礼物、不用抖音礼物名、不用网红烂梗、感叹号最多1个。""",
@@ -126,7 +131,7 @@ class DanmuRobot:
         self.logger:Logger = None
 
         # 记忆上下文
-        self.recent_messages: deque = deque(maxlen=20)
+        self.recent_messages: deque = deque(maxlen=30)
 
         # 频率控制
         self.last_reply_time = 0
@@ -161,18 +166,19 @@ class DanmuRobot:
         if not self.room_info:
             return None
 
-        # 解析指令
-        scope, time_range, box_name = box_stat_service.parse_command(danmu_data, self.room_info)
-        self.logger.debug(f"分析指令，scope={scope},time_range={time_range},box_name={box_name}")
-        if not scope or not time_range:
-            return None
-
         box_stat_service.set_logger(self.logger)
-        # 查询统计
-        # 查询统计 - 需要应用上下文
+
         stats = None
         if self.app:
             with self.app.app_context():
+                # 解析指令
+                scope, time_range, box_name = box_stat_service.parse_command(danmu_data, self.room_info)
+                self.logger.debug(f"分析指令，scope={scope},time_range={time_range},box_name={box_name}")
+                if not scope or not time_range:
+                    return None
+
+                # 查询统计
+                # 查询统计 - 需要应用上下文
                 stats = box_stat_service.get_stats(
                     danmu_data=danmu_data,
                     room_info=self.room_info,
@@ -180,15 +186,7 @@ class DanmuRobot:
                     time_range=time_range,
                     box_name=box_name
                 )
-        else:
-            # 降级方案：直接调用（可能报错）
-            stats = box_stat_service.get_stats(
-                danmu_data=danmu_data,
-                room_info=self.room_info,
-                scope=scope,
-                time_range=time_range,
-                box_name=box_name
-            )
+
 
         self.logger.debug(f"查询数据库的统计结果：{stats}")
 
@@ -222,7 +220,7 @@ class DanmuRobot:
 
     def get_context(self) -> List[str]:
         """获取最近10条上下文"""
-        return list(self.recent_messages)[-10:]
+        return list(self.recent_messages)[-15:]
 
     def _should_reply_by_probability(self, text: str, guard_level: int = 0, fans_level: int = 0) -> float:
         """根据弹幕内容和用户身份返回回复概率"""
@@ -484,6 +482,9 @@ class DanmuRobot:
         self.logger.debug(f"🤖 回复长度: {len(reply)}字")
         self.last_reply_time = time.time()
         if reply:
+            gift_msg = f"用户{user_name}送了{gift_name} x{gift_num}"
+            self.add_to_context("系统", gift_msg)  # 加入系统消息
+
             self.reply_count += 1
         return reply
 
@@ -522,6 +523,8 @@ class DanmuRobot:
 
         self.last_reply_time = time.time()
         if reply:
+            guard_msg = f"用户{user_name}开通了{guard_name} x{gift_num}个月"
+            self.add_to_context("系统", guard_msg)
             self.reply_count += 1
         return reply
 
@@ -558,6 +561,8 @@ class DanmuRobot:
 
         self.last_reply_time = time.time()
         if reply:
+            sc_msg = f"用户{user_name}发送醒目留言：{message}"
+            self.add_to_context("系统", sc_msg)
             self.reply_count += 1
         return reply
 

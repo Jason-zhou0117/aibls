@@ -77,7 +77,7 @@ class BoxStatService:
                     break
 
         # 特殊处理："我的盲盒"（包含盲盒，上面已处理）
-
+        self.logger.debug(f"分析是否触发盲盒统计: rest_text={rest_text},matched={matched}")
         # 如果没有匹配到时间模式，不触发
         if not matched:
             return False, None
@@ -88,8 +88,6 @@ class BoxStatService:
 
         # 提取盲盒名称（去掉可能的"盲盒"后缀）
         box_name = rest_text.strip()
-        if box_name.endswith("盲盒"):
-            box_name = box_name[:-2]
 
         # 查询数据库确认是否为有效盲盒名称
         if self._is_valid_box_name(box_name):

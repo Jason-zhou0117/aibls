@@ -34,7 +34,7 @@ class DeepSeekBotService:
         【重要】
         保持回复自然流畅，不要为了用热词而破坏通顺度"""
 
-    def _call_api(self, messages: List[Dict[str, str]], temperature: float = 0.6, max_tokens: int = 30,logger:Logger=None) -> Optional[str]:
+    def _call_api(self, messages: List[Dict[str, str]], temperature: float = 0.65, max_tokens: int = 35,logger:Logger=None) -> Optional[str]:
         """调用 DeepSeek API"""
         if logger is None:
             logger = logging.getLogger(self.__class__.__name__)
@@ -121,7 +121,7 @@ class DeepSeekBotService:
         if room_info:
             host_name = room_info.get("owner_name")
             if host_name:
-                host_info = f"当前主播是「{host_name}」。用户可能会用简称、外号或昵称的一部分来称呼主播，请根据上下文判断是否指主播本人。主播是唱歌的不会跳舞等其他才艺。"
+                host_info = f"当前主播是「{host_name}」。用户可能会用简称、外号或昵称的一部分来称呼主播，请根据上下文判断是否指主播本人。主播是唱歌的不会跳舞等其他才艺。3. 结尾可以引导互动（点歌或发弹幕），点歌要100人气票或1个心动盲盒."
 
         user_prompt = f"""最重要：回复必须 10-20 字，你写完后自己数一下，超过重新生成
     
@@ -129,7 +129,10 @@ class DeepSeekBotService:
             
         【弹幕历史】
         {context_str}
-    
+        
+        【系统提醒】
+        如果最近有用户承诺要刷某礼物，但实际刷了别的或数量不符，你可以委婉提醒或开玩笑式吐槽。
+        
         【当前弹幕】
         {user_name}（{user_title}）：{user_text}
     
@@ -153,7 +156,7 @@ class DeepSeekBotService:
         请直接回复："""
 
         # logger.debug(f"提示词模板：系统提示词：{personality} \n 用户提示词：{user_prompt}")
-        return await self.chat(personality, user_prompt, temperature=0.6)
+        return await self.chat(personality, user_prompt, temperature=0.7)
 
     async def generate_gift_reply(
             self,
