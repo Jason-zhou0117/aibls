@@ -205,6 +205,15 @@ class SendGiftDetail(db.Model):
     total_scope = db.Column(db.NUMERIC(10, 2), nullable=False) #爆出礼物的价值与盲盒价值的差额
     created_at = db.Column(db.DateTime, default=datetime.now)
 
+    # 索引
+    __table_args__ = (
+        db.Index('idx_blind_stats', 'room_id', 'sender_uid', 'send_date', 'send_month', 'blind_gift_id'),
+        db.Index('idx_send_month', 'send_month'),
+        db.Index('idx_send_date', 'send_date'),
+        db.Index('idx_sender_uid', 'sender_uid'),
+        db.Index('idx_room_id', 'room_id'),
+    )
+
     def to_dict(self):
         return {
             'id': self.id,

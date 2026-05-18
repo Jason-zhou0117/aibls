@@ -141,3 +141,15 @@ def poll_status():
     except Exception as e:
         logger.error(f"轮询扫码状态异常: {e}")
         return jsonify({"code": 1102, "text": str(e)})
+
+
+@user_api.route('/logout', methods=['POST'])
+def logout():
+    """退出登录，清除 session 中的用户信息"""
+    # 移除 login_user（根据您实际存储的 key 调整）
+    if 'login_user' in session:
+        session.pop('login_user', None)
+    # 如果有其他用户相关字段，一并清除
+    # session.clear()  # 如果需要清除整个session
+
+    return jsonify({'code': 0, 'message': 'success'})
