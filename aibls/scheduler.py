@@ -82,7 +82,7 @@ class DanmakuScheduler:
             # self.logger.info(f"本轮完成，当前成语: {current_chengyu}，继续下一轮接龙")
 
         except Exception as e:
-            self.logger.error(f"定时发送弹幕出错: {e}")
+            self.logger.error(f"定时发送弹幕出错: {e}",exc_info=True)
 
     def _run(self):
         """后台线程运行 - 持续接龙模式"""
@@ -163,7 +163,7 @@ class DanmakuScheduler:
             self._sent_count += 1
             self.logger.info(f"[{session.user_name}] 发送修仙弹幕: {text_meditation}")
         except Exception as e:
-            self.logger.error(f"发送修仙弹幕异常: {e}")
+            self.logger.error(f"发送修仙弹幕异常: {e}",exc_info=True)
 
     def _send_chengyu_danmaku(self, session: LogOffUser, chengyu: str):
         """发送成语弹幕"""
@@ -189,7 +189,7 @@ class DanmakuScheduler:
             self._sent_count += 1
             self.logger.info(f"[{session.user_name}] 发送成语: {chengyu} (第{self._sent_count}条)")
         except Exception as e:
-            self.logger.error(f"发送成语弹幕异常: {e}")
+            self.logger.error(f"发送成语弹幕异常: {e}",exc_info=True)
 
     def reset_game(self):
         """手动重置游戏"""

@@ -418,7 +418,7 @@ class DanmuRobot:
                     logger=self.logger
                 )
             except Exception as e:
-                self.logger.error(f"[ERROR] AI生成回复失败: {e}")
+                self.logger.error(f"[ERROR] AI生成回复失败: {e}",exc_info=True)
                 return None
 
         if not reply:

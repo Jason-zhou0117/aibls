@@ -43,7 +43,7 @@ def update_room():
         else:
             return jsonify({"code": -210001, "message": message})
     except Exception as e:
-        logger.error(f"更新房间信息失败: {e}")
+        logger.error(f"更新房间信息失败: {e}",exc_info=True)
         return jsonify({"code": -210001, "message": str(e)})
 
 
@@ -73,7 +73,7 @@ def search_room_list():
             "count": len(result_data)
         })
     except Exception as e:
-        logger.error(f"搜索房间列表失败: {e}")
+        logger.error(f"搜索房间列表失败: {e}",exc_info=True)
         return jsonify({"code": -210002, "message": str(e)})
 
 

@@ -106,7 +106,7 @@ class GiftService:
             db.session.commit()
             return gift.to_dict(), None
         except Exception as e:
-            logger.error(f"添加礼物失败: {e}")
+            logger.error(f"添加礼物失败: {e}",exc_info=True)
             db.session.rollback()
             return None, str(e)
 
@@ -127,7 +127,7 @@ class GiftService:
             db.session.commit()
             return gift.to_dict(), None
         except Exception as e:
-            logger.error(f"更新礼物失败: {e}")
+            logger.error(f"更新礼物失败: {e}",exc_info=True)
             db.session.rollback()
             return None, str(e)
 
@@ -146,13 +146,13 @@ class GiftService:
                     try:
                         os.remove(video.path)
                     except Exception as e:
-                        logger.error(f"删除视频文件失败: {e}")
+                        logger.error(f"删除视频文件失败: {e}",exc_info=True)
 
             db.session.delete(gift)
             db.session.commit()
             return True, "删除成功"
         except Exception as e:
-            logger.error(f"删除礼物失败: {e}")
+            logger.error(f"删除礼物失败: {e}",exc_info=True)
             db.session.rollback()
             return False, str(e)
 
@@ -182,7 +182,7 @@ class GiftService:
             db.session.commit()
             return video.to_dict(), None
         except Exception as e:
-            logger.error(f"添加视频失败: {e}")
+            logger.error(f"添加视频失败: {e}",exc_info=True)
             db.session.rollback()
             return None, str(e)
 
@@ -202,7 +202,7 @@ class GiftService:
                 try:
                     os.remove(video.path)
                 except Exception as e:
-                    logger.error(f"删除视频文件失败: {e}")
+                    logger.error(f"删除视频文件失败: {e}",exc_info=True)
 
             db.session.delete(video)
 
@@ -216,7 +216,7 @@ class GiftService:
             db.session.commit()
             return True, "删除成功"
         except Exception as e:
-            logger.error(f"删除视频失败: {e}")
+            logger.error(f"删除视频失败: {e}",exc_info=True)
             db.session.rollback()
             return False, str(e)
 
@@ -322,7 +322,7 @@ class GiftService:
             db.session.commit()
             return True, "同步成功"
         except Exception as e:
-            logger.error(f"同步礼物失败: {e}")
+            logger.error(f"同步礼物失败: {e}",exc_info=True)
             db.session.rollback()
             return False, str(e)
 

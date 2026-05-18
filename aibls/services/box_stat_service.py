@@ -260,7 +260,7 @@ class BoxStatService:
 
         except Exception as e:
             if self.logger:
-                self.logger.error(f"查询盲盒统计失败: {e}")
+                self.logger.error(f"查询盲盒统计失败: {e}",exc_info=True)
             return None
 
     def _get_profit_level(self, amount_cny: float) -> Tuple[str, str]:

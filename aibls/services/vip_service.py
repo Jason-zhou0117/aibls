@@ -74,7 +74,7 @@ class VIPService:
                 try:
                     os.remove(video_path)
                 except Exception as e:
-                    logger.error(f"删除视频文件失败: {e}")
+                    logger.error(f"删除视频文件失败: {e}",exc_info=True)
 
         db.session.delete(user)
         db.session.commit()
@@ -109,7 +109,7 @@ class VIPService:
             db.session.commit()
             return video.to_dict(), None
         except Exception as e:
-            logger.error(f"添加视频失败: {e}")
+            logger.error(f"添加视频失败: {e}",exc_info=True)
             db.session.rollback()
             return None, str(e)
 
@@ -127,7 +127,7 @@ class VIPService:
             try:
                 os.remove(video_path)
             except Exception as e:
-                logger.error(f"删除视频文件失败: {e}")
+                logger.error(f"删除视频文件失败: {e}",exc_info=True)
 
         db.session.delete(video)
         db.session.commit()
@@ -157,7 +157,7 @@ class VIPService:
             db.session.commit()
             return True, "同步成功"
         except Exception as e:
-            logger.error(f"同步VIP用户失败: {e}")
+            logger.error(f"同步VIP用户失败: {e}",exc_info=True)
             db.session.rollback()
             return False, str(e)
 # 全局服务实例

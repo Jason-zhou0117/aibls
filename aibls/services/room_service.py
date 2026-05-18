@@ -49,7 +49,7 @@ class RoomService:
                 return False, f"房间 {room_id} 不存在"
         except Exception as e:
             db.session.rollback()
-            logger.error(f"更换默认房间时出错：{e}")
+            logger.error(f"更换默认房间时出错：{e}",exc_info=True)
             return False, str(e)
 
     @staticmethod

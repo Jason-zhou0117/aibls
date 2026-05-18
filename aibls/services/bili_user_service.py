@@ -39,7 +39,7 @@ class BiliUserService:
             # 保存登录并获取登录对象
             return dict_user
         except Exception as e:
-            logger.error(e)
+            logger.error(e,exc_info=True)
             raise BLSException(-10001, "实时获取用户信息时出错")
 
     @staticmethod
@@ -55,7 +55,7 @@ class BiliUserService:
                                                                          user_info))
             return user_info
         except Exception as e:
-            logger.error(e)
+            logger.error(e,exc_info=True)
             return None
 
 bili_user_service = BiliUserService()

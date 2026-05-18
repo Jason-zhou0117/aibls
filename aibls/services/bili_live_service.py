@@ -21,7 +21,7 @@ class BiliLiveService:
             logger.info(f"获取B站房间信息如下：是Room_ID={room_id}的信息:{room_info}")
             return room_info
         except Exception as e:
-            logger.error(e)
+            logger.error(e,exc_info=True)
             return None
 
     @staticmethod
@@ -37,7 +37,7 @@ class BiliLiveService:
             logger.info(f"获取B站房间的礼物信息下：是Room_ID={room_id}的信息:{gift_common}")
             return gift_common
         except Exception as e:
-            logger.error(e)
+            logger.error(e,exc_info=True)
             return None
 
     @staticmethod
@@ -53,7 +53,7 @@ class BiliLiveService:
             logger.info(f"获取B站房间的礼物信息下：是Room_ID={room_id}的信息:{gift_common}")
             return gift_common
         except Exception as e:
-            logger.error(e)
+            logger.error(e,exc_info=True)
             return None
 
 
@@ -73,7 +73,7 @@ class BiliLiveService:
             logger.info(f"弹幕发送成功")
             return True
         except Exception as e:
-            logger.error(f"发送弹幕失败：{e}")
+            logger.error(f"发送弹幕失败：{e}",exc_info=True)
             return False
 
 bili_live_service = BiliLiveService()

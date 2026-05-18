@@ -29,7 +29,7 @@ class GiftStatService:
             ).distinct().order_by(SendGiftDetail.send_month.desc()).all()
             return [m[0] for m in months]
         except Exception as e:
-            logger.error(f"获取月份列表失败: {e}")
+            logger.error(f"获取月份列表失败: {e}",exc_info=True)
             return []
 
     @staticmethod
@@ -99,7 +99,7 @@ class GiftStatService:
             return stats
 
         except Exception as e:
-            logger.error(f"汇总月度数据失败: {e}")
+            logger.error(f"汇总月度数据失败: {e}",exc_info=True)
             db.session.rollback()
             return None
 

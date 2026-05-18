@@ -72,7 +72,7 @@ class DeepSeekBotService:
                 logger.warning(f"[ERROR] API 调用失败: {response.status_code}")
                 return None
         except Exception as e:
-            logger.error(f"[ERROR] API 请求异常: {e}")
+            logger.error(f"[ERROR] API 请求异常: {e}",exc_info=True)
             return None
 
     async def chat(self, system_prompt: str, user_prompt: str, temperature: float = 0.6,logger:Logger=None) -> Optional[str]:

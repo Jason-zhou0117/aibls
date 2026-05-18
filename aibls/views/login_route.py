@@ -139,7 +139,7 @@ def poll_status():
         return jsonify(result)
 
     except Exception as e:
-        logger.error(f"轮询扫码状态异常: {e}")
+        logger.error(f"轮询扫码状态异常: {e}",exc_info=True)
         return jsonify({"code": 1102, "text": str(e)})
 
 

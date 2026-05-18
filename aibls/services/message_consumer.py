@@ -45,7 +45,7 @@ class MessageConsumer:
             try:
                 self._process_one_message()
             except Exception as e:
-                self.logger.error(f"消费消息错误: {e}")
+                self.logger.error(f"消费消息错误: {e}",exc_info=True)
                 time.sleep(0.5)
 
     def _process_one_message(self):
@@ -94,7 +94,7 @@ class MessageConsumer:
                 self.stats['queue_size_history'].pop(0)
 
         except Exception as e:
-            self.logger.error(f"推送消息错误: {e}")
+            self.logger.error(f"推送消息错误: {e}",exc_info=True)
 
     def stop(self):
         """停止消费者"""

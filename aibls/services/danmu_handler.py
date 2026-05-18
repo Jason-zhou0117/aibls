@@ -139,7 +139,7 @@ class AsyncMessageGenerator:
             # 运行异步生成器
             self.loop.run_until_complete(self._run_listener())
         except Exception as e:
-            logger.error(f"异步循环错误: {e}")
+            logger.error(f"异步循环错误: {e}",exc_info=True)
         finally:
             self.loop.close()
             logger.info(f"异步事件循环已关闭")
@@ -158,7 +158,7 @@ class AsyncMessageGenerator:
             # 连接并开始监听
             sync(self._room.connect())
         except Exception as e:
-            logger.error(f"监听连接出错: {e}")
+            logger.error(f"监听连接出错: {e}",exc_info=True)
 
 
     async def on_danmaku(self, event):
@@ -201,13 +201,16 @@ class AsyncMessageGenerator:
                             is_at_bot = True
                             logger.info(f"🤖 被用户 {sender_name} @了！")
                     except json.JSONDecodeError as e:
-                        logger.debug(f"解析extra失败: {e}")
+                        logger.error(f"解析extra失败: {e}",exc_info=True)
                 # 开始分析粉丝信息
                 sender_data = info[0][15].get('user', '')
-                user_base = sender_data.get('base')
-                sender_face = user_base.get('face',"")
-                medal_data = sender_data.get('medal')
-                guard_level = medal_data.get('guard_level')
+                if sender_data:
+                    user_base = sender_data.get('base')
+                    if user_base:
+                        sender_face = user_base.get('face',"")
+                    medal_data = sender_data.get('medal')
+                    if medal_data:
+                        guard_level = medal_data.get('guard_level')
             #     #获取用户详情
             # user_detail = await self.load_user_info(sender_uid)
 
@@ -271,7 +274,7 @@ class AsyncMessageGenerator:
                 self._reply_tasks.add(task)
                 task.add_done_callback(self._reply_tasks.discard)
         except Exception as e:
-            logger.error(f"解析弹幕数据出错: {e}")
+            logger.error(f"解析弹幕数据出错: {e}",exc_info=True)
 
     async def _parse_datetime_str_(self,timestamp) -> str:
         if timestamp > 10 ** 10:  # 判断是否为毫秒（大于10位数）
@@ -416,7 +419,7 @@ class AsyncMessageGenerator:
                 logger.info(f"机器人未启用: robot={self.robot}, enabled={self.robot.enabled if self.robot else None}")
 
         except Exception as e:
-            logger.error(f"解析礼物数据出错: {e}")
+            logger.error(f"解析礼物数据出错: {e}",exc_info=True)
 
     async def on_buy_guard(self, event):
         """上舰事件回调"""
@@ -539,7 +542,7 @@ class AsyncMessageGenerator:
                 task.add_done_callback(self._reply_tasks.discard)
 
         except Exception as e:
-            logger.error(f"解析上舰数据出错: {e}")
+            logger.error(f"解析上舰数据出错: {e}",exc_info=True)
 
     async def on_super_chat(self, event):
         """超级聊天（醒目留言）事件回调"""
@@ -620,7 +623,7 @@ class AsyncMessageGenerator:
                 task.add_done_callback(self._reply_tasks.discard)
 
         except Exception as e:
-            logger.error(f"解析醒目留言数据出错: {e}")
+            logger.error(f"解析醒目留言数据出错: {e}",exc_info=True)
 
 
     async def on_user_video_link(self, event):
@@ -630,7 +633,7 @@ class AsyncMessageGenerator:
             logger.debug(f"*************视频连线：{event}")
             
         except Exception as e:
-            logger.error(f"解析醒目留言数据出错: {e}")
+            logger.error(f"解析醒目留言数据出错: {e}",exc_info=True)
 
     async def on_user_enter_v2(self, event):
         """(新版)进入直播间事件回调"""
@@ -692,7 +695,7 @@ class AsyncMessageGenerator:
                     # 放入消息队列，由消费者推送到前端
                     self.message_queue.put(video_command)
         except Exception as e:
-            logger.error(f"解析进入事件数据出错: {e}")
+            logger.error(f"解析进入事件数据出错: {e}",exc_info=True)
 
     async def on_user_enter(self, event):
         """(新版)进入直播间事件回调"""
@@ -793,7 +796,7 @@ class AsyncMessageGenerator:
                 task.add_done_callback(self._reply_tasks.discard)
 
         except Exception as e:
-            logger.error(f"解析进入事件数据出错: {e}")
+            logger.error(f"解析进入事件数据出错: {e}",exc_info=True)
 
 
     async def _robot_reply_wrapper(self, event_type: str, data: dict):
@@ -824,8 +827,3 @@ class AsyncMessageGenerator:
         except Exception as e:
             self.app.logger.error(f"机器人回复错误: {e}", exc_info=True)
 
-    async def load_user_info(self,user_id):
-        user_obj = user.User(user_id,self.credential)
-        user_info = await user_obj.get_user_info()
-        print(user_info)
-        return user_info

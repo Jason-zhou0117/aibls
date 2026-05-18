@@ -50,7 +50,7 @@ class SendGiftService:
             return True, f"已添加投喂日志 {send_gift_data.id} "
         except Exception as e:
             db.session.rollback()
-            logger.error(f"更换默认房间时出错：{e}")
+            logger.error(f"更换默认房间时出错：{e}",exc_info=True)
             return False, str(e)
 
 send_gift_service = SendGiftService()

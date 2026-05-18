@@ -128,7 +128,7 @@ class LogoffService:
             db.session.commit()
             return logoff.to_dict(), None
         except Exception as e:
-            logger.error(f"添加视频失败: {e}")
+            logger.error(f"添加视频失败: {e}",exc_info=True)
             db.session.rollback()
             return None, str(e)
 
