@@ -222,9 +222,11 @@ class DanmuRobot:
         """获取最近10条上下文"""
         return list(self.recent_messages)[-15:]
 
-    def _should_reply_by_probability(self, text: str, guard_level: int = 0, fans_level: int = 0) -> float:
+    def _should_reply_by_probability(self, text: str, guard_level: int = 0, fans_level: int = 0,honor_level:int = 0) -> float:
         """根据弹幕内容和用户身份返回回复概率"""
         if guard_level >= 1:
+            return 1.0
+        if honor_level >= 50:
             return 1.0
         if fans_level > 20:
             return 0.9
@@ -321,6 +323,7 @@ class DanmuRobot:
         is_at_bot = danmu_data.get("is_at_bot", False)
         guard_level = danmu_data.get("guard_level", 0)
         fans_level = danmu_data.get("medal_level", 0)
+        honor_level = danmu_data.get("honor_level", 0)
 
         #如果没有消息，则直接返回
         if not text:
@@ -374,7 +377,7 @@ class DanmuRobot:
         # 概率判断，如果是@机器人，则必须执行，否则进行概率判断。
         #舰长及以上，必须回复；
         #
-        prob = 1.0 if is_at_bot else self._should_reply_by_probability(text, guard_level, fans_level)
+        prob = 1.0 if is_at_bot else self._should_reply_by_probability(text, guard_level, fans_level,honor_level)
         if random.random() > prob:
             return None
 

@@ -239,6 +239,7 @@ class BoxStatService:
 
             if scope == "user":
                 query = query.filter(SendGiftDetail.sender_uid == sender_uid)
+                query = query.filter(SendGiftDetail.room_id == room_id)
             else:
                 query = query.filter(SendGiftDetail.room_id == room_id)
 
