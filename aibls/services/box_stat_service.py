@@ -137,6 +137,13 @@ class BoxStatService:
         if "我的盲盒" in remaining_text:
             remaining_text = remaining_text.replace("我的盲盒", "本月盲盒")
 
+        if "播间盲盒" in remaining_text:
+            remaining_text = remaining_text.replace("播间盲盒", "播间本月盲盒")
+        elif "房间盲盒" in remaining_text:
+            remaining_text = remaining_text.replace("房间盲盒", "房间本月盲盒")
+        elif "直播间盲盒" in remaining_text:
+            remaining_text = remaining_text.replace("直播间盲盒", "直播间本月盲盒")
+
         # 解析时间和盲盒名称
         time_range = None
         box_name = extracted_box_name  # 使用前面提取的盲盒名称
