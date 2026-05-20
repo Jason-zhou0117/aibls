@@ -16,7 +16,7 @@ class BoxStatService:
     TIME_KEYWORDS = ["今日", "今天", "昨日", "昨天", "前日", "前天", "本月", "上月"]
 
     # 房间前缀词
-    ROOM_PREFIXES = ["播间", "本播间", "房间"]
+    ROOM_PREFIXES = ["播间", "本播间", "房间", "直播间"]
 
     def __init__(self):
         self.logger = None
@@ -140,9 +140,9 @@ class BoxStatService:
         if "播间盲盒" in remaining_text:
             remaining_text = remaining_text.replace("播间盲盒", "播间本月盲盒")
         elif "房间盲盒" in remaining_text:
-            remaining_text = remaining_text.replace("房间盲盒", "房间本月盲盒")
+            remaining_text = remaining_text.replace("房间盲盒", "播间本月盲盒")
         elif "直播间盲盒" in remaining_text:
-            remaining_text = remaining_text.replace("直播间盲盒", "直播间本月盲盒")
+            remaining_text = remaining_text.replace("直播间盲盒", "播间本月盲盒")
 
         # 解析时间和盲盒名称
         time_range = None
